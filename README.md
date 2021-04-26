@@ -12,7 +12,7 @@ repository for Piano 2.0 MVP v1
 #### targets
 
 ##### hardware targets
-- [ ] setup MIDI input with laptop
+- [\] setup MIDI input with laptop
 - [ ] see how input data looks like
 - [ ] \(Optional) set output in a target file destination
 - [ ] allow user to press key
