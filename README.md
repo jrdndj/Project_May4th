@@ -12,17 +12,17 @@ repository for Piano 2.0 MVP v1
 #### targets
 
 ##### hardware targets
-- [\] setup MIDI input with laptop
+- [x] setup MIDI input with laptop
 - [ ] see how input data looks like
 - [ ] \(Optional) set output in a target file destination
 - [ ] allow user to press key
 - [ ] identify which key is pressed (return keybinding) 
 
 ##### software targets 
-- [ ] setup unity environment for the piano roll engine
+- [x] setup unity environment for the piano roll engine
 - [ ] setup music xml with visual interface
 - [ ] connect music xml to unity engine
-- [ ] configure musicxml to generate viz
+- [x] configure musicxml to generate viz
 - [ ] stream songs from musicxml to unity engine
 - [ ] check consistency and correctness of samplesongs
 - [ ] design scalable SOLID facade for adaptation engine
