@@ -20,8 +20,8 @@ repository for Piano 2.0 MVP v1
 
 ##### software targets 
 - [x] setup unity environment for the piano roll engine
-- [ ] setup music xml with visual interface
-- [ ] connect music xml to unity engine
+- [x] setup music xml with visual interface
+- [x] connect music xml to unity engine
 - [x] configure musicxml to generate viz
 - [ ] stream songs from musicxml to unity engine
 - [ ] check consistency and correctness of samplesongs
