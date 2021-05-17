@@ -29,5 +29,13 @@ repository for Piano 2.0 MVP v1
 
 ##### integration targets
 
+###### some notes from @wilmol
+
+How to convert midi file into json string?
+Looking at MidiFileSequencer:
+We used a 3rd party library (DryWetMidi) which turns a midi file into List<Note> (See method: public void LoadMidiFile(string file))
+Then we create NoteDuration objects from each note. (See method: private void SpawnNotesDropDown(List<Note> notes))
+Then use another 3rd party library (JsonDotNet) to save the JSON from List<NoteDuration> This works because NoteDuration is serialisable with [DataContract], (see the bottom of that file).
+
 ###### @jrdndj
 
