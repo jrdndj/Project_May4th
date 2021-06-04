@@ -23,8 +23,8 @@ repository for Piano 2.0 MVP v1
 - [x] setup music xml with visual interface
 - [x] connect music xml to unity engine
 - [x] configure musicxml to generate viz
-- [ ] stream songs from musicxml to unity engine
-- [ ] check consistency and correctness of samplesongs
+- [x] stream songs from musicxml to unity engine
+- [x] check consistency and correctness of samplesongs
 - [ ] design scalable SOLID facade for adaptation engine
 
 ##### integration targets
