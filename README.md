@@ -13,10 +13,10 @@ repository for Piano 2.0 MVP v1
 
 ##### hardware targets
 - [x] setup MIDI input with laptop
-- [ ] see how input data looks like
+- [x] see how input data looks like
 - [ ] \(Optional) set output in a target file destination
 - [ ] allow user to press key
-- [ ] identify which key is pressed (return keybinding) 
+- [x] identify which key is pressed (return keybinding) 
 
 ##### software targets 
 - [x] setup unity environment for the piano roll engine
