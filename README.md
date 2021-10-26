@@ -37,9 +37,10 @@ target completion of MVP 13/11/2021
 - [x] connect music xml to unity engine
 - [ ] configure musicxml to generate viz
 - [ ] stream songs from musicxml to unity engine
+- [x] followed the steps from https://answers.unity.com/questions/1434686/how-to-integrate-drywetmidi-net-46-library-in-unit.html 
 - [x] check consistency and correctness of samplesongs
 - [x] design scalable SOLID facade for adaptation engine
-- [ ] file browser integration for song selection
+- [x] file browser integration for song selection
 - [x] skeletal menu from home to practice song
 - [x] logging of keypresss
 - [x] acquiring temporal information from the midi
