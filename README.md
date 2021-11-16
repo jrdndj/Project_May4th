@@ -9,9 +9,9 @@ repository for Piano 2.0 MVP v1
 
 #### software details ===
 
-#### latest updates as of 22/10/2021
+#### latest updates as of 16/11/2021
 
-target completion of MVP 13/11/2021
+target completion of MVP ~~13/11/2021~~ 30/11/2021
 
 
 #### targets for an minimum viable product (MVP) 
@@ -31,7 +31,7 @@ target completion of MVP 13/11/2021
 
 ##### software targets 
 - [x] setup unity environment for the piano roll engine
-- [ ] setup keybindings in unity
+- [x] setup keybindings in unity
 - [x] setup new input system in unity
 - [ ] setup music xml with visual interface
 - [x] connect music xml to unity engine
@@ -45,6 +45,10 @@ target completion of MVP 13/11/2021
 - [x] logging of keypresss
 - [x] acquiring temporal information from the midi
 - [ ] synthesize sounds for C2 to B3 and C4 to C7. include sharp/flat keys 
+- [ ] MIDIFileSequencer (to convert .mid into List<Node> which can be used by LoadMIDIFile.cs)
+- [ ] NoteDurationObject for use of SpawnNotesDropDown 
+- [ ] integrate DryWetMidi
+- [x] port to v 2017.4.8.f1 
 
 ##### integration targets
 - [ ] setup external speakers to play synthesized sound
@@ -62,11 +66,11 @@ Then use another 3rd party library (JsonDotNet) to save the JSON from List<NoteD
 
  
 #### revised schedule ===
-- [ ] MVP ready for initial spatiotemporal data collection 13/11/2021
-- [ ] spatiotemporal data collection until 13/12/2021
+- [ ] MVP ready for initial spatiotemporal data collection ~~13/11/2021~~ 30/11/2021
+- [ ] spatiotemporal data collection until ~~13/12/2021~~ 23/12/2021
 - [ ] data cleaning and analysis
 - [ ] regression modeling
-- [ ] UIST paper 13/01/2021
+- [ ] UIST paper ~~13/01/2021~~ 23/01/2021
   
 ###### @jrdndj
 
