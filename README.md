@@ -39,8 +39,8 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] setup unity environment for the piano roll engine
 - [x] setup keybindings in unity
 - [x] setup new input system in unity
-- [ ] parse midi into musicxml and load them in unity environment (at least one midi file)
-- [ ] convert musicxml generated into piano roll sequence 
+- [x] parse midi into chord information and load them in unity environment (at least one midi file) 14.07.2022
+- [ ] convert chord information generated into piano roll sequence 
 - [ ] setup virtual piano environment (keys, finger colors, aspect ratio)
 - [ ] overlay piano roll sequence onto virtual piano environment
 - [ ] synthesize sound (using FMOD perhaps?) 
