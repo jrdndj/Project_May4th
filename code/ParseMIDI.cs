@@ -10,6 +10,9 @@ using Melanchall.DryWetMidi.Interaction; //to get song info
 
 public class ParseMIDI : MonoBehaviour
 {
+    public GameObject prefab;
+    //putting this here cos it should be here (for spawning the key)
+
     /*
     * we need the following method if we will rewrite the midi - 
     * especially on the improv part
@@ -105,7 +108,11 @@ public class ParseMIDI : MonoBehaviour
 
     private void SpawnKey(string ChordName, long YScale)
     {
+
+        //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html 
+        Instantiate(prefab, new Vector3(YScale, 0, 0));
         Debug.Log("Chord name is " + ChordName + " and its length is " + YScale );
+
     }
 
 
