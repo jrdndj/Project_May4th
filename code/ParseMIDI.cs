@@ -10,8 +10,10 @@ using Melanchall.DryWetMidi.Interaction; //to get song info
 
 public class ParseMIDI : MonoBehaviour
 {
-    public GameObject prefab;
-    //putting this here cos it should be here (for spawning the key)
+
+    //spawnkey related variables
+    public GameObject Spawn_prefab; //dont forget to drag the prefab to the script in the unity interface
+    //public float speed; //this is the speed of the movement of the note going down
 
     /*
     * we need the following method if we will rewrite the midi - 
@@ -100,18 +102,40 @@ public class ParseMIDI : MonoBehaviour
         //consider writing this into csv so we can compare later on with the timing of user keypress
 
         //pass actual values to spawnkey instead of chord info
-  
-
         SpawnKey(ChordName, YScale);
+        //spawnkey must be in update and not on star
 
     }
 
     private void SpawnKey(string ChordName, long YScale)
     {
 
-        //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html 
-        Instantiate(prefab, new Vector3(YScale, 0, 0));
+        //test values: Chord C2 C3 chord length 480
+        // c2: x: -541.5     y: -149      z: 0
+        // green line:  x: 0    y: -80     z: 0 
+        //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html
+        //need to pass the note to prefab 
+       GameObject Note = GameObject.Instantiate(Spawn_prefab, new Vector3(-331.5f, -149.0f, 0), Quaternion.identity);
+        //GameObject note = GameObject.Instantiate(Spawn_prefab, Spawn_prefab.transform.position + new Vector3(0, Time.fixedDeltaTime, 0), Quaternion.Euler(0, 0, 0));
+
         Debug.Log("Chord name is " + ChordName + " and its length is " + YScale );
+
+        //this code is from Melody.CS
+       // for (int i = 0; i < melodyNotes.Length; i++)
+      //  {
+            //update this code later to contain the list of chords extracted 
+          //  GameObject keyRef = GameObject.Find(melodyNotes[i]);
+
+            //update this to contain the x and y from chord info 
+          //  GameObject note = GameObject.Instantiate(note_prefab, keyRef.transform.position + new Vector3(0, 500 + cumulativeTime * partitureSpeed, 0), Quaternion.Euler(0, 0, 0));
+            //melody notes here is processed as an array and is called in the loop 
+          //  note.GetComponent<Note>()._name = melodyNotes[i];
+          //  note.transform.SetParent(canv.transform);
+
+            //set new time for the notes
+         //   cumulativeTime += (float)melodyDuration[i];
+            //Debug.Log(cumulativeTime);
+      //  }
 
     }
 
@@ -127,8 +151,12 @@ public class ParseMIDI : MonoBehaviour
     }
 
     // Update is called once per frame
+    //this is where we put the code to update the position of the spawned keys
+    //from Note.cs
     void Update()
     {
-
+        //got this code from Note.cs
+        //fixedupdate moves the notes from top to bottom given a speed variable defined in **speed**
+       Spawn_prefab.transform.position -= new Vector3(0, 5f*Time.deltaTime, 0); //set to 5f for now
     }
 }
