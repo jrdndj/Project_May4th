@@ -41,13 +41,6 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] setup new input system in unity
 - [x] parse midi into chord information and load them in unity environment (at least one midi file) 14.07.2022
 - [x] convert chord information unity applicable assets and information (yscale, location, etc)
-- [x] spawn a key from this chord information
-- [ ] generate co-routines to time multiple spawns
-- [ ] generate co-routines for spawn movement (transform position)
-- [ ] generate data structures (list) to store piano key coordinates
-- [ ] test for timing and accuracy 
-- [ ] integrate with piano midi input
-- [ ] destroy object upon click
 - [x] setup virtual piano environment (keys, finger colors, aspect ratio)
 - [ ] calibrate virtual piano environment with the existing setup
 - [ ] overlay piano roll sequence onto virtual piano environment
@@ -57,7 +50,21 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] logging of spatiotemporal data 
 - [ ] export spatio temporal data with musicxml into csv 
 
+###### single chord
+- [x] spawn a key from this chord information
+- [x] move piano roll key
+- [x] destroy upon collision with green line
+- [ ] test for timing and accuracy 
+- [ ] integrate with piano midi input
+- [ ] destroy object upon click
 
+###### multiple chords
+- [ ] generate co-routines to time multiple spawns
+- [ ] generate co-routines for spawn movement (transform position)
+- [ ] generate data structures (list) to store piano key coordinates
+- [ ] test for timing and accuracy 
+- [ ] integrate with piano midi input
+- [ ] destroy object upon click
 
 ##### some other tasks due to restructuring
 - [ ] ~~setup music xml with visual interface~~

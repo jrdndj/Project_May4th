@@ -13,6 +13,7 @@ public class ParseMIDI : MonoBehaviour
 
     //spawnkey related variables
     public GameObject Spawn_prefab; //dont forget to drag the prefab to the script in the unity interface
+    public GameObject Note; 
     //public float speed; //this is the speed of the movement of the note going down
 
     /*
@@ -115,7 +116,7 @@ public class ParseMIDI : MonoBehaviour
         // green line:  x: 0    y: -80     z: 0 
         //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html
         //need to pass the note to prefab 
-       GameObject Note = GameObject.Instantiate(Spawn_prefab, new Vector3(-331.5f, -149.0f, 0), Quaternion.identity);
+        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(0, -149.0f, 0), Quaternion.identity);
         //GameObject note = GameObject.Instantiate(Spawn_prefab, Spawn_prefab.transform.position + new Vector3(0, Time.fixedDeltaTime, 0), Quaternion.Euler(0, 0, 0));
 
         Debug.Log("Chord name is " + ChordName + " and its length is " + YScale );
@@ -139,11 +140,6 @@ public class ParseMIDI : MonoBehaviour
 
     }
 
-
-    /*
-     * unit default methods ignore them for now
-     */
-
     // Start is called before the first frame update
     void Start()
     {
@@ -152,11 +148,16 @@ public class ParseMIDI : MonoBehaviour
 
     // Update is called once per frame
     //this is where we put the code to update the position of the spawned keys
-    //from Note.cs
     void Update()
     {
-        //got this code from Note.cs
         //fixedupdate moves the notes from top to bottom given a speed variable defined in **speed**
-       Spawn_prefab.transform.position -= new Vector3(0, 5f*Time.deltaTime, 0); //set to 5f for now
+        if(Note.transform.position.y <= -690) // -780 divide by length of object 180 
+        {
+            Destroy(Note);
+            Debug.Log("Object destroyed");
+        }
+        else Note.transform.position -= new Vector3(0, 50f * Time.deltaTime, 0); //set to 5f for now
+        
     }
 }
+ 
