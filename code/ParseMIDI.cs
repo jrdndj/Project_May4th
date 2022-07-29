@@ -13,7 +13,13 @@ public class ParseMIDI : MonoBehaviour
 
     //spawnkey related variables
     public GameObject Spawn_prefab; //dont forget to drag the prefab to the script in the unity interface
-    public GameObject Note; 
+    public GameObject Note;
+
+
+    //stores the index of the piano keys for GetChildPosition.x
+    float[] XCoords = new float[69]; 
+    // e. g. c2 is 3, greenline is 68, 0 based index
+  
     //public float speed; //this is the speed of the movement of the note going down
 
     /*
@@ -108,15 +114,31 @@ public class ParseMIDI : MonoBehaviour
 
     }
 
+    //get their XCoords and store them in the array for easy access
+    void GetXCoordinates()
+    {
+        for (int ctr = 0, ctr2 = 3; ctr < 68 && ctr2 <=63; ctr++, ctr2++)
+        {
+            XCoords[ctr] = this.gameObject.transform.GetChild(ctr2).GetChild(1).position.x;
+            Debug.Log("Piano key is " + this.gameObject.transform.GetChild(ctr2) +
+                " its X coordinate is  " + XCoords[ctr]);
+        }
+    }
+    //what now jordan you need to map them 
+
     private void SpawnKey(string ChordName, long YScale)
     {
-
+        //gets the x coordinates
+        // c2 is 3, line is 1 for each note
+        var XCord = this.gameObject.transform.GetChild(3).GetChild(1).position.x;
+       //var XCord = XCoords[]
+    
         //test values: Chord C2 C3 chord length 480
         // c2: x: -541.5     y: -149      z: 0
         // green line:  x: 0    y: -80     z: 0 
         //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html
-        //need to pass the note to prefab 
-        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(0, -149.0f, 0), Quaternion.identity);
+        //need to pass the note to prefab
+        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, -149.0f, 0), Quaternion.identity);
         //GameObject note = GameObject.Instantiate(Spawn_prefab, Spawn_prefab.transform.position + new Vector3(0, Time.fixedDeltaTime, 0), Quaternion.Euler(0, 0, 0));
 
         Debug.Log("Chord name is " + ChordName + " and its length is " + YScale );
@@ -143,6 +165,7 @@ public class ParseMIDI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GetXCoordinates();
         ReadFile();
     }
 
@@ -150,14 +173,17 @@ public class ParseMIDI : MonoBehaviour
     //this is where we put the code to update the position of the spawned keys
     void Update()
     {
+        //green line is 68th element in piano prefab object
+        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
         //fixedupdate moves the notes from top to bottom given a speed variable defined in **speed**
-        if(Note.transform.position.y <= -690) // -780 divide by length of object 180 
+        //  if(Note.transform.position.y <= -690) // -780 minus half of length (180)
+        if (Note.transform.position.y <= YCordGreenLine)
         {
             Destroy(Note);
             Debug.Log("Object destroyed");
         }
         else Note.transform.position -= new Vector3(0, 50f * Time.deltaTime, 0); //set to 5f for now
-        
+       
     }
 }
  
