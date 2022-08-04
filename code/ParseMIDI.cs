@@ -115,6 +115,13 @@ public class ParseMIDI : MonoBehaviour
     }
 
     //get their XCoords and store them in the array for easy access
+    /*
+     * piano prefab has 69 objects
+     * we have 0 to 68 index
+     * white keys start from 2 (index) to 38 (index)
+     * black keys start from 39 to 63 (index)
+     * other elements 64 to 68
+     */
     void GetXCoordinates()
     {
         for (int ctr = 0, ctr2 = 3; ctr < 68 && ctr2 <=63; ctr++, ctr2++)
