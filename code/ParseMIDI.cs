@@ -15,12 +15,12 @@ public class ParseMIDI : MonoBehaviour
     public GameObject Spawn_prefab; //dont forget to drag the prefab to the script in the unity interface
     public GameObject Note;
 
-
     //stores the index of the piano keys for GetChildPosition.x
     float[] XCoords = new float[69]; 
     // e. g. c2 is 3, greenline is 68, 0 based index
   
-    //public float speed; //this is the speed of the movement of the note going down
+    //standard speed considering 100 bpm 
+    public float speed=100;
 
     /*
     * we need the following method if we will rewrite the midi - 
@@ -52,10 +52,8 @@ public class ParseMIDI : MonoBehaviour
         * the file from the unity simple file browser master
         * 
         */
-
         var midiFile = MidiFile.Read("Assets/MusicXML/Intermediate/Mozart - Sonata Facile 1st Movement.mid");
 
-        //commented for now since we dont 
         //to confirm file was read, we play a sound preview for now
        /* using (var outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth"))
         using (var playback = midiFile.GetPlayback(outputDevice))
@@ -83,7 +81,6 @@ public class ParseMIDI : MonoBehaviour
 
         // check this library for this solution
         //https://github.com/melanchall/drywetmidi/issues/17
-        //TempoMap tempoMap = midiFile.GetTempoMap();
         IEnumerable<Chord> chords = midiFile.GetChords();
 
     //you will find chord definitions here https://melanchall.github.io/drywetmidi/api/Melanchall.DryWetMidi.Interaction.Chord.html 
@@ -135,6 +132,7 @@ public class ParseMIDI : MonoBehaviour
 
     private void SpawnKey(string ChordName, long YScale)
     {
+        /* spawn key at ideal place */ 
         //gets the x coordinates
         // c2 is 3, line is 1 for each note
         var XCord = this.gameObject.transform.GetChild(3).GetChild(1).position.x;
@@ -143,10 +141,9 @@ public class ParseMIDI : MonoBehaviour
         //test values: Chord C2 C3 chord length 480
         // c2: x: -541.5     y: -149      z: 0
         // green line:  x: 0    y: -80     z: 0 
-        //reference from this site https://docs.unity3d.com/ScriptReference/Object.Instantiate.html
-        //need to pass the note to prefab
-        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, -149.0f, 0), Quaternion.identity);
-        //GameObject note = GameObject.Instantiate(Spawn_prefab, Spawn_prefab.transform.position + new Vector3(0, Time.fixedDeltaTime, 0), Quaternion.Euler(0, 0, 0));
+        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
+        /* key spawned must have the size based on its YScale value from ChordInfo */
+        Note.transform.localScale = new Vector3(30, YScale, 1);
 
         Debug.Log("Chord name is " + ChordName + " and its length is " + YScale );
 
@@ -182,14 +179,13 @@ public class ParseMIDI : MonoBehaviour
     {
         //green line is 68th element in piano prefab object
         var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-        //fixedupdate moves the notes from top to bottom given a speed variable defined in **speed**
-        //  if(Note.transform.position.y <= -690) // -780 minus half of length (180)
         if (Note.transform.position.y <= YCordGreenLine)
         {
             Destroy(Note);
             Debug.Log("Object destroyed");
         }
-        else Note.transform.position -= new Vector3(0, 50f * Time.deltaTime, 0); //set to 5f for now
+        else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
+       //this moves the piano roll down based on speed times deltatime
        
     }
 }

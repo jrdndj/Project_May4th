@@ -1,7 +1,7 @@
 # Project_May4th
 repository for Piano 2.0 MVP v1
 
-### MVP version ready by 12 Aug 2022
+### MVP version ready by 22 Aug 2022
 
 
 #### hardware details ===
