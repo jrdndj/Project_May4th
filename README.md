@@ -54,14 +54,14 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] spawn a key from this chord information
 - [x] move piano roll key
 - [x] destroy upon collision with green line
-- [ ] test for timing and accuracy 
+- [x] test for timing and accuracy 
 - [ ] integrate with piano midi input
 - [ ] destroy object upon click
 
 ###### multiple chords
-- [ ] generate co-routines to time multiple spawns
-- [ ] generate co-routines for spawn movement (transform position)
-- [ ] generate data structures (list) to store piano key coordinates
+- [ ] generate co-routines to time multiple spawns - **ONGOING**
+- [ ] generate co-routines for spawn movement (transform position) - **ONGOING**
+- [ ] generate data structures (list) to store piano key coordinates - **ONGOING**
 - [ ] test for timing and accuracy 
 - [ ] integrate with piano midi input
 - [ ] destroy object upon click
