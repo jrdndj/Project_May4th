@@ -59,9 +59,10 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] destroy object upon click
 
 ###### multiple chords
+- [ ] add timer - **ONGOING**
 - [ ] generate co-routines to time multiple spawns - **ONGOING**
 - [ ] generate co-routines for spawn movement (transform position) - **ONGOING**
-- [ ] generate data structures (list) to store piano key coordinates - **ONGOING**
+- [x] generate data structures (list) to store piano key coordinates
 - [ ] test for timing and accuracy 
 - [ ] integrate with piano midi input
 - [ ] destroy object upon click
@@ -79,9 +80,9 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] logging of keypresss
 - [x] acquiring temporal information from the midi
 - [ ] ~~synthesize sounds for C2 to B3 and C4 to C7. include sharp/flat keys~~ 
-- [ ] MIDIFileSequencer (to convert .mid into List<Node> which can be used by LoadMIDIFile.cs)
-- [ ] NoteDurationObject for use of SpawnNotesDropDown 
-- [ ] integrate DryWetMidi
+- [x] MIDIFileSequencer (to convert .mid into List<Node> which can be used by LoadMIDIFile.cs)
+- [x] NoteDurationObject for use of SpawnNotesDropDown 
+- [x] integrate DryWetMidi
 - [x] port to v 2017.4.8.f1 
 
 ##### integration targets
