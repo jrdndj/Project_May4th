@@ -42,6 +42,13 @@ public class ParseMIDI : MonoBehaviour
     private IEnumerator spawn;
     private IEnumerator move;
 
+    //spawn related variables
+    public int spawnNumber = 0;
+
+    GameObject[] bang = new GameObject[3000];
+
+
+
     /*
     * we need the following method if we will rewrite the midi - 
     * especially on the improv part
@@ -75,7 +82,7 @@ public class ParseMIDI : MonoBehaviour
             XCoords[ctr] = this.gameObject.transform.GetChild(ctr2).GetChild(1).position.x;
             //Debug.Log("Piano key is " + this.gameObject.transform.GetChild(ctr2) +
             //   " its X coordinate is  " + XCoords[ctr]);
-            Debug.Log("Piano key is " + KeyIndex[ctr] + " its X coordinate is  " + XCoords[ctr]);
+           // Debug.Log("Piano key is " + KeyIndex[ctr] + " its X coordinate is  " + XCoords[ctr]);
             /*so in principle
             KeyIndex[0] = C2
             XCoords[0] = x position of c2
@@ -138,7 +145,7 @@ public class ParseMIDI : MonoBehaviour
         int Ctr = 0;
         foreach (var row in notes.ToList())
         {
-            Debug.Log("Extracted count: " + Ctr + " chord: " + row + " chord time: " + row.Time + " chord endtime: " + row.EndTime + " chord length: " + row.Length);
+          //  Debug.Log("Extracted count: " + Ctr + " chord: " + row + " chord time: " + row.Time + " chord endtime: " + row.EndTime + " chord length: " + row.Length);
             //put in current stream
             NoteName = row.ToString();
             ShowUpTime = row.Time;
@@ -197,7 +204,7 @@ public class ParseMIDI : MonoBehaviour
                 if (string.Equals(InputNotes[Ctr], KeyIndex[Ctr2]))
                 {
                     index = Ctr2;
-                    Debug.Log("The index of " + InputNotes[Ctr] + " is " + XCoords[index]);
+                 //   Debug.Log("The index of " + InputNotes[Ctr] + " is " + XCoords[index]);
                     //store the completed value in InputXCoords
                     InputXCoords[Ctr] = XCoords[index];
                 }//endif
@@ -207,17 +214,24 @@ public class ParseMIDI : MonoBehaviour
 
     }//endGetKeyIndex
 
-    private IEnumerator SpawnKey()
+    private void SpawnKey(int Ctr)
     //private void SpawnKey(string NoteName, long YScale)
     {
-        while (true)
-        {
-            int songlength = InputNotes.Length;
-            for (int Ctr = 0; Ctr < songlength; Ctr++)
+     
+         Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
+         Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1);
+         Debug.Log(InputChordLength[Ctr] + " was spawned ");
+
+        //this is where the key moves down
+         var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+         if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
             {
-                Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
-                Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1);
-            }//endfor
+                Destroy(Note);
+                Debug.Log("Object destroyed");
+            }
+         else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
+                                                                                       //this moves the piano roll down based on speed times deltatime
+
 
             /* spawn key at ideal place */
             //gets the x coordinates
@@ -229,27 +243,32 @@ public class ParseMIDI : MonoBehaviour
             // green line:  x: 0    y: -80     z: 0 
             // Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
             /* key spawned must have the size based on its YScale value from ChordInfo */
-           // Note.transform.localScale = new Vector3(30, YScale, 1);
+            // Note.transform.localScale = new Vector3(30, YScale, 1);
 
             //Debug.Log("Chord name is " + NoteName + " and its length is " + YScale);
-            yield return null;
-        }//endofwhile
+          //  yield return null;
+     
     }//endspawnkey
 
-    private IEnumerator MoveKey()
+    private IEnumerator MoveKey(GameObject Note)
     {
-        while (true)
+       // while (true)
+       // {
+          //  green line is 68th element in piano prefab object
+             var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+        if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
         {
-            //green line is 68th element in piano prefab object
-            var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-            if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
-            {
-                Destroy(Note);
-                Debug.Log("Object destroyed");
-            }
-            else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
-                                                                                       //this moves the piano roll down based on speed times deltatime
-        }//endwhile
+            Destroy(Note);
+            Debug.Log("Object destroyed");
+        }
+        else
+        {
+            Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+            Debug.Log("Moving...");
+        }//set to 5f for now
+                                                                                           //this moves the piano roll down based on speed times deltatime
+      //  }//endwhile
+        yield return null;
     }
 
     // Start is called before the first frame update
@@ -267,17 +286,30 @@ public class ParseMIDI : MonoBehaviour
         GetKeyIndex();
         //mappings are correct and do not cause issue now
 
+        //set timer to zero here 
+
         //STEP 04: Spawn keys based on x positions based from key index
-        SpawnKey();
-        
+        // SpawnKey();
+
+      
+
     }
 
     // Update is called once per frame
     //this is where we put the code to update the position of the spawned keys
     void Update()
     {
-        spawn = SpawnKey();
-        StartCoroutine(spawn);
+     
+        if(spawnNumber < InputNotes.Length){
+            SpawnKey(spawnNumber);
+            spawnNumber++;
+        }
+
+        move = MoveKey(Note);
+        StartCoroutine(move);
+
+        //spawn = SpawnKey();
+        //StartCoroutine(spawn);
         // move = MoveKey();
         //StartCoroutine(move);
 
