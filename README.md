@@ -60,7 +60,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 
 ###### multiple chords
 - [ ] add timer - **ONGOING**
-- [ ] generate co-routines to time multiple spawns - **ONGOING**
+- [x] generate co-routines to time multiple spawns - 
 - [ ] generate co-routines for spawn movement (transform position) - **ONGOING**
 - [x] generate data structures (list) to store piano key coordinates
 - [ ] test for timing and accuracy 
