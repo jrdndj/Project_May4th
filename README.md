@@ -1,7 +1,7 @@
 # Project_May4th
 repository for Piano 2.0 MVP v1
 
-### MVP version ready by 22 Aug 2022
+### MVP version ready by ~22 Aug~ 17 Oct 2022
 
 
 #### hardware details ===
@@ -61,7 +61,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 ###### multiple chords
 - [ ] add timer - **ONGOING**
 - [x] generate co-routines to time multiple spawns - 
-- [ ] generate co-routines for spawn movement (transform position) - **ONGOING**
+- [x] generate co-routines for spawn movement (transform position) - 
 - [x] generate data structures (list) to store piano key coordinates
 - [ ] test for timing and accuracy 
 - [ ] integrate with piano midi input
