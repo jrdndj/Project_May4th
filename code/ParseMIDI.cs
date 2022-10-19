@@ -29,11 +29,11 @@ public class ParseMIDI : MonoBehaviour
     public int index;
     long YScale = 0; // this will be the length 
     string NoteName = null; //adding null fixes the problem
-    float ShowUpTime, EndTime;
+    string ShowUpTime, EndTime;
 
     //song input variables
     string[] InputNotes = new string[3000];
-    float[] InputShowUpTime = new float[3000];
+    string[] InputShowUpTime = new string[3000];
     long[] InputChordLength = new long[3000];
     float[] InputXCoords = new float[3000];
     //bool splitted = false;
@@ -48,14 +48,12 @@ public class ParseMIDI : MonoBehaviour
     public TimeSpan songTime;
     public float currentTime;
     public int startMinutes;
-    bool stopwatchActive = true; 
+    public TimeSpan start;
 
     //spawn related variables
     public int spawnNumber = 0;
 
     GameObject[] bang = new GameObject[3000];
-
-
 
     /*
     * we need the following method if we will rewrite the midi - 
@@ -153,6 +151,9 @@ public class ParseMIDI : MonoBehaviour
 
         //getting note info instead of chord info. 
         IEnumerable<Melanchall.DryWetMidi.Interaction.Note> notes = midiFile.GetNotes();
+
+        //add  tempomap to do time span conversions
+        TempoMap tempoMap = midiFile.GetTempoMap();
         //now lets check how the data looks like
         //Notes to Chords: look at me, I am boss now 
         int Ctr = 0;
@@ -161,15 +162,22 @@ public class ParseMIDI : MonoBehaviour
           //  Debug.Log("Extracted count: " + Ctr + " chord: " + row + " chord time: " + row.Time + " chord endtime: " + row.EndTime + " chord length: " + row.Length);
             //put in current stream
             NoteName = row.ToString();
-            ShowUpTime = row.Time; //we need to convert this to metric time
-            var showuptimeconverted = ShowUpTime / 1000000; 
-            Debug.Log(NoteName + " will show up on " + ShowUpTime + " and will last " + YScale);
-            EndTime = row.EndTime; //we also need to convert the endtime to seconds  
-            YScale = row.Length;
+            MetricTimeSpan metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(row.Time, tempoMap); //get rowtime from ticks to metrictime format
+            TimeSpan bufferTime = (TimeSpan)metricTime;
+            ShowUpTime = bufferTime.ToString(@"mm\:ss\:fff"); //store the string equivalent of it //removed @"hh\:mm\:ss" //should be in @"mm\:ss\:fff"
+
+            //recycle metricTime to convert EndTime this time 
+            metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(row.EndTime, tempoMap);
+            //recycle timespan
+            bufferTime = (TimeSpan)metricTime;
+            EndTime = bufferTime.ToString(@"mm\:ss\:fff"); //should be in @"mm\:ss\:fff"
+            YScale = row.Length; //you need to convert from ticks to metric length if we wanna know when
+            //but we need YScale for length for the prefab later on that's why
+            Debug.Log(NoteName + " will show up on " + ShowUpTime + " and will last " + YScale + " and will disappear on " + EndTime);
 
             //put all these values in the input stream 
             InputNotes[Ctr] = NoteName;
-            InputShowUpTime[Ctr] = showuptimeconverted;
+            InputShowUpTime[Ctr] = ShowUpTime;
             InputChordLength[Ctr] = YScale;
             Ctr++;
         }//endforeach
@@ -243,7 +251,7 @@ public class ParseMIDI : MonoBehaviour
         //uncomment these two to go back just in case
         //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
         //Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1);
-        Debug.Log(InputChordLength[Ctr] + " was spawned ");
+        Debug.Log(InputNotes[Ctr] + " was spawned ");
 
         //this is where the key moves down
          var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
@@ -310,7 +318,8 @@ public class ParseMIDI : MonoBehaviour
         //mappings are correct and do not cause issue now
 
         //set timer to zero here
-        currentTime = 0; //current time is stored in seconds, start at 00 
+        currentTime = 0; //current time is stored in seconds, start at 00
+        start = TimeSpan.Zero;
         startWatch = Time.time;
 
         //STEP 04: Spawn keys based on x positions based from key index
@@ -324,17 +333,19 @@ public class ParseMIDI : MonoBehaviour
     //this is where we put the code to update the position of the spawned keys
     void Update()
     {
+        
         for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
+            //timespan should be here 
             TimeSpan time = TimeSpan.FromSeconds(currentTime);
-            if (stopwatchActive == true ){ //starts the timer basically 
-                currentTime = currentTime + Time.deltaTime;
-                Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
-                Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
-                if (currentTime == InputShowUpTime[threadCtr])
-                {
-                    SpawnKey(threadCtr);
-                }//this controls the spawning based on the timers
-            }//endif
+            //assume things can spawn at the start of time
+            if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr])==0){
+                SpawnKey(threadCtr);
+            }//endif 
+            currentTime += Time.deltaTime;
+            //Debug.Log("current time is " + currentTime.ToString(@"mm\:ss\:fff"));
+            Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
+            Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
+         
          }//for loop to time the spawning of keys
 
         //dont move for now just spawn at the right time 
