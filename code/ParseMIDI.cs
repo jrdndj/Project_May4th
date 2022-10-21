@@ -253,14 +253,17 @@ public class ParseMIDI : MonoBehaviour
         //Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1);
         Debug.Log(InputNotes[Ctr] + " was spawned ");
 
+        //simply move them after? 
+        MoveKey(Note); 
+
         //this is where the key moves down
-         var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-         if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
-            {
-                Destroy(Note);
-                Debug.Log("Object destroyed");
-            }
-         else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
+        // var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+         //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
+           // {
+             //   Destroy(Note);
+              //  Debug.Log("Object destroyed");
+            //}
+        // else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
                                                                                        //this moves the piano roll down based on speed times deltatime
 
 
@@ -283,10 +286,9 @@ public class ParseMIDI : MonoBehaviour
 
     private IEnumerator MoveKey(GameObject Note)
     {
-       // while (true)
-       // {
-          //  green line is 68th element in piano prefab object
-             var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+      
+        //  green line is 68th element in piano prefab object
+        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
         if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
         {
             Destroy(Note);
@@ -333,20 +335,50 @@ public class ParseMIDI : MonoBehaviour
     //this is where we put the code to update the position of the spawned keys
     void Update()
     {
+
+        //this checks how many has been spawned 
+        int nSpawned = InputNotes.Length;
         
-        for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
-            //timespan should be here 
-            TimeSpan time = TimeSpan.FromSeconds(currentTime);
-            //assume things can spawn at the start of time
-            if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr])==0){
-                SpawnKey(threadCtr);
-            }//endif 
-            currentTime += Time.deltaTime;
-            //Debug.Log("current time is " + currentTime.ToString(@"mm\:ss\:fff"));
+        //pop it like a stack
+        TimeSpan time = TimeSpan.FromSeconds(currentTime);
+        for (threadCtr = 0; threadCtr <= InputNotes.Length-nSpawned && nSpawned > 0 ; threadCtr++ ){
             Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
-            Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
+            if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr]) == 0){
+                Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
+                SpawnKey(threadCtr);
+                nSpawned--;
+                //decrement for each spawned key
+                //after spawn just move them
+                }//endif
+            Debug.Log("move to next character. current time: " + time.ToString(@"mm\:ss\:fff"));
+        }//endfor that scans through each of elements in the stream
+
+        //only increment to the next time when all keys on that time have been spawned
+        currentTime += Time.deltaTime;
+           
+   
+        //for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
+        //    //timespan should be here 
+        //    TimeSpan time = TimeSpan.FromSeconds(currentTime);
+        //    //assume things can spawn at the start of time
+        //    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr])==0){
+        //        SpawnKey(threadCtr);
+        //        //after spawn just move them 
+        //    }//endif
+        //    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr+1]) == 0)
+        //    {
+        //        SpawnKey(threadCtr+1);
+        //        //check the next n keys 
+        //    }//endif 
+
+
+        //    //delta time and threadctr should not move
+        //    currentTime += Time.deltaTime;
+        //    //Debug.Log("current time is " + currentTime.ToString(@"mm\:ss\:fff"));
+        //    Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
+        //    Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
          
-         }//for loop to time the spawning of keys
+        // }//for loop to time the spawning of keys
 
         //dont move for now just spawn at the right time 
         //move = MoveKey(Note);
