@@ -59,11 +59,11 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] destroy object upon click
 
 ###### multiple chords
-- [ ] add timer - **ONGOING**
+- [x] add timer - 
 - [x] generate co-routines to time multiple spawns - 
 - [x] generate co-routines for spawn movement (transform position) - 
 - [x] generate data structures (list) to store piano key coordinates
-- [ ] test for timing and accuracy 
+- [ ] test for timing and accuracy **ONGOING**
 - [ ] integrate with piano midi input
 - [ ] destroy object upon click
 
@@ -90,14 +90,6 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] run pilot user study 
 - [ ] measure projection board hind legs
 - [ ] acquire materials for projection board hind legs 
-
-###### some notes from @wilmol
-
-How to convert midi file into json string?
-Looking at MidiFileSequencer:
-We used a 3rd party library (DryWetMidi) which turns a midi file into List<Note> (See method: public void LoadMidiFile(string file))
-Then we create NoteDuration objects from each note. (See method: private void SpawnNotesDropDown(List<Note> notes))
-Then use another 3rd party library (JsonDotNet) to save the JSON from List<NoteDuration> This works because NoteDuration is serialisable with [DataContract], (see the bottom of that file).
 
  
 #### revised schedule ===
