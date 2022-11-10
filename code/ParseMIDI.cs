@@ -1,6 +1,6 @@
 ﻿using System; //for TimeSpan to work
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; //for lists to work 
 using System.Linq; //added for toList of chords
 using UnityEngine;
 //added this to consider drywetmidi libraries
@@ -38,6 +38,11 @@ public class ParseMIDI : MonoBehaviour
     float[] InputXCoords = new float[3000];
     //bool splitted = false;
 
+    //adding dictionary for the note elements
+    //string1 is Key-time, string2 is elt-indexs of InputNotes
+    Dictionary<string, List<string>> NoteTimes = new Dictionary<string, List<string>>();
+    
+
     //coroutine related variables
     private IEnumerator spawn;
     private IEnumerator move;
@@ -49,6 +54,18 @@ public class ParseMIDI : MonoBehaviour
     public float currentTime;
     public int startMinutes;
     public TimeSpan start;
+
+    
+    
+    public struct FetchList
+    {
+       public float TimePoint; //point of time where the keys spawn
+
+        //index to the note from input stream as element of a list
+       public List<Int32> NoteIndex; 
+    }//endstruct
+
+    FetchList[] fetch;
 
     //spawn related variables
     public int spawnNumber = 0;
@@ -179,6 +196,19 @@ public class ParseMIDI : MonoBehaviour
             InputNotes[Ctr] = NoteName;
             InputShowUpTime[Ctr] = ShowUpTime;
             InputChordLength[Ctr] = YScale;
+
+            //this portion of the code creates the hashmap of time and key pairs. 
+            List<string> list1 = new List<string>();
+            for (int i = 0; i< NoteTimes[ShowUpTime].Count; i++)
+            {
+                list1.Add(NoteTimes[ShowUpTime][i]);
+            }
+            list1.Add(NoteName);
+
+            NoteTimes.Add(ShowUpTime, list1);
+            //thanks nuwan
+
+
             Ctr++;
         }//endforeach
 
@@ -235,7 +265,7 @@ public class ParseMIDI : MonoBehaviour
            // Ctr++;
         }//endouterfor
 
-    }//endGetKeyIndex
+    }//endGetKeyIndex   
 
     private void SpawnKey(int Ctr)
     //private void SpawnKey(string NoteName, long YScale)
@@ -354,7 +384,8 @@ public class ParseMIDI : MonoBehaviour
         }//endfor that scans through each of elements in the stream
 
         //only increment to the next time when all keys on that time have been spawned
-        currentTime += Time.deltaTime;
+        currentTime += Time.deltaTime*0.01f; //multiply by 100
+        Debug.Log(">>> Current time is " + currentTime);
            
    
         //for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
