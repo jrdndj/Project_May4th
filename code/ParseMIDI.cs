@@ -1,6 +1,6 @@
 ﻿using System; //for TimeSpan to work
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; //for lists to work 
 using System.Linq; //added for toList of chords
 using UnityEngine;
 //added this to consider drywetmidi libraries
@@ -38,17 +38,32 @@ public class ParseMIDI : MonoBehaviour
     float[] InputXCoords = new float[3000];
     //bool splitted = false;
 
+    //adding dictionary for the note elements
+    //string1 is Key-time, string2 is elt-indexs of InputNotes
+    Dictionary<string, List<string>> NoteTimes = new Dictionary<string, List<string>>();
+    
     //coroutine related variables
     private IEnumerator spawn;
     private IEnumerator move;
 
     //thread timer related variables
     private float startWatch;
-    private int threadCtr = 0;
+    //private int threadCtr = 0;
     public TimeSpan songTime;
     public float currentTime;
     public int startMinutes;
     public TimeSpan start;
+    public int kCtr = 0; //used to track mapping with time and length
+
+
+    public struct FetchList
+    {
+       public float TimePoint; //point of time where the keys spawn
+       //index to the note from input stream as element of a list
+       public List<Int32> NoteIndex; 
+    }//endstruct
+
+    FetchList[] fetch;
 
     //spawn related variables
     public int spawnNumber = 0;
@@ -86,9 +101,6 @@ public class ParseMIDI : MonoBehaviour
             KeyIndex[ctr] = this.gameObject.transform.GetChild(ctr2).name;
             //store their value in XCords
             XCoords[ctr] = this.gameObject.transform.GetChild(ctr2).GetChild(1).position.x;
-            //Debug.Log("Piano key is " + this.gameObject.transform.GetChild(ctr2) +
-            //   " its X coordinate is  " + XCoords[ctr]);
-           // Debug.Log("Piano key is " + KeyIndex[ctr] + " its X coordinate is  " + XCoords[ctr]);
             /*so in principle
             KeyIndex[0] = C2
             XCoords[0] = x position of c2
@@ -138,14 +150,7 @@ public class ParseMIDI : MonoBehaviour
 
     }//end ReadFile
 
-    /*
-        now we need to parse it in musicXML so we can get features such as
-        pitch
-        timbre
-        tempo
-        dynamics
-        etc
-   */
+    //we get the elements such as note, chord showup time and length from Note 
     void GetSongInfo(MidiFile midiFile)
     {
 
@@ -161,7 +166,7 @@ public class ParseMIDI : MonoBehaviour
         {
           //  Debug.Log("Extracted count: " + Ctr + " chord: " + row + " chord time: " + row.Time + " chord endtime: " + row.EndTime + " chord length: " + row.Length);
             //put in current stream
-            NoteName = row.ToString();
+            NoteName = row.ToString();            
             MetricTimeSpan metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(row.Time, tempoMap); //get rowtime from ticks to metrictime format
             TimeSpan bufferTime = (TimeSpan)metricTime;
             ShowUpTime = bufferTime.ToString(@"mm\:ss\:fff"); //store the string equivalent of it //removed @"hh\:mm\:ss" //should be in @"mm\:ss\:fff"
@@ -173,14 +178,48 @@ public class ParseMIDI : MonoBehaviour
             EndTime = bufferTime.ToString(@"mm\:ss\:fff"); //should be in @"mm\:ss\:fff"
             YScale = row.Length; //you need to convert from ticks to metric length if we wanna know when
             //but we need YScale for length for the prefab later on that's why
-            Debug.Log(NoteName + " will show up on " + ShowUpTime + " and will last " + YScale + " and will disappear on " + EndTime);
+            //Debug.Log(NoteName + " will show up on " + ShowUpTime + " and will last " + YScale + " and will disappear on " + EndTime);
 
             //put all these values in the input stream 
             InputNotes[Ctr] = NoteName;
             InputShowUpTime[Ctr] = ShowUpTime;
             InputChordLength[Ctr] = YScale;
+            //Debug.Log(NoteName + " >> " + ShowUpTime + " >> " + YScale );
+
+            //this creates the hashmap of time and key pairs for spawning
+            List<string> list1 = new List<string>();
+            try
+            {
+                for (int i = 0; i < NoteTimes[ShowUpTime].Count; i++)
+                {
+                    list1.Add(NoteTimes[ShowUpTime][i]);
+                }
+                
+            }
+            catch(Exception e)
+            {
+                //Debug.Log("came here");
+                NoteTimes[ShowUpTime] = new List<string>();
+            }
+            list1.Add(NoteName);
+            //Debug.Log(list1);
+            NoteTimes[ShowUpTime] = list1;
+            //Debug.Log(NoteTimes);
+            //thanks nuwan
+
             Ctr++;
         }//endforeach
+
+        ////print contents of dictionary just to be sure
+        //foreach (var item in NoteTimes)
+        //{
+        //    //print the time key
+        //    Debug.Log(item.Key);
+        //    for (int i = 0; i < NoteTimes[item.Key].Count; i++)
+        //    {
+        //        Debug.Log(NoteTimes[item.Key][i]);
+        //    }
+        //}//foreachdictionary print
 
         // notes > chord 
         // check this library for this solution
@@ -188,31 +227,9 @@ public class ParseMIDI : MonoBehaviour
         // IEnumerable<Chord> chords = midiFile.GetChords();
 
         //you will find chord definitions here https://melanchall.github.io/drywetmidi/api/Melanchall.DryWetMidi.Interaction.Chord.html 
-        //  int Ctr = 0;
-        //foreach (var row in chords.ToList())
-        //{ 
-        //Debug.Log(" count: " + Ctr + " chord: " + row + " chord time: " + row.Time + " chord endtime: " + row.EndTime + " chord length: " + row.Length);
-        //  ChordName = row.ToString();
-        // ShowUpTime = row.Time;
-        //EndTime = row.EndTime;
-        //YScale = row.Length;
 
-        //put all these values in the input stream which
-        //InputChords[Ctr] = ChordName;
-        //InputShowUpTime[Ctr] = ShowUpTime;
-        //InputChordLength[Ctr] = YScale;
-        //Ctr++;
-        //}
-        //Debug.Log("Song size is " + Ctr++);
-        //consider writing this into csv so we can compare later on with the timing of user keypress
- 
-        //return (NoteName, YScale);
-     //   SpawnKey(NoteName, YScale);
-
-        //no need to pass since the arrays have been updated
     }//endgetsonginfo
 
-    //we set the index in KeyIndex array so know the position
     // in unity: Gs5, B5 etc
     // in midi file: "C2 C3" <- we need to split 
     void GetKeyIndex()
@@ -220,7 +237,8 @@ public class ParseMIDI : MonoBehaviour
         int Ctr = 0;
         int streamlength = InputNotes.Length;
 
-        for(Ctr = 0; Ctr < streamlength; Ctr++) 
+        //we set the index in KeyIndex array so know the position
+        for (Ctr = 0; Ctr < streamlength; Ctr++) 
         {
             for (int Ctr2 = 0; Ctr2 < 69; Ctr2++)
             {
@@ -231,22 +249,32 @@ public class ParseMIDI : MonoBehaviour
                     //store the completed value in InputXCoords
                     InputXCoords[Ctr] = XCoords[index];
                 }//endif
-            }//endfor
+            }//endinnerfor
            // Ctr++;
         }//endouterfor
+        Debug.Log("XCoords assigned and captured. ");
 
-    }//endGetKeyIndex
+    }//endGetKeyIndex   
 
-    private void SpawnKey(int Ctr)
+    //call the coroutine when the logic is satisfied (at time x)
+
+     
+   
+
+    public IEnumerator SpawnKey(int Ctr)
     //private void SpawnKey(string NoteName, long YScale)
     {
 
+       // Debug.Log("entered spawnkey");
         //test instantiate by child
         Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
-        Note.transform.SetParent(Note.transform); //set your parent
+        //Debug.Log("note instantiated");
+        //yield break;// return Note;
+
+       // Debug.Log("note yielded");
+        //Note.transform.SetParent(Note.transform); //set your parent
         //Note = Instantiate(Spawn_prefab); //instantiate as child
         Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1); //set length
-
 
         //uncomment these two to go back just in case
         //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
@@ -254,34 +282,49 @@ public class ParseMIDI : MonoBehaviour
         Debug.Log(InputNotes[Ctr] + " was spawned ");
 
         //simply move them after? 
-        MoveKey(Note); 
+        //MoveKey(Note);
+
+        ////temporarily moved movekey here to move stuff
+        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+        if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
+        {
+            Destroy(Note);
+            Debug.Log("Object destroyed");
+        }
+        else
+        {
+            Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+            Debug.Log("Moving...");
+        }//set to 5f for now
 
         //this is where the key moves down
         // var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-         //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
-           // {
-             //   Destroy(Note);
-              //  Debug.Log("Object destroyed");
-            //}
+        //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
+        // {
+        //   Destroy(Note);
+        //  Debug.Log("Object destroyed");
+        //}
         // else Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0); //set to 5f for now
-                                                                                       //this moves the piano roll down based on speed times deltatime
+        //this moves the piano roll down based on speed times deltatime
 
 
-            /* spawn key at ideal place */
-            //gets the x coordinates
-            // c2 is 3, line is 1 for each note
-            // var XCord = this.gameObject.transform.GetChild(3).GetChild(1).position.x;
-            //var XCord = XCoords[]
+        /* spawn key at ideal place */
+        //gets the x coordinates
+        // c2 is 3, line is 1 for each note
+        // var XCord = this.gameObject.transform.GetChild(3).GetChild(1).position.x;
+        //var XCord = XCoords[]
 
-            // c2: x: -541.5     y: -149      z: 0
-            // green line:  x: 0    y: -80     z: 0 
-            // Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
-            /* key spawned must have the size based on its YScale value from ChordInfo */
-            // Note.transform.localScale = new Vector3(30, YScale, 1);
+        // c2: x: -541.5     y: -149      z: 0
+        // green line:  x: 0    y: -80     z: 0 
+        // Note = GameObject.Instantiate(Spawn_prefab, new Vector3(XCord, 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
+        /* key spawned must have the size based on its YScale value from ChordInfo */
+        // Note.transform.localScale = new Vector3(30, YScale, 1);
 
-            //Debug.Log("Chord name is " + NoteName + " and its length is " + YScale);
-          //  yield return null;
-     
+        //Debug.Log("Chord name is " + NoteName + " and its length is " + YScale);
+        //yield break;
+        //yield return Note;
+        yield return null; 
+
     }//endspawnkey
 
     private IEnumerator MoveKey(GameObject Note)
@@ -307,7 +350,6 @@ public class ParseMIDI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         //STEP 01: get all xcoordinates relative to the piano object for easy loading
         GetXCoordinates();
 
@@ -320,14 +362,12 @@ public class ParseMIDI : MonoBehaviour
         //mappings are correct and do not cause issue now
 
         //set timer to zero here
-        currentTime = 0; //current time is stored in seconds, start at 00
+        currentTime = 0.000f; //current time is stored in seconds, start at 00
         start = TimeSpan.Zero;
         startWatch = Time.time;
 
         //STEP 04: Spawn keys based on x positions based from key index
-        // SpawnKey();
-
-      
+        // SpawnKey();      
 
     }
 
@@ -336,53 +376,88 @@ public class ParseMIDI : MonoBehaviour
     void Update()
     {
 
-        //this checks how many has been spawned 
-        int nSpawned = InputNotes.Length;
-        
-        //pop it like a stack
         TimeSpan time = TimeSpan.FromSeconds(currentTime);
-        for (threadCtr = 0; threadCtr <= InputNotes.Length-nSpawned && nSpawned > 0 ; threadCtr++ ){
-            Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
-            if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr]) == 0){
-                Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
-                SpawnKey(threadCtr);
-                nSpawned--;
-                //decrement for each spawned key
-                //after spawn just move them
-                }//endif
-            Debug.Log("move to next character. current time: " + time.ToString(@"mm\:ss\:fff"));
-        }//endfor that scans through each of elements in the stream
+        Debug.Log("XXXX " + time.ToString(@"mm\:ss\:fff"));
+        //timespan should have only 3 decimal places (truncate to 3) 
+        foreach (var item in NoteTimes)
+        {
+            //compare current time with NoteTimes[item.Key]
+            
+            if (String.Compare(time.ToString(@"mm\:ss\:fff"), item.Key) == 0)
+            {
+                Debug.Log("item.Key is " + item.Key + " and current time is " + time.ToString(@"mm\:ss\:fff"));
+                //iterate through the rest of the items in List<>
+                for (int nCtr = 0; nCtr < NoteTimes[item.Key].Count; nCtr++)
+                {
+                    //spawn here                   
+                    Debug.Log("Should spawn " + NoteTimes[item.Key][nCtr] + " at " + item.Key);
+                    StartCoroutine(SpawnKey(kCtr)); 
+                    kCtr++;                    
+                    }//enditerator
+             }//endifcomparison
+              //move time!
 
-        //only increment to the next time when all keys on that time have been spawned
-        currentTime += Time.deltaTime;
            
-   
-        //for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
-        //    //timespan should be here 
-        //    TimeSpan time = TimeSpan.FromSeconds(currentTime);
-        //    //assume things can spawn at the start of time
-        //    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr])==0){
-        //        SpawnKey(threadCtr);
-        //        //after spawn just move them 
-        //    }//endif
-        //    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr+1]) == 0)
-        //    {
-        //        SpawnKey(threadCtr+1);
-        //        //check the next n keys 
-        //    }//endif 
+        }//endforeach
+
+        //should be outside foreach
+        currentTime += (Time.deltaTime * 0.05f); //addded 0 cos it skips a lot
+       // currentTime += (Time.deltaTime * 0.051f)/2; //addded 0 cos it skips a lot
+        Debug.Log("current" + currentTime);
+        //Debug.Log("item.Key is " + item.Key + " and current time is " + time.ToString(@"mm\:ss\:fff"));
 
 
-        //    //delta time and threadctr should not move
-        //    currentTime += Time.deltaTime;
-        //    //Debug.Log("current time is " + currentTime.ToString(@"mm\:ss\:fff"));
+
+        //anything below this will be replaced by the new algorithm above
+
+        ////this checks how many has been spawned 
+        //int nSpawned = InputNotes.Length;
+
+        ////pop it like a stack
+        //TimeSpan time = TimeSpan.FromSeconds(currentTime);
+        //for (threadCtr = 0; threadCtr <= InputNotes.Length-nSpawned && nSpawned > 0 ; threadCtr++ ){
         //    Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
-        //    Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
-         
+        //    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr]) == 0){
+        //        Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
+        //        SpawnKey(threadCtr);
+        //        nSpawned--;
+        //        //decrement for each spawned key
+        //        //after spawn just move them
+        //        }//endif
+        //    Debug.Log("move to next character. current time: " + time.ToString(@"mm\:ss\:fff"));
+        //}//endfor that scans through each of elements in the stream
+
+        ////only increment to the next time when all keys on that time have been spawned
+        //currentTime += Time.deltaTime*0.01f; //multiply by 100
+        //Debug.Log(">>> Current time is " + currentTime);
+
+
+        ////for (threadCtr = 0; threadCtr<InputNotes.Length; threadCtr++) {
+        ////    //timespan should be here 
+        ////    TimeSpan time = TimeSpan.FromSeconds(currentTime);
+        ////    //assume things can spawn at the start of time
+        ////    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr])==0){
+        ////        SpawnKey(threadCtr);
+        ////        //after spawn just move them 
+        ////    }//endif
+        ////    if (String.Compare(time.ToString(@"mm\:ss\:fff"), InputShowUpTime[threadCtr+1]) == 0)
+        ////    {
+        ////        SpawnKey(threadCtr+1);
+        ////        //check the next n keys 
+        ////    }//endif 
+
+
+        ////    //delta time and threadctr should not move
+        ////    currentTime += Time.deltaTime;
+        ////    //Debug.Log("current time is " + currentTime.ToString(@"mm\:ss\:fff"));
+        ////    Debug.Log("current time is " + time.ToString(@"mm\:ss\:fff"));
+        ////    Debug.Log("InputShowUpTime of " + InputNotes[threadCtr] + " is " + InputShowUpTime[threadCtr]);
+
         // }//for loop to time the spawning of keys
 
         //dont move for now just spawn at the right time 
         //move = MoveKey(Note);
-       // StartCoroutine(move);
+        // StartCoroutine(move);
 
         //spawn = SpawnKey();
         //StartCoroutine(spawn);
