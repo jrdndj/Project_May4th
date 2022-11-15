@@ -23,7 +23,7 @@ public class ParseMIDI : MonoBehaviour
     // e. g. c2 is 3, greenline is 68, 0 based index
   
     //standard speed considering 150 bpm 
-    public float speed=150; 
+    public float speed=500; 
 
     //note related variables
     public int index;
@@ -54,6 +54,7 @@ public class ParseMIDI : MonoBehaviour
     public int startMinutes;
     public TimeSpan start;
     public int kCtr = 0; //used to track mapping with time and length
+    //float globalStartTime = 0, globalEndTime = 0;
 
 
     public struct FetchList
@@ -68,7 +69,7 @@ public class ParseMIDI : MonoBehaviour
     //spawn related variables
     public int spawnNumber = 0;
 
-    GameObject[] bang = new GameObject[3000];
+    //GameObject[] bang = new GameObject[3000];
 
     /*
     * we need the following method if we will rewrite the midi - 
@@ -257,24 +258,27 @@ public class ParseMIDI : MonoBehaviour
     }//endGetKeyIndex   
 
     //call the coroutine when the logic is satisfied (at time x)
-
-     
+       
    
 
     public IEnumerator SpawnKey(int Ctr)
     //private void SpawnKey(string NoteName, long YScale)
     {
+        GameObject Spawn; 
+        float keyStartTime = currentTime;
 
-       // Debug.Log("entered spawnkey");
+        //set spawn point
+        var YCordSpawnPoint = this.gameObject.transform.GetChild(69).position.y;
+        // Debug.Log("entered spawnkey");
         //test instantiate by child
-        Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
+        Spawn = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], YCordSpawnPoint+ InputChordLength[Ctr], 0), Quaternion.identity, Spawn_prefab.transform.parent);
         //Debug.Log("note instantiated");
         //yield break;// return Note;
 
-       // Debug.Log("note yielded");
+        // Debug.Log("note yielded");
         //Note.transform.SetParent(Note.transform); //set your parent
         //Note = Instantiate(Spawn_prefab); //instantiate as child
-        Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1); //set length
+        Spawn.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1); //set length
 
         //uncomment these two to go back just in case
         //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
@@ -284,18 +288,44 @@ public class ParseMIDI : MonoBehaviour
         //simply move them after? 
         //MoveKey(Note);
 
+
+        //Vector3 Ypos = gameObject.transform.GetChild(68).position;
+        ////Debug.Log("ks" + keyStartTime);
+        ////float keyEndTime=100;
+        ////  green line is 68th element in piano prefab object
+        //var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+
+        //if (Spawn.transform.position.y + (Spawn.transform.localScale.y / 2) <= YCordGreenLine)
+        //{
+        //    Destroy(Spawn);
+        //    Debug.Log("Object destroyed");
+        //}
+        //else
+        //{
+        //    Debug.Log("delta time " + Time.deltaTime);
+        //    //Note1.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+        //    //Note1.transform.position = Note1.transform.position - new Vector3(0, speed*Time.deltaTime, 0);
+        //    //Ypos.y = Mathf.Lerp(transform.position.y, Ypos.y, 0.2f);
+        //    Spawn.transform.position = new Vector3(Spawn.transform.position.x, Mathf.Lerp(transform.position.y, Ypos.y, 0.2f), Spawn.transform.position.z);
+
+        //    // Note1.transform.position.y = Vector3.Lerp(Note1.transform.position.y, this.gameObject.transform.GetChild(68).position, Time.deltaTime);
+        //    Debug.Log("transform position " + Spawn.transform.position.y);
+        //    Debug.Log("Moving...");
+        //}//set to 5f for now
+
         ////temporarily moved movekey here to move stuff
-        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-        if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
-        {
-            Destroy(Note);
-            Debug.Log("Object destroyed");
-        }
-        else
-        {
-            Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
-            Debug.Log("Moving...");
-        }//set to 5f for now
+        //var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+        //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
+        //{
+        //    Destroy(Note);
+        //    Debug.Log("Object destroyed");
+        //}
+        //else
+        //{
+        //    Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+        //    Debug.Log("Position is " + Note.transform.position);
+        //    Debug.Log("Moving...");
+        //}//set to 5f for now
 
         //this is where the key moves down
         // var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
@@ -323,28 +353,112 @@ public class ParseMIDI : MonoBehaviour
         //Debug.Log("Chord name is " + NoteName + " and its length is " + YScale);
         //yield break;
         //yield return Note;
-        yield return null; 
+        StartCoroutine(MoveKey(Spawn, keyStartTime));
+       // MoveKey(Spawn, keyStartTime);
+        yield return Spawn;
+        //Destroy(Spawn);
+        //Debug.Log("Object destroyed");
+
 
     }//endspawnkey
 
-    private IEnumerator MoveKey(GameObject Note)
+    private IEnumerator MoveKey(GameObject Note1, float keyStartTime)
+    //private void MoveKey(GameObject Note1, float keyStartTime)
     {
-      
-        //  green line is 68th element in piano prefab object
+
+        //this is the target position vector of the LERP
+        Vector3 Ypos = gameObject.transform.GetChild(68).position;
         var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-        if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
-        {
-            Destroy(Note);
-            Debug.Log("Object destroyed");
-        }
-        else
-        {
-            Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
-            Debug.Log("Moving...");
-        }//set to 5f for now
-                                                                                           //this moves the piano roll down based on speed times deltatime
-      //  }//endwhile
-        yield return null;
+        float time = 0.1f;
+
+        //this is the start position of the object 
+        Vector3 startPosition = Note1.transform.position;
+        //the target interpolation is the y position plus half of its size 
+        Vector3 targetPosition = new Vector3(Note1.transform.position.x, Ypos.y - (Note1.transform.localScale.y /2), Note1.transform.position.z);
+        while (Note1.transform.position.y + (Note1.transform.localScale.y / 2) >= YCordGreenLine)
+        //while (Note1.transform.position.y >= YCordGreenLine)
+            {
+            Note1.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
+           // Debug.Log("startposition" + startPosition);
+          //  Debug.Log("target" + targetPosition);
+            time += Time.deltaTime;
+            yield return null;            
+        }        
+        //Note1.transform.position = targetPosition;
+
+        //yield return null; 
+
+        //float keyEndTime=100;
+        //  green line is 68th element in piano prefab object
+        //var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
+
+        //if (Note1.transform.position.y + (Note1.transform.localScale.y / 2) <= YCordGreenLine)
+        //{
+        //    Destroy(Note1);
+        //    Debug.Log("Object destroyed");
+        //}
+        //else
+        //{
+        //    Debug.Log("delta time " + Time.deltaTime);
+        //    //Note1.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+        //    //Note1.transform.position = Note1.transform.position - new Vector3(0, speed*Time.deltaTime, 0);
+        //   //Ypos.y = Mathf.Lerp(transform.position.y, Ypos.y, 0.2f);
+        //    Note1.transform.position = new Vector3(Note1.transform.position.x, Mathf.Lerp(transform.position.y, Ypos.y, 0.2f), Note1.transform.position.z); 
+
+        //    // Note1.transform.position.y = Vector3.Lerp(Note1.transform.position.y, this.gameObject.transform.GetChild(68).position, Time.deltaTime);
+        //    Debug.Log("transform position " + Note1.transform.position.y);
+        //    Debug.Log("Moving...");    
+        //}//set to 5f for now
+
+
+
+
+        //for (float ks = keyStartTime; ks <= keyEndTime; ks+=3 ) // 150*.02
+        //{
+        //    Debug.Log("start time " + ks + "end time " + keyEndTime);
+        //    Debug.Log("initial y pos is" + Note1.transform.position.y);
+        //    if (Note1.transform.position.y + (Note1.transform.localScale.y / 2) >= YCordGreenLine)
+        //    {
+        //        //goes down
+        //        //Note1.transform.position = Note1.transform.position + new Vector3(0, -ks, 0);
+
+        //        Note1.transform.position = Vector3.Lerp(Note1.transform.position, this.gameObject.transform.GetChild(68).position, Time.deltaTime);
+        //        // Note1.transform.position.y = Note1.transform.position.y - ks;
+        //        Debug.Log("y is " + Note1.transform.position.y);
+        //        //Debug.Log("ks moving is " + ks);
+        //        //Debug.Log("Moving...");
+
+        //    }
+        //    else
+        //    {
+        //        keyEndTime = currentTime; 
+        //        //Destroy(Note1);
+        //        //Debug.Log("Object destroyed");
+        //    }
+        //}//endfor
+
+
+        //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
+        //{
+        //    Destroy(Note);
+        //    Debug.Log("Object destroyed");
+        //}
+        //else
+        //{
+        //    //continuously call thius 'timer' until object is destroyed
+        //    for (; keyStartTime <=  )
+        //    {
+        //        Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
+        //        Debug.Log("Moving...");
+
+        //    }//to 
+
+        //}//set to 5f for now
+        //this moves the piano roll down based on speed times deltatime
+        //  }//endwhile
+        //yield return null;
+        Destroy(Note1);
+        Debug.Log("Object destroyed");
     }
 
     // Start is called before the first frame update
@@ -375,23 +489,24 @@ public class ParseMIDI : MonoBehaviour
     //this is where we put the code to update the position of the spawned keys
     void Update()
     {
-
         TimeSpan time = TimeSpan.FromSeconds(currentTime);
-        Debug.Log("XXXX " + time.ToString(@"mm\:ss\:fff"));
+        //Debug.Log("XXXX " + time.ToString(@"mm\:ss\:fff"));
         //timespan should have only 3 decimal places (truncate to 3) 
         foreach (var item in NoteTimes)
         {
             //compare current time with NoteTimes[item.Key]
-            
             if (String.Compare(time.ToString(@"mm\:ss\:fff"), item.Key) == 0)
             {
-                Debug.Log("item.Key is " + item.Key + " and current time is " + time.ToString(@"mm\:ss\:fff"));
+                //Debug.Log("item.Key is " + item.Key + " and current time is " + time.ToString(@"mm\:ss\:fff"));
                 //iterate through the rest of the items in List<>
                 for (int nCtr = 0; nCtr < NoteTimes[item.Key].Count; nCtr++)
                 {
                     //spawn here                   
                     Debug.Log("Should spawn " + NoteTimes[item.Key][nCtr] + " at " + item.Key);
-                    StartCoroutine(SpawnKey(kCtr)); 
+                    StartCoroutine(SpawnKey(kCtr));
+                    
+                    //StartCoroutine(MoveKey(Spawn, keyStartTime));
+
                     kCtr++;                    
                     }//enditerator
              }//endifcomparison
@@ -401,12 +516,11 @@ public class ParseMIDI : MonoBehaviour
         }//endforeach
 
         //should be outside foreach
-        currentTime += (Time.deltaTime * 0.05f); //addded 0 cos it skips a lot
+        //currentTime += (Time.deltaTime * 0.05f); 
+        currentTime += Time.deltaTime;
        // currentTime += (Time.deltaTime * 0.051f)/2; //addded 0 cos it skips a lot
-        Debug.Log("current" + currentTime);
+        //Debug.Log("current" + currentTime);
         //Debug.Log("item.Key is " + item.Key + " and current time is " + time.ToString(@"mm\:ss\:fff"));
-
-
 
         //anything below this will be replaced by the new algorithm above
 

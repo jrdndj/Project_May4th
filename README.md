@@ -63,7 +63,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] generate co-routines to time multiple spawns - 
 - [x] generate co-routines for spawn movement (transform position) - 
 - [x] generate data structures (list) to store piano key coordinates
-- [ ] test for timing and accuracy **ONGOING**
+- [x] test for timing and accuracy 
 - [ ] integrate with piano midi input
 - [ ] destroy object upon click
 
