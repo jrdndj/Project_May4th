@@ -1,7 +1,7 @@
 # Project_May4th
 repository for Piano 2.0 MVP v1
 
-### MVP version ready by ~22 Aug~ I DONT EVEN KNOW ANYMORE 
+### MVP version ready by ~22 Aug~ ~I DONT EVEN KNOW ANYMORE~ AY WE HERE BRUH 
 
 
 #### hardware details ===
@@ -43,9 +43,9 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] convert chord information unity applicable assets and information (yscale, location, etc)
 - [x] setup virtual piano environment (keys, finger colors, aspect ratio)
 - [ ] calibrate virtual piano environment with the existing setup
-- [ ] overlay piano roll sequence onto virtual piano environment
-- [ ] synthesize sound (using FMOD perhaps?) 
-- [ ] tracking of keypress along with piano roll
+- [x] overlay piano roll sequence onto virtual piano environment
+- [x] synthesize sound - used garageband
+- [x] tracking of keypress along with piano roll
 - [ ] scoring 
 - [ ] logging of spatiotemporal data 
 - [ ] export spatio temporal data with musicxml into csv 
@@ -55,7 +55,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] move piano roll key
 - [x] destroy upon collision with green line
 - [x] test for timing and accuracy 
-- [ ] integrate with piano midi input
+- [x] integrate with piano midi input
 - [ ] destroy object upon click
 
 ###### multiple chords
@@ -64,7 +64,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] generate co-routines for spawn movement (transform position) - 
 - [x] generate data structures (list) to store piano key coordinates
 - [x] test for timing and accuracy 
-- [ ] integrate with piano midi input
+- [ ] ~~integrate with piano midi input~~
 - [ ] destroy object upon click
 
 ##### some other tasks due to restructuring
