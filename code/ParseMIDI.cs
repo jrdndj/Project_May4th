@@ -71,16 +71,6 @@ public class ParseMIDI : MonoBehaviour
 
     //GameObject[] bang = new GameObject[3000];
 
-    /*
-    * we need the following method if we will rewrite the midi - 
-    * especially on the improv part
-    * and the adaptive part
-    * 
-    */
-    // midiFile.Write("Assets/MusicXML/New/improvised00.mid");
-    //commented for now since this task is out of scope 130720222
-    //all newly written as in New folder for the improvised version per user
-
     //for issues we can revert to
     //https://github.com/melanchall/drywetmidi#getting-started 
 
@@ -126,6 +116,7 @@ public class ParseMIDI : MonoBehaviour
         * 
         */
         var midiFile = MidiFile.Read("Assets/MusicXML/Intermediate/Mozart - Sonata Facile 1st Movement.mid");
+        //var midiFile = MidiFile.Read("Assets/MusicXML/improv sample.mid");
 
         //to confirm file was read, we play a sound preview for now
         /* using (var outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth"))
@@ -136,7 +127,7 @@ public class ParseMIDI : MonoBehaviour
          }
         */
         //get MIDI duration to help us determine the timer
-     
+
         TimeSpan midiFileDuration = midiFile.GetDuration<MetricTimeSpan>();
         songTime = midiFileDuration;
         Debug.Log("Song duration is " + midiFileDuration); //prints the duration 
@@ -267,7 +258,7 @@ public class ParseMIDI : MonoBehaviour
         GameObject Spawn; 
         float keyStartTime = currentTime;
 
-        //set spawn point
+        //set spawn point - get the y coord of 69th element which is the green light
         var YCordSpawnPoint = this.gameObject.transform.GetChild(69).position.y;
         // Debug.Log("entered spawnkey");
         //test instantiate by child
@@ -278,7 +269,8 @@ public class ParseMIDI : MonoBehaviour
         // Debug.Log("note yielded");
         //Note.transform.SetParent(Note.transform); //set your parent
         //Note = Instantiate(Spawn_prefab); //instantiate as child
-        Spawn.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1); //set length
+        Spawn.transform.localScale = new Vector3(20, InputChordLength[Ctr], 1); //set length
+        //changed 20 from 30 to adjust to key size
 
         //uncomment these two to go back just in case
         //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
@@ -369,7 +361,8 @@ public class ParseMIDI : MonoBehaviour
         //this is the target position vector of the LERP
         Vector3 Ypos = gameObject.transform.GetChild(68).position;
         var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-        float time = 0.1f;
+       // float time = 0.01f;
+        float time = 0; 
 
         //this is the start position of the object 
         Vector3 startPosition = Note1.transform.position;
@@ -379,15 +372,17 @@ public class ParseMIDI : MonoBehaviour
         //while (Note1.transform.position.y >= YCordGreenLine)
             {
             Note1.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
-           // Debug.Log("startposition" + startPosition);
-          //  Debug.Log("target" + targetPosition);
+            // Debug.Log("startposition" + startPosition);
+            //  Debug.Log("target" + targetPosition);
             time += Time.deltaTime;
+            //original time
+
+           
+            //time = time * time * time * (time * (6f * time - 15f) + 10f);
             yield return null;            
         }        
         //Note1.transform.position = targetPosition;
-
         //yield return null; 
-
         //float keyEndTime=100;
         //  green line is 68th element in piano prefab object
         //var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
@@ -409,10 +404,6 @@ public class ParseMIDI : MonoBehaviour
         //    Debug.Log("transform position " + Note1.transform.position.y);
         //    Debug.Log("Moving...");    
         //}//set to 5f for now
-
-
-
-
         //for (float ks = keyStartTime; ks <= keyEndTime; ks+=3 ) // 150*.02
         //{
         //    Debug.Log("start time " + ks + "end time " + keyEndTime);
@@ -436,8 +427,6 @@ public class ParseMIDI : MonoBehaviour
         //        //Debug.Log("Object destroyed");
         //    }
         //}//endfor
-
-
         //if (Note.transform.position.y + (Note.transform.localScale.y / 2) <= YCordGreenLine)
         //{
         //    Destroy(Note);
@@ -450,9 +439,7 @@ public class ParseMIDI : MonoBehaviour
         //    {
         //        Note.transform.position -= new Vector3(0, speed * Time.deltaTime, 0);
         //        Debug.Log("Moving...");
-
         //    }//to 
-
         //}//set to 5f for now
         //this moves the piano roll down based on speed times deltatime
         //  }//endwhile
@@ -502,7 +489,7 @@ public class ParseMIDI : MonoBehaviour
                 for (int nCtr = 0; nCtr < NoteTimes[item.Key].Count; nCtr++)
                 {
                     //spawn here                   
-                    Debug.Log("Should spawn " + NoteTimes[item.Key][nCtr] + " at " + item.Key);
+                    //Debug.Log("Should spawn " + NoteTimes[item.Key][nCtr] + " at " + item.Key);
                     StartCoroutine(SpawnKey(kCtr));
                     
                     //StartCoroutine(MoveKey(Spawn, keyStartTime));
