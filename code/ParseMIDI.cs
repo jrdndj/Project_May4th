@@ -115,8 +115,11 @@ public class ParseMIDI : MonoBehaviour
         * the file from the unity simple file browser master
         * 
         */
-        var midiFile = MidiFile.Read("Assets/MusicXML/Intermediate/Mozart - Sonata Facile 1st Movement.mid");
+        //var midiFile = MidiFile.Read("Assets/MusicXML/Intermediate/Mozart - Sonata Facile 1st Movement.mid");
         //var midiFile = MidiFile.Read("Assets/MusicXML/improv sample.mid");
+
+        //contains folder of improv lickss
+        var midiFile = MidiFile.Read("Assets/MusicXML/ImprovLicks/Lick01.mid");
 
         //to confirm file was read, we play a sound preview for now
         /* using (var outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth"))
@@ -262,15 +265,16 @@ public class ParseMIDI : MonoBehaviour
         var YCordSpawnPoint = this.gameObject.transform.GetChild(69).position.y;
         // Debug.Log("entered spawnkey");
         //test instantiate by child
-        Spawn = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], YCordSpawnPoint+ InputChordLength[Ctr], 0), Quaternion.identity, Spawn_prefab.transform.parent);
+        Spawn = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], YCordSpawnPoint+InputChordLength[Ctr], 0), Quaternion.identity, Spawn_prefab.transform.parent);
         //Debug.Log("note instantiated");
         //yield break;// return Note;
 
         // Debug.Log("note yielded");
         //Note.transform.SetParent(Note.transform); //set your parent
         //Note = Instantiate(Spawn_prefab); //instantiate as child
-        Spawn.transform.localScale = new Vector3(20, InputChordLength[Ctr], 1); //set length
+        Spawn.transform.localScale = new Vector3(40, InputChordLength[Ctr], 1); //set length
         //changed 20 from 30 to adjust to key size
+        
 
         //uncomment these two to go back just in case
         //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
@@ -367,9 +371,9 @@ public class ParseMIDI : MonoBehaviour
         //this is the start position of the object 
         Vector3 startPosition = Note1.transform.position;
         //the target interpolation is the y position plus half of its size 
-        Vector3 targetPosition = new Vector3(Note1.transform.position.x, Ypos.y - (Note1.transform.localScale.y /2), Note1.transform.position.z);
-        while (Note1.transform.position.y + (Note1.transform.localScale.y / 2) >= YCordGreenLine)
-        //while (Note1.transform.position.y >= YCordGreenLine)
+        Vector3 targetPosition = new Vector3(Note1.transform.position.x, Ypos.y - (Note1.transform.localScale.y /2), -1);
+        while (Note1.transform.position.y + (Note1.transform.localScale.y / 2) > YCordGreenLine)
+        //changed rom >= to >. revert if it causes issues
             {
             Note1.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
             // Debug.Log("startposition" + startPosition);
