@@ -10,7 +10,7 @@ repository for Piano 2.0 MVP v1
 
 #### software details ===
 
-#### latest updates as of 12/07/2022
+#### latest updates as of ~~12/07/2022~~ 07.02.2023
 
 target completion of MVP 12/08/2022  ~~13/11/2021~~
 
@@ -42,7 +42,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] parse midi into chord information and load them in unity environment (at least one midi file) 14.07.2022
 - [x] convert chord information unity applicable assets and information (yscale, location, etc)
 - [x] setup virtual piano environment (keys, finger colors, aspect ratio)
-- [ ] calibrate virtual piano environment with the existing setup
+- [x] calibrate virtual piano environment with the existing setup
 - [x] overlay piano roll sequence onto virtual piano environment
 - [x] synthesize sound - used garageband
 - [x] tracking of keypress along with piano roll
@@ -56,7 +56,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] destroy upon collision with green line
 - [x] test for timing and accuracy 
 - [x] integrate with piano midi input
-- [ ] destroy object upon click
+- [x] destroy object upon click
 
 ###### multiple chords
 - [x] add timer - 
@@ -65,7 +65,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] generate data structures (list) to store piano key coordinates
 - [x] test for timing and accuracy 
 - [ ] ~~integrate with piano midi input~~
-- [ ] destroy object upon click
+- [x] destroy object upon click
 
 ##### some other tasks due to restructuring
 - [ ] ~~setup music xml with visual interface~~
@@ -88,7 +88,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 ##### integration targets
 - [ ] setup external speakers to play synthesized sound
 - [ ] run pilot user study 
-- [ ] measure projection board hind legs
+- [x] measure projection board hind legs
 - [ ] acquire materials for projection board hind legs 
 
  
