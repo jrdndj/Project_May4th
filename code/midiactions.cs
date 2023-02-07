@@ -25,14 +25,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
-                },
-                {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
-                    ""id"": ""bd895b08-98a8-4b40-912c-426fc9f83af4"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -706,17 +698,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
                     ""action"": ""MIDIEvents"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""6abfdd67-75c5-47da-ad0a-4732422e3c8e"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""New action"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1326,7 +1307,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_MIDIEvents = m_Player.FindAction("MIDIEvents", throwIfNotFound: true);
-        m_Player_Newaction = m_Player.FindAction("New action", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1389,13 +1369,11 @@ public class @Midiactions : IInputActionCollection, IDisposable
     private readonly InputActionMap m_Player;
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_MIDIEvents;
-    private readonly InputAction m_Player_Newaction;
     public struct PlayerActions
     {
         private @Midiactions m_Wrapper;
         public PlayerActions(@Midiactions wrapper) { m_Wrapper = wrapper; }
         public InputAction @MIDIEvents => m_Wrapper.m_Player_MIDIEvents;
-        public InputAction @Newaction => m_Wrapper.m_Player_Newaction;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1408,9 +1386,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
                 @MIDIEvents.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMIDIEvents;
                 @MIDIEvents.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMIDIEvents;
                 @MIDIEvents.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnMIDIEvents;
-                @Newaction.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNewaction;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -1418,9 +1393,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
                 @MIDIEvents.started += instance.OnMIDIEvents;
                 @MIDIEvents.performed += instance.OnMIDIEvents;
                 @MIDIEvents.canceled += instance.OnMIDIEvents;
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
             }
         }
     }
@@ -1578,7 +1550,6 @@ public class @Midiactions : IInputActionCollection, IDisposable
     public interface IPlayerActions
     {
         void OnMIDIEvents(InputAction.CallbackContext context);
-        void OnNewaction(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

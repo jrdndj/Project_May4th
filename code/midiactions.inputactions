@@ -12,14 +12,6 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
-                },
-                {
-                    "name": "New action",
-                    "type": "Button",
-                    "id": "bd895b08-98a8-4b40-912c-426fc9f83af4",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -691,17 +683,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "MIDIEvents",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6abfdd67-75c5-47da-ad0a-4732422e3c8e",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "New action",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
