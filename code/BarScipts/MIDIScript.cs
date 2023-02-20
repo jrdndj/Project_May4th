@@ -11,7 +11,7 @@ public class MIDIScript : MonoBehaviour
     // 21: A0
     int keyOffset = 36; //from 21 
 
-    [SerializeField] GameObject barManager;
+    [SerializeField] GameObject BarManager;
 
     // Start is called before the first frame update
     void Start()
@@ -28,9 +28,9 @@ public class MIDIScript : MonoBehaviour
                     note.noteNumber,
                     note.shortDisplayName,
                     velocity
-                ));
+                ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
-               barManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+               BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
             };
 
             midiDevice.onWillNoteOff += (note) => {
@@ -38,14 +38,14 @@ public class MIDIScript : MonoBehaviour
                     "Released #{0} {1} ",
                     note.noteNumber,
                     note.shortDisplayName
-                ));
+                ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
-               barManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
+                BarManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
             };
         };
     }
 
-    // Update is called once per frame
+    // Update is called once p  er frame
     void Update()
     {
 

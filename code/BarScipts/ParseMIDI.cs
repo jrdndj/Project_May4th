@@ -1,4 +1,4 @@
-﻿using System; //for TimeSpan to work
+﻿    using System; //for TimeSpan to work
 using System.Collections;
 using System.Collections.Generic; //for lists to work 
 using System.Linq; //added for toList of chords
@@ -10,10 +10,12 @@ using Melanchall.DryWetMidi.Interaction; //to get song info
 
 public class ParseMIDI : MonoBehaviour
 {
+    //this is for BarManager
+   [SerializeField] GameObject BarManager;
 
     //spawnkey related variables
     public GameObject Spawn_prefab; //dont forget to drag the prefab to the script in the unity interface
-    public GameObject Note;
+    //public GameObject Note;
 
     //for easier mapping of the keys in the piano
     string[] KeyIndex = new string[69];
@@ -23,7 +25,10 @@ public class ParseMIDI : MonoBehaviour
     // e. g. c2 is 3, greenline is 68, 0 based index
   
     //standard speed considering 150 bpm 
-    public float speed=500; 
+    public float speed=500;
+
+    //number for notes to spawn
+    public int noteCtr = 0;
 
     //note related variables
     public int index;
@@ -41,7 +46,11 @@ public class ParseMIDI : MonoBehaviour
     //adding dictionary for the note elements
     //string1 is Key-time, string2 is elt-indexs of InputNotes
     Dictionary<string, List<string>> NoteTimes = new Dictionary<string, List<string>>();
-    
+
+    //we also map the keys from the midi file to into the keyboard itself
+    //to do this we use a dictionary as well
+    Dictionary<string, List<string>> FileChords = new Dictionary<string, List<string>>();
+
     //coroutine related variables
     private IEnumerator spawn;
     private IEnumerator move;
@@ -120,17 +129,8 @@ public class ParseMIDI : MonoBehaviour
 
         //contains folder of improv lickss
         var midiFile = MidiFile.Read("Assets/MusicXML/ImprovLicks/Lick01.mid");
-
-        //to confirm file was read, we play a sound preview for now
-        /* using (var outputDevice = OutputDevice.GetByName("Microsoft GS Wavetable Synth"))
-         using (var playback = midiFile.GetPlayback(outputDevice))
-         {
-             playback.Speed = 1.0; //initially 2.0 but we want regular speed
-             playback.Play();
-         }
-        */
+   
         //get MIDI duration to help us determine the timer
-
         TimeSpan midiFileDuration = midiFile.GetDuration<MetricTimeSpan>();
         songTime = midiFileDuration;
         Debug.Log("Song duration is " + midiFileDuration); //prints the duration 
@@ -151,6 +151,7 @@ public class ParseMIDI : MonoBehaviour
 
         //getting note info instead of chord info. 
         IEnumerable<Melanchall.DryWetMidi.Interaction.Note> notes = midiFile.GetNotes();
+        IEnumerable<Melanchall.DryWetMidi.Interaction.Chord> songchords = midiFile.GetChords();
 
         //add  tempomap to do time span conversions
         TempoMap tempoMap = midiFile.GetTempoMap();
@@ -179,6 +180,7 @@ public class ParseMIDI : MonoBehaviour
             InputNotes[Ctr] = NoteName;
             InputShowUpTime[Ctr] = ShowUpTime;
             InputChordLength[Ctr] = YScale;
+            noteCtr++;
             //Debug.Log(NoteName + " >> " + ShowUpTime + " >> " + YScale );
 
             //this creates the hashmap of time and key pairs for spawning
@@ -195,6 +197,7 @@ public class ParseMIDI : MonoBehaviour
             {
                 //Debug.Log("came here");
                 NoteTimes[ShowUpTime] = new List<string>();
+                Debug.Log("Exception " + e);
             }
             list1.Add(NoteName);
             //Debug.Log(list1);
@@ -206,15 +209,18 @@ public class ParseMIDI : MonoBehaviour
         }//endforeach
 
         ////print contents of dictionary just to be sure
-        //foreach (var item in NoteTimes)
-        //{
-        //    //print the time key
-        //    Debug.Log(item.Key);
+        //  foreach (var item in NoteTimes)
+        // {
+        //print the time key
+        //   Debug.Log(item.Key);
         //    for (int i = 0; i < NoteTimes[item.Key].Count; i++)
         //    {
         //        Debug.Log(NoteTimes[item.Key][i]);
-        //    }
-        //}//foreachdictionary print
+        //   }
+        //  }//foreachdictionary print
+
+        //TEST SENT CHORD
+      //  BarManager.GetComponent<BarScript>().spawnKeys("C#2", noteCtr);
 
         // notes > chord 
         // check this library for this solution
@@ -323,11 +329,6 @@ public class ParseMIDI : MonoBehaviour
         Debug.Log("Object destroyed");
     }
 
-    //lights up a group of keys based on the licks 
-    public void HighlightLicks()
-    {
-
-    }//endHighlightLicks
 
     // Start is called before the first frame update
     void Start()
@@ -367,10 +368,13 @@ public class ParseMIDI : MonoBehaviour
                 {
                     //spawn here                   
                     //Debug.Log("Should spawn " + NoteTimes[item.Key][nCtr] + " at " + item.Key);
-                  //  StartCoroutine(SpawnKey(kCtr));
-                  //uncomment if ready to play
-                    
+                    //  StartCoroutine(SpawnKey(kCtr));
+                    //uncomment if ready to play
+
                     //StartCoroutine(MoveKey(Spawn, keyStartTime));
+
+                    //send the stuff here to BarScript
+                    
 
                     kCtr++;                    
                     }//enditerator

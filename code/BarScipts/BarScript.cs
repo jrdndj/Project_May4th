@@ -269,8 +269,8 @@ public class BarScript : MonoBehaviour
             //add a layer here that if the button pressed is the same in the midi then light green
           
            //theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
-           //theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
-           theColor.pressedColor = Color.green;
+           theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
+           theColor.pressedColor = Color.white;
            blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.green;
            //changed to red unless they are correct
         }//endifblackkeys
@@ -284,9 +284,9 @@ public class BarScript : MonoBehaviour
 
             //color changing methods
           // theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
-          // theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
+          theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
 
-           theColor.pressedColor = Color.green;
+           theColor.pressedColor = Color.white;
            whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.green;
         }//endwhitekeys
     }//end onNoteOn
@@ -305,7 +305,7 @@ public class BarScript : MonoBehaviour
             //color related blocks
             //higlightkey
             //get button information for color transformation
-            theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
+           // theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
             theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
             //theColor.pressedColor = Color.green;
             blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
@@ -318,10 +318,10 @@ public class BarScript : MonoBehaviour
             //barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
 
             //color changing methods
-            theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
+           // theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
             theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
             //theColor.pressedColor = Color.green;
-            whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
+           whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
            
         }//endcolorwhitekeys
 
