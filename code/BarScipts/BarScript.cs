@@ -10,6 +10,11 @@ public class BarScript : MonoBehaviour
     const int keysCount = 68; //changed from 88
     public int mode; //can be 1, 2, or 3
 
+    //color variables
+    Color32 improvpink = new Color32(255, 150, 234, 255);
+    Color32 green = Color.green;
+    Color32 yellow = Color.yellow;
+
     //serialized field for the greenline
     [SerializeField] GameObject GreenLine;
 
@@ -30,7 +35,7 @@ public class BarScript : MonoBehaviour
     //list of stuff
     static List<int> Dmin7Chord = new List<int>() { 8, 10, 12, 14 };
     static List<int> Dmin7ChordTone = new List<int>() { 15, 17, 19, 20 };
-    static List<int> Cmaj7Chord = new List<int>() {7,9, 11, 13 };
+    static List<int> Cmaj7Chord = new List<int>() { 7, 9, 11, 13 };
     static List<int> Cmaj7ChordTone = new List<int>() { 14, 16, 18, 19 };
     static List<int> G7Chord = new List<int>() { 11, 13, 15, 17 };
     static List<int> G7ChordTone = new List<int>() { 18, 20, 22, 24 };
@@ -40,6 +45,13 @@ public class BarScript : MonoBehaviour
     static List<int> Emin7ChordTone = new List<int>() { 16, 18, 20, 22 };
     static List<int> Fmaj7Chord = new List<int>() { 10, 12, 14, 16 };
     static List<int> Fmaj7ChordTone = new List<int>() { 17, 19, 21, 22 };
+
+    //this is special list for real time presses only 
+    static List<int> PressedList = new List<int>();
+
+    //another special list just for the secondarily raised octave
+    static List<int> SecondOctave = new List<int>();
+
     //extended harmonies, simply get last value then +2
 
     //mother list that we can control later on
@@ -72,10 +84,11 @@ public class BarScript : MonoBehaviour
 
     //these are the color related objects
     public ColorBlock theColor;
+    public Color alpha;
     public Button theButton;
 
     int chordctr = 0;
-    int lickctr = 0; 
+    int lickctr = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -88,29 +101,35 @@ public class BarScript : MonoBehaviour
         //both mode 1 and 2 begin with the standard chord Dmin7
         if (mode == 1)
         {
-            HighlightChords(ChordList[0]);
+            //  HighlightChords(ChordList[0], yellow);
             chordctr++;
-            Debug.Log("mode 1");
+            //  Debug.Log("mode 1");
         }
-        if(mode == 2)
+        if (mode == 2)
         {
-            HighlightChords(ChordList[0]);
-            HighlightLicks(LickList[0]);
-            chordctr++;
-            lickctr++;
-            Debug.Log("mode 2");
+            //   HighlightChords(ChordList[0], yellow);
+            //  HighlightLicks(LickList[0], improvpink);
+            //  chordctr++;
+            //  lickctr++;
+            //   Debug.Log("mode 2");
         }
         if (mode == 3)
         {
-            HighlightLicks(LickList[0]);
-            lickctr++;
-            Debug.Log("mode 3");
+            //   HighlightLicks(LickList[0], improvpink);
+            //   lickctr++;
+            //  Debug.Log("mode 3");
         }
+        if (mode == 4)
+        {
+            //add secondoctave to list to initialize
+            //   LickList.Add(SecondOctave);
+            //    HighlightLicks(LickList[LickList.Count - 1], improvpink); //get the latest one 
+        }//this is for the secondary octave based on press
         //control condition
 
         //call HighlightLicks here
         //HighlightChords(ChordList[rand]);
-       // HighlightLicks(LickList[rand]);
+        // HighlightLicks(LickList[rand]);
 
         //for the midi related 
         for (int i = 0; i < 68; i++)
@@ -185,46 +204,50 @@ public class BarScript : MonoBehaviour
         //above this line are the reverse piano roll commands  ========
 
         //check all keys
-        allkeyscleared = checkAllKeysIfWhite();
+        //  allkeyscleared = checkAllKeysIfWhite();
 
-       //show different suggestive higlights here 
-        if (allkeyscleared==0) //0 means all keys are white
-        {
+        //show different suggestive higlights here 
+        //if (allkeyscleared == 0) //0 means all keys are white
+        //{
 
-            //then we can call another highlight
-            //HighlightChords(ChordList[rand]);
-            //HighlightLicks(LickList[rand]);
-            if (mode == 1 && chordctr < ChordList.Count)
-            {
-                HighlightChords(ChordList[chordctr]);
-                chordctr++;
+        //    //then we can call another highlight
+        //    //HighlightChords(ChordList[rand]);
+        //    //HighlightLicks(LickList[rand]);
+        //    if (mode == 1 && chordctr < ChordList.Count)
+        //    {
+        //        HighlightChords(ChordList[chordctr], yellow);
+        //        chordctr++;
 
-            }
-            if (mode == 2 && chordctr < ChordList.Count && lickctr < LickList.Count)
-            {
-                HighlightChords(ChordList[chordctr]);
-                HighlightLicks(LickList[lickctr]);
-                chordctr++;
-                lickctr++;
-            }
-            if (mode == 3 && lickctr < LickList.Count)
-            {
-                HighlightLicks(LickList[lickctr]);
-                lickctr++;
-            }
+        //    }
+        //    if (mode == 2 && chordctr < ChordList.Count && lickctr < LickList.Count)
+        //    {
+        //        HighlightChords(ChordList[chordctr], yellow);
+        //        HighlightLicks(LickList[lickctr], improvpink);
+        //        chordctr++;
+        //        lickctr++;
+        //    }
+        //    if (mode == 3 && lickctr < LickList.Count)
+        //    {
+        //        HighlightLicks(LickList[lickctr], improvpink);
+        //        lickctr++;
+        //    }
+        //    if (mode == 4)//no need for additional criteria since this will be unique
+        //    {
+        //        HighlightLicks(LickList[LickList.Count - 1], improvpink); //get the latest one 
+        //    }//end of by press mode improv suggestion
 
-            if (chordctr == 4) chordctr = 0;
-            if (lickctr == 4) lickctr = 0;
+        //    if (chordctr == 4) chordctr = 0;
+        //    if (lickctr == 4) lickctr = 0;
 
 
-        }//endcheckkeyswhite
+        //}//endcheckkeyswhite
     }//end on note off
 
     //public void spawnKeys(string noteName, int noteCtr)
     //{
 
     //    int noteNumber = 40;
-    //    Debug.Log(noteName + " should spawn here bruh " );
+    //    Debug.Log(noteName + " should spawn here bruh ");
     //    //have some processing here to receive the note then assign it to its x coord
     //    //sets the spawn to match that of the gameobject Bar in resources
     //    GameObject barPrefab;
@@ -249,9 +272,9 @@ public class BarScript : MonoBehaviour
 
         //should i comment these too?
         // create bar object
-        GameObject barPrefab;
-        barPrefab = (GameObject)Resources.Load("Prefab/Bar");
-        barsPressed[noteNumber] = Instantiate(barPrefab);
+        //GameObject barPrefab;
+        // barPrefab = (GameObject)Resources.Load("Prefab/Bar");
+        // barsPressed[noteNumber] = Instantiate(barPrefab);
         //should instantiate it on the Xcoord of the gameobject
 
         //we are now spawning at the local position of the button in the scene
@@ -259,35 +282,31 @@ public class BarScript : MonoBehaviour
         {
             //use blackKeys BUT get their index
             //blacklist.IndexOf(noteNumber); //and use this as blackKey index
-            barsPressed[noteNumber].transform.position = new Vector3(blackKeys[blacklist.IndexOf(noteNumber)].transform.position.x, 0, 0); //used position 
-                                                                                                                                           //uncomment line below if things fuck up 
-            barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
+            //  barsPressed[noteNumber].transform.position = new Vector3(blackKeys[blacklist.IndexOf(noteNumber)].transform.position.x, 0, 0); //used position
+            //uncomment line below if things fuck up 
+            //  barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
 
-            //color changing methods
-            //get button information for color transformation
-
-            //add a layer here that if the button pressed is the same in the midi then light green
-          
-           //theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
-           theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
-           theColor.pressedColor = Color.white;
-           blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.green;
-           //changed to red unless they are correct
+            //do these even matter? lets remove later
+            theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
+            theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
+            theColor.pressedColor = Color.white;
+            blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
+            //changed to red unless they are correct
         }//endifblackkeys
         else
         {   //use whiteKeys
             //we shouldnt put -36
-            barsPressed[noteNumber].transform.position = new Vector3(whiteKeys[whitelist.IndexOf(noteNumber)].transform.position.x, 0, 0);
+            //  barsPressed[noteNumber].transform.position = new Vector3(whiteKeys[whitelist.IndexOf(noteNumber)].transform.position.x, 0, 0);
 
             //uncomment line below if things fuck up 
-            barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
+            //   barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
 
             //color changing methods
-          // theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
-          theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
+            theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
+            theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
+            theColor.pressedColor = Color.white;
+            whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
 
-           theColor.pressedColor = Color.white;
-           whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.green;
         }//endwhitekeys
     }//end onNoteOn
 
@@ -299,17 +318,17 @@ public class BarScript : MonoBehaviour
             //use blackKeys BUT get their index
             //blacklist.IndexOf(noteNumber); //and use this as blackKey index
             //barsPressed[noteNumber].transform.position = new Vector3(blackKeys[blacklist.IndexOf(noteNumber)].transform.position.x, 0, 0);
-           // barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
+            // barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
 
             //color changing methods
             //color related blocks
             //higlightkey
             //get button information for color transformation
-           // theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
+            theButton = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>();
             theColor = blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Button>().colors;
-            //theColor.pressedColor = Color.green;
-            blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
-      
+            theColor.pressedColor = Color.white;
+            blackKeys[blacklist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.black;
+
         }
         else
         {   //use whiteKeys
@@ -318,34 +337,36 @@ public class BarScript : MonoBehaviour
             //barsPressed[noteNumber].transform.SetParent(barManager.transform, true);
 
             //color changing methods
-           // theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
+            theButton = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>();
             theColor = whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Button>().colors;
-            //theColor.pressedColor = Color.green;
-           whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.white;
-           
+            theColor.pressedColor = Color.white;
+            whiteKeys[whitelist.IndexOf(noteNumber)].GetComponent<Image>().color = Color.black;
+
         }//endcolorwhitekeys
 
-        barsReleased.Add(Clone(barsPressed[noteNumber]));
-        DestroyImmediate(barsPressed[noteNumber]);
-        isKeyPressed[noteNumber] = false;
+        //  barsReleased.Add(Clone(barsPressed[noteNumber]));
+        //  DestroyImmediate(barsPressed[noteNumber]);
+        //  isKeyPressed[noteNumber] = false;
     }//end bars pressed on note off 
 
     //lights up a group of keys based on the licks 
-    public void HighlightChords(List<int> chordset)
+    public List<int> HighlightChords(List<int> chordset, Color32 color)
     {
         //show all 4 as a for loop
-        for (int i = 0; i< chordset.Count; i++)
+        for (int i = 0; i < chordset.Count; i++)
         {
             theButton = whiteKeys[chordset[i]].GetComponent<Button>();
             theColor = whiteKeys[chordset[i]].GetComponent<Button>().colors;
-            theColor.highlightedColor = Color.yellow;
-            whiteKeys[chordset[i]].GetComponent<Image>().color = Color.yellow;
-        }//endfors      
+            //theColor.highlightedColor = Color.yellow;
+            theColor.highlightedColor = color;
+            whiteKeys[chordset[i]].GetComponent<Image>().color = color;
+        }//endfors
+        return chordset;
         //====== highlight chord tones next in blue 
     }//endHighlightMelodyChords
 
     //lights up a group of keys based on the licks 
-    public void HighlightLicks(List<int> lickset)
+    public List<int> HighlightLicks(List<int> lickset, Color32 improvpink)
     {
         //fetch set of notes and their counterpart notenumbers in midi
         // then call the respective lighting buttons
@@ -353,13 +374,15 @@ public class BarScript : MonoBehaviour
         //====== highlight chord tones next in blue 
 
         //show all 4 as a for loop
-        for (int i = 0; i < lickset.Count   ; i++)
+        for (int i = 0; i < lickset.Count; i++)
         {
             theButton = whiteKeys[lickset[i]].GetComponent<Button>();
             theColor = whiteKeys[lickset[i]].GetComponent<Button>().colors;
-            theColor.highlightedColor = new Color32(255, 150, 234, 255); //pink color
+            // theColor.highlightedColor = new Color32(255, 150, 234, 255); //pink color
+            theColor.highlightedColor = improvpink;
             whiteKeys[lickset[i]].GetComponent<Image>().color = theColor.highlightedColor;
-        }//endfor       
+        }//endfor
+        return lickset;
     }//endHighlightLicks
 
     GameObject Clone(GameObject obj)
@@ -374,8 +397,8 @@ public class BarScript : MonoBehaviour
 
     public int checkAllKeysIfWhite()
     {
-        int clear = 0; 
-        //check all white keys first
+        int clear = 0;
+        //this is scanning through the white list and changing them to white 
         for (int i = 0; i < 36; i++)
         {
             theButton = whiteKeys[i].GetComponent<Button>();
@@ -400,28 +423,89 @@ public class BarScript : MonoBehaviour
         return clear;
     }//endcheck all checks if white
 
-    public void getHighlightedKeys()
-    {
-        for (int i = 0; i < 36; i++)
-        {
-            theButton = whiteKeys[i].GetComponent<Button>();
-            theColor = whiteKeys[i].GetComponent<Button>().colors;
-            if (whiteKeys[i].GetComponent<Image>().color != Color.white)
-            {
-               // barsHighlighted.Add(i);
-            }//endif
-        }//endfor white keys
+    //im not sure this function does really anything
+    //public void getHighlightedKeys()
+    //{
+    //    for (int i = 0; i < 36; i++)
+    //    {
+    //        theButton = whiteKeys[i].GetComponent<Button>();
+    //        theColor = whiteKeys[i].GetComponent<Button>().colors;
+    //        if (whiteKeys[i].GetComponent<Image>().color != Color.white)
+    //        {
+    //            // barsHighlighted.Add(i);
+    //        }//endif
+    //    }//endfor white keys
 
-        //add the same method but for black keys here
-        for (int i = 0; i < 25; i++)
+    //    //add the same method but for black keys here
+    //    for (int i = 0; i < 25; i++)
+    //    {
+    //        theButton = blackKeys[i].GetComponent<Button>();
+    //        theColor = blackKeys[i].GetComponent<Button>().colors;
+    //        if (blackKeys[i].GetComponent<Image>().color != Color.white)
+    //        {
+    //            //barsHighlighted.Add(i);
+    //        }//endif
+    //    }//endfor white keys
+    //}//endHiglightedkeys
+
+    //detect the note number then suggest 1-3-5-7 but on the second next octave
+    public void raiseOctavePressed(int noteNumber)
+    {
+        int key = 0;
+        //get the notenumber then return the list for highlightlicks
+
+        //we need a control here to see - limit to 60 only  
+        if (noteNumber < 28) //anything more than this would cause an exception
         {
-            theButton = blackKeys[i].GetComponent<Button>();
-            theColor = blackKeys[i].GetComponent<Button>().colors;
-            if (blackKeys[i].GetComponent<Image>().color != Color.white)
+            key = 7;
+            //add the next immediate octave of it
+            //  PressedList.Add(key += noteNumber);
+            //keep adding the rest until it has at least 4
+            for (int i = 1; i < 4; i++) //yes this should be 1 not 0
             {
-               //barsHighlighted.Add(i);
-            }//endif
-        }//endfor white keys
-    }//endHiglightedkeys
+                //     PressedList.Add(key + 2);
+            }//end for i should have at least 4 new keys 
+
+            //add list to licklist
+            // LickList.Add(PressedList);
+            // HighlightLicks(LickList[LickList.Count - 1], improvpink);
+        }//endof the control limit
+        else //anything more than this would cause an exception
+        {
+            key = 7;
+            //add the next immediate octave of it
+            //   PressedList.Add(key -= noteNumber);
+            //keep adding the rest until it has at least 4
+            for (int i = 1; i < 4; i++) //yes this should be 1 not 0
+            {
+                //      PressedList.Add(key - 2);
+            }//end for i should have at least 4 new keys 
+
+            //add list to licklist
+            //  LickList.Add(PressedList);
+            //  HighlightLicks(LickList[LickList.Count - 1], improvpink); //gets the last element in the list
+        }//endof the control limit 
+    }//endraiseOctavePressed
+
+
+    public int secondOctaveRaised(int noteNumber)
+    {
+        //get the chord
+        int key = 14;
+
+        if (noteNumber < 35)
+        {
+            // SecondOctave.Add(key += noteNumber);
+
+            //then we add the rest in the sequence at least 4 times
+            for (int i = 1; i < 4; i++) //yes this should be 1 not 0
+            {
+                //  SecondOctave.Add(key + 2);
+            }
+            //  LickList.Add(SecondOctave);
+        }//because we jump two more octves thats why
+        return SecondOctave.Count;
+        //get the chordtone then simply plus 7
+    }
 
 }//endclass
