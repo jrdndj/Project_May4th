@@ -196,7 +196,7 @@ public class ParseMIDI : MonoBehaviour
             catch(Exception e)
             {
                 //Debug.Log("came here");
-                NoteTimes[ShowUpTime] = new List<string>();
+             //   NoteTimes[ShowUpTime] = new List<string>();
                 Debug.Log("Exception " + e);
             }
             list1.Add(NoteName);

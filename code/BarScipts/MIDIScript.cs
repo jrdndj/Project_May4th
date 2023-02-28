@@ -11,7 +11,8 @@ public class MIDIScript : MonoBehaviour
     // 21: A0
     int keyOffset = 36; //from 21 
 
-    [SerializeField] GameObject BarManager;
+    [SerializeField] GameObject BarManager; //for the improv
+    [SerializeField] GameObject RollManager; //for the pianoroll
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +23,8 @@ public class MIDIScript : MonoBehaviour
             var midiDevice = device as Minis.MidiDevice;
             if (midiDevice == null) return;
 
-            midiDevice.onWillNoteOn += (note, velocity) => {
+            midiDevice.onWillNoteOn += (note, velocity) =>
+            {
                 Debug.Log(string.Format(
                     "Pressed #{0} {1} vel:{2:0.00}  ",
                     note.noteNumber,
@@ -30,10 +32,26 @@ public class MIDIScript : MonoBehaviour
                     velocity
                 ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
-               BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
-            };
+                //I think the error checking should take place here
+                // if (BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity))
+                //  {
 
-            midiDevice.onWillNoteOff += (note) => {
+                //   }//enderror checking
+
+                //this generates the reverse piano roll 
+                BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+                //this generates the mode4 improv suggestions
+                //if (BarManager.GetComponent<BarScript>().checkAllKeysIfWhite() <= 7
+                //&& BarManager.GetComponent<BarScript>().secondOctaveRaised(note.noteNumber) < 4)
+                //{
+                //    //call here raiseOctavePressed similar to the previous line
+                //  //  BarManager.GetComponent<BarScript>().raiseOctavePressed(note.noteNumber - keyOffset);
+                //}//endif
+
+            }; //important onWillNoteOn function 
+
+            midiDevice.onWillNoteOff += (note) =>
+            {
                 Debug.Log(string.Format(
                     "Released #{0} {1} ",
                     note.noteNumber,
@@ -49,5 +67,8 @@ public class MIDIScript : MonoBehaviour
     void Update()
     {
 
+
     }
+
+
 }
