@@ -46,9 +46,9 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] overlay piano roll sequence onto virtual piano environment
 - [x] synthesize sound - used garageband
 - [x] tracking of keypress along with piano roll
-- [ ] black layout
+- [x] black layout
 - [ ] piano roll melody
-- [ ] improv suggestive based on bars
+- [x] improv suggestive based on bars
 - [ ] scoring 
 - [ ] logging of spatiotemporal data 
 - [ ] export spatio temporal data with musicxml into csv 
