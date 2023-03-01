@@ -33,18 +33,18 @@ public class BarScript : MonoBehaviour
     //this means I want to return value in the 8th as the index of whitelist
 
     //list of stuff
-    static List<int> Dmin7Chord = new List<int>() { 8, 10, 12, 14 };
-    static List<int> Dmin7ChordTone = new List<int>() { 15, 17, 19, 20 };
-    static List<int> Cmaj7Chord = new List<int>() { 7, 9, 11, 13 };
-    static List<int> Cmaj7ChordTone = new List<int>() { 14, 16, 18, 19 };
-    static List<int> G7Chord = new List<int>() { 11, 13, 15, 17 };
-    static List<int> G7ChordTone = new List<int>() { 18, 20, 22, 24 };
-    static List<int> Amin7Chord = new List<int>() { 5, 7, 9, 11 };
-    static List<int> Amin7ChordTone = new List<int>() { 12, 14, 16, 18 };
-    static List<int> Emin7Chord = new List<int>() { 9, 11, 13, 15 };
-    static List<int> Emin7ChordTone = new List<int>() { 16, 18, 20, 22 };
-    static List<int> Fmaj7Chord = new List<int>() { 10, 12, 14, 16 };
-    static List<int> Fmaj7ChordTone = new List<int>() { 17, 19, 21, 22 };
+    //static List<int> Dmin7Chord = new List<int>() { 8, 10, 12, 14 };
+    //static List<int> Dmin7ChordTone = new List<int>() { 15, 17, 19, 20 };
+    //static List<int> Cmaj7Chord = new List<int>() { 7, 9, 11, 13 };
+    //static List<int> Cmaj7ChordTone = new List<int>() { 14, 16, 18, 19 };
+    //static List<int> G7Chord = new List<int>() { 11, 13, 15, 17 };
+    //static List<int> G7ChordTone = new List<int>() { 18, 20, 22, 24 };
+    //static List<int> Amin7Chord = new List<int>() { 5, 7, 9, 11 };
+    //static List<int> Amin7ChordTone = new List<int>() { 12, 14, 16, 18 };
+    //static List<int> Emin7Chord = new List<int>() { 9, 11, 13, 15 };
+    //static List<int> Emin7ChordTone = new List<int>() { 16, 18, 20, 22 };
+    //static List<int> Fmaj7Chord = new List<int>() { 10, 12, 14, 16 };
+    //static List<int> Fmaj7ChordTone = new List<int>() { 17, 19, 21, 22 };
 
     //this is special list for real time presses only 
     static List<int> PressedList = new List<int>();
@@ -54,9 +54,9 @@ public class BarScript : MonoBehaviour
 
     //extended harmonies, simply get last value then +2
 
-    //mother list that we can control later on
-    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, Cmaj7Chord, G7Chord, Amin7Chord, Emin7Chord, Fmaj7Chord };
-    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, Cmaj7ChordTone, G7ChordTone, Amin7ChordTone, Emin7ChordTone, Fmaj7ChordTone };
+    ////mother list that we can control later on
+    //List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, Cmaj7Chord, G7Chord, Amin7Chord, Emin7Chord, Fmaj7Chord };
+    //List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, Cmaj7ChordTone, G7ChordTone, Amin7ChordTone, Emin7ChordTone, Fmaj7ChordTone };
 
 
     //so we can map each key in the virtual piano to the key
@@ -69,9 +69,9 @@ public class BarScript : MonoBehaviour
     GameObject[] barsPressed = new GameObject[keysCount]; // bars linked to the pressed key
     [SerializeField] List<GameObject> barsReleased = new List<GameObject>(); // bars linked to the released key
 
-    //for the proper piano roll
-    GameObject[] barstoSpawn = new GameObject[keysCount]; //in the end we just need 68
-    [SerializeField] List<GameObject> barsSpawned = new List<GameObject>();
+    ////for the proper piano roll
+    //GameObject[] barstoSpawn = new GameObject[keysCount]; //in the end we just need 68
+    //[SerializeField] List<GameObject> barsSpawned = new List<GameObject>();
 
 
     //add a collected of higlighted bars but we just need their indices
@@ -170,36 +170,36 @@ public class BarScript : MonoBehaviour
         //}//endmove barspressed
 
         //from this line below  are the reverse piano roll commands  ========
-        for (int i = 0; i < 68; i++)
-        {
-            if (isKeyPressed[i] && barsPressed[i] != null)
-            {
-                Vector3 scale = barsPressed[i].transform.localScale;
-                scale.y += barSpeed * 2; //changed from *2 
-                barsPressed[i].transform.localScale = scale;
-                Vector3 pos = barsPressed[i].transform.position;
-                pos.y += barSpeed;
-                barsPressed[i].transform.position = pos;
-            }
-        }//endforiskeyPressed
+        //for (int i = 0; i < 68; i++)
+        //{
+        //    if (isKeyPressed[i] && barsPressed[i] != null)
+        //    {
+        //        Vector3 scale = barsPressed[i].transform.localScale;
+        //        scale.y += barSpeed * 2; //changed from *2 
+        //        barsPressed[i].transform.localScale = scale;
+        //        Vector3 pos = barsPressed[i].transform.position;
+        //        pos.y += barSpeed;
+        //        barsPressed[i].transform.position = pos;
+        //    }
+        //}//endforiskeyPressed
 
-        //released keys
-        for (int i = barsReleased.Count - 1; i >= 0; i--)
-        {
-            Vector3 pos = barsReleased[i].transform.position;
+        ////released keys
+        //for (int i = barsReleased.Count - 1; i >= 0; i--)
+        //{
+        //    Vector3 pos = barsReleased[i].transform.position;
 
-            // destroy bars when it reached upperPositionLimit
-            if (pos.y + (barsReleased[i].transform.localScale.y / 2) > upperPositionLimit)
-            {
-                Destroy(barsReleased[i]);
-                barsReleased.RemoveAt(i);
-            }//endifbarsreleased
-            else
-            {
-                pos.y += barSpeed * 2; //changed from 2
-                barsReleased[i].transform.position = pos;
-            }//end else bars released
-        }//end checking of all bars
+        //    // destroy bars when it reached upperPositionLimit
+        //    if (pos.y + (barsReleased[i].transform.localScale.y / 2) > upperPositionLimit)
+        //    {
+        //        Destroy(barsReleased[i]);
+        //        barsReleased.RemoveAt(i);
+        //    }//endifbarsreleased
+        //    else
+        //    {
+        //        pos.y += barSpeed * 2; //changed from 2
+        //        barsReleased[i].transform.position = pos;
+        //    }//end else bars released
+        //}//end checking of all bars
 
         //above this line are the reverse piano roll commands  ========
 
