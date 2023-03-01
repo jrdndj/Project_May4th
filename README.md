@@ -29,11 +29,11 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] ~~play sound via garageband~~
 - [x] identify which key is pressed (return keybinding) 
 - [x] projector setup
-- [ ] laser cutting of projection board
+- [x] laser cutting of projection board
 - [x] applying white paint/tape on black keys to assist projection visuals
 - [x] applying subtle key labels for new users
 - [x] solve issues with keys C6 to G6 having a delayed startup (significant delay)
-- [ ] setup back stand of white screen for stability 
+- [x] setup back stand of white screen for stability 
 
 ##### software targets 
 - [x] setup unity environment for the piano roll engine
@@ -46,6 +46,9 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] overlay piano roll sequence onto virtual piano environment
 - [x] synthesize sound - used garageband
 - [x] tracking of keypress along with piano roll
+- [ ] black layout
+- [ ] piano roll melody
+- [ ] improv suggestive based on bars
 - [ ] scoring 
 - [ ] logging of spatiotemporal data 
 - [ ] export spatio temporal data with musicxml into csv 
@@ -89,7 +92,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] setup external speakers to play synthesized sound
 - [ ] run pilot user study 
 - [x] measure projection board hind legs
-- [ ] acquire materials for projection board hind legs 
+- [z] acquire materials for projection board hind legs 
 
  
 #### revised schedule ===
