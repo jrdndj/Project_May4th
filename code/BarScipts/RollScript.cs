@@ -1,27 +1,52 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; //added for colors
 
 public class RollScript : MonoBehaviour
 {
-    //all the keys in one set
+    //============ ENVIRONMENT RELATED VARIABLES =============/
+
+    //this helps the mapping of keys similar to that midi hardware
     [SerializeField] List<GameObject> pianoKeys = new List<GameObject>();
 
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
+    //[SerializeField] GameObject piano; //should be the piano lets sees
 
-    //some more serialised lists for spawning and destroying
-    //for the reverse piano roll
-    GameObject[] spawnedBars = new GameObject[keysCount]; // bars linked to the pressed key
-    [SerializeField] List<GameObject> rollingBars = new List<GameObject>(); // bars linked to the released key
+    //this is to manage spawns
+    GameObject[] spawnedBars = new GameObject[keysCount];
+    //[SerializeField] List<GameObject> spawnedBars = new List<GameObject>(); // bars linked to the released key
+
+    //this is for fallen spawns
+    GameObject[] fallenBars = new GameObject[keysCount];
+
+    //for the lower position limit
+    public GameObject green_line;
+
+    //for the spawn point
+    public GameObject spawn_top;
+
+    //help us check for errors and control the number of spawns
     const int keysCount = 61; //or is it 68?
-    //const int lowerpositionlimit = 0; 
+    public float lowerpositionlimit; //changed to float
+    public float spawnpoint;
+    bool[] isKeyPressed = new bool[keysCount];
+
+    float barSpeed = (float)0.65; //from 0.05 0.15 was ok
+
+    //=========== COLOR RELATED VARIABLES ==========/
+    //these are the color related objects
+    public ColorBlock theColor;
+    public Button theButton;
+    Color32 improvpink = new Color32(255, 150, 234, 255);
+    Color32 green = Color.green;
+    Color32 yellow = Color.yellow;
+
+    //=========== CHORD RELATED VARIABLES ==========/
 
     //still need my enum for black key spawning
     List<int> blacklist = new List<int>() { 1, 3, 6, 8, 10, 13, 15, 18, 20, 22, 25, 27, 30, 32, 34, 37, 39, 42, 44, 46, 49, 51, 54, 56, 58 };
-
-    //this list contains their index in whitelist so we dont need to super hardcode
-    //this means I want to return value in the 8th as the index of whitelist
 
     //systematically first octave white is 0th to 6th, second octave is 7th to 13th etc
     /**
@@ -32,8 +57,7 @@ public class RollScript : MonoBehaviour
      * octave of 6 index is 48 to 59
      * octave of 7 index is only 60
      */
-
-    //list of white only chords and their chord licks
+    //list of some white only chords and their chord licks
     //D3 F3 A3 C4 --- D4 F4 A4 C5 - ok mapped!
     static List<int> Dmin7Chord = new List<int>() { 14, 17, 21, 24 };
     static List<int> Dmin7ChordTone = new List<int>() { 26, 29, 33, 36 };
@@ -71,30 +95,26 @@ public class RollScript : MonoBehaviour
     //some crucial variables
     int spawnCount = 0;
 
-    //for some reason I need the Clone method just to be safe
-    GameObject Clone(GameObject obj)
-    // reference: https://develop.hateblo.jp/entry/2018/06/30/142319
-    {
-        var clone = GameObject.Instantiate(obj) as GameObject;
-        clone.transform.parent = obj.transform.parent;
-        clone.transform.position = obj.transform.position; //changed from LocalPosition
-        clone.transform.localScale = obj.transform.localScale;
-        return clone;
-    }
-
     //this method is to initialize important stuff for the piano roll
-    public void spawnRoll(List<int> indexList)
+    public void SpawnRoll(List<int> indexList)
     {
+        //for debugging purposes 
         int success = 0;
 
         //set prefabs
         GameObject whitePrefab, blackPrefab;
         whitePrefab = (GameObject)Resources.Load("Prefab/whitekeyprefab");
         blackPrefab = (GameObject)Resources.Load("Prefab/blackkeyprefab");
+
+        //scan through the list of keys to spawn based on type
         for (int i = 0; i < indexList.Count; i++)
         {
+            //get the transform position of the elements
+            //it shouldnt matter anyway
+            Vector3 keypos = pianoKeys[indexList[i]].transform.localPosition;
+       
             //get the position of the element in indexList
-            Vector3 wkpos = pianoKeys[indexList[i]].transform.position;
+            //Vector3 wkpos = pianoKeys[indexList[i]].transform.position;
             //if index is in blacklist, then spawn blackPrefab, else whitePrefab
             if (blacklist.Contains(indexList[i])) //change this later on 
             {
@@ -117,84 +137,104 @@ public class RollScript : MonoBehaviour
 
             //store information and spawn on location regardless of prefab
             //set the height first then put them into position
-            spawnedBars[spawnCount].transform.localScale = new Vector3(pianoKeys[spawnCount].transform.localScale.x, 5, 0);
-            spawnedBars[spawnCount].transform.position = new Vector3(pianoKeys[indexList[i]].transform.position.x-40, 120-(spawnedBars[spawnCount].transform.localScale.y/2), 0);
-            spawnCount++;
+            spawnedBars[spawnCount].transform.localScale = new Vector3(pianoKeys[spawnCount].transform.localScale.x, 1, 1); //why 5 again? 
 
-            //transfer them to the serialize list so they move
-            rollingBars.Add(Clone(spawnedBars[spawnCount]));
+            //this put thems into the right x y coordinates
+            //spawnedBars[spawnCount].transform.position = new Vector3(pianoKeys[indexList[i]].transform.position.x, spawnpoint+(spawnedBars[spawnCount].transform.localScale.y / 2), 0);
+            Debug.Log("keypos.y = " + keypos.y + "keyscale.y = " + spawnedBars[spawnCount].transform.localScale.y + "combined = " + keypos.y+(spawnedBars[spawnCount].transform.localScale.y / 2));
+            spawnedBars[spawnCount].transform.localPosition = new Vector3(keypos.x, spawnpoint, keypos.z);
+
+            //increase count of spawn cos of serializedfield
+            spawnCount++;
         }//endfor iterating loop list
         if (success == 4)
         {
             Debug.Log("Chord spawned");
         }
 
-        rollKeys();
     }//end spawnRoll
 
-    public void rollKeys()
+    private void RollKeys()
     {
-        float barSpeed = (float)0.65; //from 0.05 0.15 was ok 
-        float lowerpositionlimit = (float)700; //changed from 100 
-        //released keys
-        for (int i = rollingBars.Count - 1; i >= 0; i--)
+        //roll the objects spawns downward
+        for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
-            Vector3 pos = spawnedBars[i].transform.position;
-
-            // destroy bars when it reached upperPositionLimit
-            if (pos.y + (spawnedBars[i].transform.localScale.y / 2) > lowerpositionlimit)
+            //if these dont work then lets LERP
+            if (isKeyPressed[i] && spawnedBars[i] != null)
             {
-                Destroy(spawnedBars[i]);
-                rollingBars.RemoveAt(i);
-            }//endifbarsreleased
-            else
-            {
-                pos.y += barSpeed * 2; //changed from 2
+                //Vector3 scale = spawnedBars[i].transform.localScale;
+                //scale.y += barSpeed * 2; //changed from *2 
+                //spawnedBars[i].transform.localScale = scale;
+                Vector3 pos = spawnedBars[i].transform.position;
+                //changed to -= since we need them to go down
+                pos.y -= barSpeed;
                 spawnedBars[i].transform.position = pos;
-            }//end else bars released
-        }//end checking of all bars
-
+            }
+            // Debug.Log("Rolling...");
+        }//endforiskeyPressed
     }//end roll keys 
 
-    //this method highlights
-
-    // Start is called before the first frame update
+    //start is for initialization 
     void Start()
     {
+        //set greenline pos
+        //these values are true never change them to transform.Position
+        lowerpositionlimit = green_line.transform.localPosition.y;
+        spawnpoint = spawn_top.transform.localPosition.y;
+
+        //this prevents the unending loops
         //get the first batch and spawn them
-        spawnRoll(C7Chord);
-        //or could be an element in the list of Chords 
+        SpawnRoll(Cmaj7Chord);
+
+        //we use this code to "wait" if any key is pressed
+        //for the midi related 
+        for (int i = 0; i < 61; i++)
+        {
+            isKeyPressed[i] = false;
+            fallenBars[i] = null;
+        }
 
     }//end start function
 
     // Update is called once per frame
     void Update()
     {
-        //move all that spawned, spawn a new one if necessar
+        //then rollkeys
+        RollKeys();
+
+        //highlightLicks
+        HighlightLicks(Cmaj7ChordTone);
 
         //have a function here to highlight improv licks
-
 
     }//end update function
 
     //some auxilliary functions here that we need to call
+    public void onNoteOn(int noteNumber, float velocity)
+    {
+
+        if (isKeyPressed[noteNumber])
+        {
+            theButton = pianoKeys[noteNumber].GetComponent<Button>();
+            theColor = pianoKeys[noteNumber].GetComponent<Button>().colors;
+            theColor.pressedColor = Color.white;
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+        }//change to white if it is pressed
+    }//endonNoteOn;
 
     //lights up a group of keys based on the licks 
-    public List<int> HighlightLicks(List<int> lickset, Color32 improvpink)
+    public List<int> HighlightLicks(List<int> lickset)
     {
-        //fetch set of notes and their counterpart notenumbers in midi
-        // then call the respective lighting buttons
-
-        //====== highlight chord tones next in blue 
-
-        //show all 4 as a for loop
+        //show all 4 as a for loops
         for (int i = 0; i < lickset.Count; i++)
         {
-            //    theButton = whiteKeys[lickset[i]].GetComponent<Button>();
-            //    theColor = whiteKeys[lickset[i]].GetComponent<Button>().colors;
-            //    // theColor.highlightedColor = new Color32(255, 150, 234, 255); //pink color
-            //    theColor.highlightedColor = improvpink;
-            //    whiteKeys[lickset[i]].GetComponent<Image>().color = theColor.highlightedColor;
+
+            theButton = pianoKeys[lickset[i]].GetComponent<Button>();
+            theColor = pianoKeys[lickset[i]].GetComponent<Button>().colors;
+            // theColor.highlightedColor = new Color32(255, 150, 234, 255); //pink color
+            theColor.highlightedColor = improvpink;
+            pianoKeys[lickset[i]].GetComponent<Image>().color = theColor.highlightedColor;
+
         }//endfor
         return lickset;
     }//endHighlightLicks
