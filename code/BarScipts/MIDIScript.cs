@@ -40,6 +40,7 @@ public class MIDIScript : MonoBehaviour
 
                 //this generates the reverse piano roll 
                 BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+                RollManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
                 //this generates the mode4 improv suggestions
                 //if (BarManager.GetComponent<BarScript>().checkAllKeysIfWhite() <= 7
                 //&& BarManager.GetComponent<BarScript>().secondOctaveRaised(note.noteNumber) < 4)
