@@ -54,28 +54,7 @@ public class BarScript : MonoBehaviour
         //randomize function for next chord tone
         var rand = UnityEngine.Random.Range(0, 6); //there are 6 in the list s
 
-        int allkeyscleared = 0;
-
-        ////this moves the keys in the barstoSpawn list
-        //for (int i = barsSpawned.Count - 1; i >= 0; i--)
-        //{
-        //    Vector3 pos = barstoSpawn[i].transform.position;
-        //    //their half starts at the upper limit 
-        //    pos.y = upperPositionLimit+(barstoSpawn[i].transform.localScale.y / 2); //all bars spawn at the top
-
-        //    // destroy bars when it reached the greenline y position
-        //    if (pos.y + (barstoSpawn[i].transform.localScale.y / 2) < GreenLine.transform.position.y)
-        //    {
-        //        Destroy(barstoSpawn[i]);
-        //      barsPressed.RemoveAt(i); 
-        //    }//endifbarsreleased
-        //    else
-        //    {
-        //        pos.y -= barSpeed * 2; //changed from 2
-        //        barstoSpawn[i].transform.position = pos;
-        //    }//end else bars released
-
-        //}//endmove barspressed
+        //int allkeyscleared = 0;
 
         //from this line below  are the reverse piano roll commands  ========
         //for (int i = 0; i < 68; i++)
@@ -153,24 +132,16 @@ public class BarScript : MonoBehaviour
 
     public void onNoteOn(int noteNumber, float velocity)
     {
-        // clearfy that the key is pressed
-        isKeyPressed[noteNumber] = true;
-        theButton = pianoKeys[noteNumber].GetComponent<Button>();
-        theColor = pianoKeys[noteNumber].GetComponent<Button>().colors;
-        theColor.pressedColor = Color.white;
-        pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+        //empty on purpose
     }//end onNoteOn
 
     public void onNoteOff(int noteNumber)
     {
-            //color changing methods
-            //color related blocks
-            //higlightkey
-            //get button information for color transformation
-            theButton = pianoKeys[noteNumber].GetComponent<Button>();
-            theColor = pianoKeys[noteNumber].GetComponent<Button>().colors;
-            theColor.pressedColor = Color.white;
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+        //this is where we put the clearing of all keys
+        theButton = pianoKeys[noteNumber].GetComponent<Button>();
+        theColor = pianoKeys[noteNumber].GetComponent<Button>().colors;
+        theColor.pressedColor = Color.white;
+        pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
     }//end bars pressed on note off 
 
     //lights up a group of keys based on the licks 
@@ -184,7 +155,7 @@ public class BarScript : MonoBehaviour
             theColor.highlightedColor = color;
             pianoKeys[chordset[i]].GetComponent<Image>().color = color;
         }//endfors
-        return chordset; 
+        return chordset;
     }//endHighlightMelodyChords
 
     //we need this later on 
@@ -212,18 +183,8 @@ public class BarScript : MonoBehaviour
             }//endif
         }//endfor white keys
 
-        ////add the same method but for black keys here
-        //for (int i = 0; i < 25; i++)
-        //{
-        //    theButton = blackKeys[i].GetComponent<Button>();
-        //    theColor = blackKeys[i].GetComponent<Button>().colors;
-        //    if (blackKeys[i].GetComponent<Image>().color != Color.black)
-        //    {
-        //        clear++;
-        //    }//endif
-        //}//endfor white keys
         return clear;
     }//endcheck all checks if white
 
-   
+
 }//endclass

@@ -47,10 +47,13 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] synthesize sound - used garageband
 - [x] tracking of keypress along with piano roll
 - [x] black layout
-- [ ] piano roll melody
+- [x] piano roll melody
 - [x] improv suggestive based on bars
+- [x] error checking - melody
+- [x] error checking - licks 
+- [x] logging of spatiotemporal data - user presses
+- [ ] logging of spatiotemporal data - correct presses
 - [ ] scoring 
-- [ ] logging of spatiotemporal data 
 - [ ] export spatio temporal data with musicxml into csv 
 
 ###### single chord
@@ -82,7 +85,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] skeletal menu from home to practice song
 - [x] logging of keypresss
 - [x] acquiring temporal information from the midi
-- [ ] ~~synthesize sounds for C2 to B3 and C4 to C7. include sharp/flat keys~~ 
+- [x] ~~synthesize sounds for C2 to B3 and C4 to C7. include sharp/flat keys~~ 
 - [x] MIDIFileSequencer (to convert .mid into List<Node> which can be used by LoadMIDIFile.cs)
 - [x] NoteDurationObject for use of SpawnNotesDropDown 
 - [x] integrate DryWetMidi
