@@ -31,23 +31,8 @@ public class MIDIScript : MonoBehaviour
                     note.shortDisplayName,
                     velocity
                 ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
-
-                //I think the error checking should take place here
-                // if (BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity))
-                //  {
-
-                //   }//enderror checking
-
-                //this generates the reverse piano roll 
-                BarManager.GetComponent<BarScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+                //noteon is processed by RollManager
                 RollManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
-                //this generates the mode4 improv suggestions
-                //if (BarManager.GetComponent<BarScript>().checkAllKeysIfWhite() <= 7
-                //&& BarManager.GetComponent<BarScript>().secondOctaveRaised(note.noteNumber) < 4)
-                //{
-                //    //call here raiseOctavePressed similar to the previous line
-                //  //  BarManager.GetComponent<BarScript>().raiseOctavePressed(note.noteNumber - keyOffset);
-                //}//endif
 
             }; //important onWillNoteOn function 
 
@@ -59,17 +44,18 @@ public class MIDIScript : MonoBehaviour
                     note.shortDisplayName
                 ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
-                BarManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
+                //noteoff is processed by rollmanager
+                RollManager.GetComponent<RollScript>().onNoteOff(note.noteNumber - keyOffset);
+
+                //decommissioning BarManager for now
+                //BarManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
             };
         };
-    }
+    }//end Start
 
     // Update is called once p  er frame
     void Update()
     {
 
-
-    }
-
-
-}
+    }//end update
+}//end MIDIScript

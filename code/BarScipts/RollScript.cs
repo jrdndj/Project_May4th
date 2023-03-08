@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//some portions of this code was inspired from https://github.com/KateSawada/midi_visualizer_tutorial_01/blob/vol01/Assets/Scripts/BarScript.cs
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; //added for colors
@@ -19,7 +20,7 @@ public class RollScript : MonoBehaviour
     //[SerializeField] List<GameObject> spawnedBars = new List<GameObject>(); // bars linked to the released key
 
     //this is for fallen spawns
-    GameObject[] fallenBars = new GameObject[keysCount];
+    // GameObject[] fallenBars = new GameObject[keysCount];
 
     //for the lower position limit
     public GameObject green_line;
@@ -32,15 +33,21 @@ public class RollScript : MonoBehaviour
     public float lowerpositionlimit; //changed to float
     public float spawnpoint;
     bool[] isKeyPressed = new bool[keysCount];
+    bool[] isKeyHighLighted = new bool[keysCount]; //for error checking
 
-    float barSpeed = (float)0.65; //from 0.05 0.15 was ok
+    //to seperate melody and improv pressing
+    bool[] melodyToPress = new bool[keysCount];
+    bool[] improvToPress = new bool[keysCount];
+    bool[] improvToHighlight = new bool[keysCount];
+
+    float barSpeed = (float)0.05; //from 0.05 0.65 was ok //0.15 is still too fast
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
     public ColorBlock theColor;
     public Button theButton;
     Color32 improvpink = new Color32(255, 150, 234, 255);
-    Color32 green = Color.green;
+    //Color32 green = Color.green;
     Color32 yellow = Color.yellow;
 
     //=========== CHORD RELATED VARIABLES ==========/
@@ -112,9 +119,8 @@ public class RollScript : MonoBehaviour
             //get the transform position of the elements
             //it shouldnt matter anyway
             Vector3 keypos = pianoKeys[indexList[i]].transform.localPosition;
-       
+
             //get the position of the element in indexList
-            //Vector3 wkpos = pianoKeys[indexList[i]].transform.position;
             //if index is in blacklist, then spawn blackPrefab, else whitePrefab
             if (blacklist.Contains(indexList[i])) //change this later on 
             {
@@ -141,11 +147,13 @@ public class RollScript : MonoBehaviour
 
             //this put thems into the right x y coordinates
             //spawnedBars[spawnCount].transform.position = new Vector3(pianoKeys[indexList[i]].transform.position.x, spawnpoint+(spawnedBars[spawnCount].transform.localScale.y / 2), 0);
-            Debug.Log("keypos.y = " + keypos.y + "keyscale.y = " + spawnedBars[spawnCount].transform.localScale.y + "combined = " + keypos.y+(spawnedBars[spawnCount].transform.localScale.y / 2));
+            //Debug.Log("keypos.y = " + keypos.y + "keyscale.y = " + spawnedBars[spawnCount].transform.localScale.y + "combined = " + keypos.y+(spawnedBars[spawnCount].transform.localScale.y / 2));
             spawnedBars[spawnCount].transform.localPosition = new Vector3(keypos.x, spawnpoint, keypos.z);
 
             //increase count of spawn cos of serializedfield
             spawnCount++;
+            //remember the melodybars that should be spawned
+            melodyToPress[indexList[i]] = true;
         }//endfor iterating loop list
         if (success == 4)
         {
@@ -154,13 +162,13 @@ public class RollScript : MonoBehaviour
 
     }//end spawnRoll
 
-    private void RollKeys()
+    public void RollKeys()
     {
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
-            //if these dont work then lets LERP
-            if (isKeyPressed[i] && spawnedBars[i] != null)
+            //add some condition where it touches the greenline to pause until pressed
+            if (spawnedBars[i] != null)
             {
                 //Vector3 scale = spawnedBars[i].transform.localScale;
                 //scale.y += barSpeed * 2; //changed from *2 
@@ -184,14 +192,14 @@ public class RollScript : MonoBehaviour
 
         //this prevents the unending loops
         //get the first batch and spawn them
-        SpawnRoll(Cmaj7Chord);
+        SpawnRoll(C7Chord);
 
-        //we use this code to "wait" if any key is pressed
-        //for the midi related 
+        //this cleans up everything at start
         for (int i = 0; i < 61; i++)
         {
             isKeyPressed[i] = false;
-            fallenBars[i] = null;
+            //dont put anything here anymore it fucks up the configuration
+
         }
 
     }//end start function
@@ -203,24 +211,58 @@ public class RollScript : MonoBehaviour
         RollKeys();
 
         //highlightLicks
-        HighlightLicks(Cmaj7ChordTone);
-
-        //have a function here to highlight improv licks
+        HighlightLicks(C7ChordTone);
 
     }//end update function
 
     //some auxilliary functions here that we need to call
     public void onNoteOn(int noteNumber, float velocity)
     {
+        //Debug.Log("note number is " + noteNumber);
+        isKeyPressed[noteNumber] = true;
 
-        if (isKeyPressed[noteNumber])
+        //highlights red if key pressed is not a lick or not in the roll
+        if ((!isKeyHighLighted[noteNumber] && !improvToPress[noteNumber]) || !melodyToPress[noteNumber])
         {
-            theButton = pianoKeys[noteNumber].GetComponent<Button>();
-            theColor = pianoKeys[noteNumber].GetComponent<Button>().colors;
-            theColor.pressedColor = Color.white;
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+        }//else treat it like a noteoff
+
+        //highlights white if key pressed is a lick or is in the roll
+        if ((isKeyHighLighted[noteNumber] && improvToPress[noteNumber]))
+        {
             pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
-        }//change to white if it is pressed
+
+        }//endif
+        if (melodyToPress[noteNumber])
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
+        }//endif
+
     }//endonNoteOn;
+
+    public void onNoteOff(int noteNumber)
+    {
+        //FIRST! - the key is no longer pressed so set it to false duh
+        isKeyPressed[noteNumber] = false;
+
+        //THEN return to the appropriate color
+
+        //if key was in lick and was pressed revert back to pink
+        //if (improvToPress[noteNumber] && improvToHighlight[noteNumber])
+        if (improvToHighlight[noteNumber])
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
+            improvToHighlight[noteNumber] = true; //change to false 
+        }//end if
+        //else make it black 
+        else
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+            //so nothing to change therefore
+
+        }
+    }//end bars pressed on note off 
 
     //lights up a group of keys based on the licks 
     public List<int> HighlightLicks(List<int> lickset)
@@ -228,12 +270,20 @@ public class RollScript : MonoBehaviour
         //show all 4 as a for loops
         for (int i = 0; i < lickset.Count; i++)
         {
+            //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
+            //if pressed, show white else show pink
+            if (isKeyPressed[lickset[i]])
+            {
+                pianoKeys[lickset[i]].GetComponent<Image>().color = Color.white;
+            }
+            else
+            {
+                pianoKeys[lickset[i]].GetComponent<Image>().color = improvpink;
+            }
 
-            theButton = pianoKeys[lickset[i]].GetComponent<Button>();
-            theColor = pianoKeys[lickset[i]].GetComponent<Button>().colors;
-            // theColor.highlightedColor = new Color32(255, 150, 234, 255); //pink color
-            theColor.highlightedColor = improvpink;
-            pianoKeys[lickset[i]].GetComponent<Image>().color = theColor.highlightedColor;
+            //flag the appropriate flags
+            improvToPress[lickset[i]] = true; //for error checking of improv 
+            isKeyHighLighted[lickset[i]] = true; //for reverting
 
         }//endfor
         return lickset;
