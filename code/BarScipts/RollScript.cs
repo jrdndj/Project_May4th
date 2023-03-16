@@ -45,8 +45,11 @@ public class RollScript : MonoBehaviour
     bool[] improvToPress = new bool[keysCount];
     bool[] improvToHighlight = new bool[keysCount];
     int checkHighlights = 0;
+    bool isRolling;
+    bool isNext; 
+    //bool greenIsHit;
 
-    float barSpeed = (float)0.15; //from 0.05 0.65 was ok //0.15 is still too fast
+    float barSpeed = (float)0.25; //from 0.05 0.65 was ok //0.15 is still too fast
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -206,10 +209,16 @@ public class RollScript : MonoBehaviour
             //puts spawn in it proper position
             spawnedBars[spawnCount].transform.localPosition = new Vector3(keypos.x, spawnpoint + 50, keypos.z);
 
+            //add colliders
+            spawnedBars[spawnCount].AddComponent<BoxCollider2D>();
+
             //increase count of spawn cos of serializedfield
             spawnCount++;
-            //remember the melodybars that should be pressed
-            melodyToPress[indexList[i]] = true;
+            if (spawntype == 1)
+            {
+                //remember the melodybars that should be pressed
+                melodyToPress[indexList[i]] = true;
+            }
         }//endfor iterating loop list
         if (success == 4)
         {
@@ -225,6 +234,7 @@ public class RollScript : MonoBehaviour
     //rolls the spawned keys to the greenline
     public void RollKeys()
     {
+        isRolling = true;
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
@@ -233,16 +243,22 @@ public class RollScript : MonoBehaviour
             if (spawnedBars[i] != null)
             {
                 Vector3 pos = spawnedBars[i].transform.position;
+                //var collider = spawnedBars[i].GetComponent<BoxCollider2D>();
                 //changed to -= since we need them to go down
                 pos.y -= barSpeed;
                 spawnedBars[i].transform.position = pos;
 
                 //STEP 03
                 //some destroy instructions here
-                if (spawnedBars[i].transform.position.y - (spawnedBars[i].transform.localScale.y) < destroy_point.transform.position.y)
+                //should be the collider now the position
+                
+                //if(collider.transform.position.y < destroy_point.transform.position.y )
+               if (spawnedBars[i].transform.position.y - (spawnedBars[i].transform.localScale.y) < destroy_point.transform.position.y)
                 //if (spawnedBars[i].transform.position.y < destroy_point.transform.position.y)
                 {
                     Destroy(spawnedBars[i]);
+                 
+
                     //spawnedBars[i] = null; //changing it to null clears it so we can do more spawns
                     spawnNew = true;
 
@@ -277,6 +293,7 @@ public class RollScript : MonoBehaviour
 
         //some crucial initialisation
         highlightNow = false;
+        isNext = false; 
 
         //STEP 01
         //spawn the first in the sequence
@@ -317,8 +334,8 @@ public class RollScript : MonoBehaviour
             else
             {
                 CleanupKeyboard();
-                HighlightLicks(ChordList[ctr-1], yellow);
-                HighlightLicks(LickList[ctr-1], improvpink);
+                HighlightLicks(ChordList[ctr - 1], yellow);
+                HighlightLicks(LickList[ctr - 1], improvpink);
                 //clear all first before setting to zero
                 ctr = 0;
             }
@@ -381,7 +398,7 @@ public class RollScript : MonoBehaviour
                 HighlightLicks(LickList[ctr], improvpink);
                 highlightNow = false;
             }//end if check hihglight now
-            //else do nothing
+           // else do nothing
 
         }//endif
 
@@ -425,12 +442,24 @@ public class RollScript : MonoBehaviour
         //if key was in lick and was pressed revert back to pink
         //if (improvToPress[noteNumber] && improvToHighlight[noteNumber])
         //if key released is in licklist? how to say this? 
-        if (improvToHighlight[noteNumber])
+        //if(LickList[ctr].Contains(noteNumber) && !spawnNew)
+        if (improvToHighlight[noteNumber] && !melodyToPress[noteNumber] && !spawnNew)
         {
             pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
             improvToHighlight[noteNumber] = true; //change to false 
         }//end if
-        //else make it black 
+        //if pressed, melody remains yellow 
+        else if (melodyToPress[noteNumber]) //&& spawnNew
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = yellow;
+
+        }//endif
+         //if (highlightNow)
+         //{
+         //    HighlightLicks(ChordList[ctr - 1], yellow);
+         //    HighlightLicks(LickList[ctr - 1], improvpink);
+         //}
+         //else make it black 
         else
         {
             pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
@@ -517,5 +546,23 @@ public class RollScript : MonoBehaviour
         }//endfor
         //return lickset;
     }//endremovelicks
+
+    ////something for collision with green point
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.collider.name == "green")
+    //    {
+    //        Debug.Log("hit!");
+    //        //greenIsHit = true;
+    //        //hihglight licks
+    //        CleanupKeyboard();
+    //        HighlightLicks(ChordList[ctr], yellow);
+    //        HighlightLicks(LickList[ctr], improvpink);
+
+    //        //then change to false
+    //        greenIsHit = false; 
+
+    //    }
+    //}//end OnCollisionEnter 
 
 }//endclass
