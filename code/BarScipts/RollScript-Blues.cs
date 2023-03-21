@@ -1,4 +1,4 @@
-﻿//some portions of this code was inspired from https://github.com/KateSawada/midi_visualizer_tutorial_01/blob/vol01/Assets/Scripts/BarScript.cs
+//some portions of this code was inspired from https://github.com/KateSawada/midi_visualizer_tutorial_01/blob/vol01/Assets/Scripts/BarScript.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,7 +56,7 @@ public class RollScript : MonoBehaviour
     //bool greenIsHit;
     //bool nameChanged; 
 
-    float barSpeed = (float)0.47; //from 0.05 0.65 was ok //0.15 is still too fast
+    float barSpeed = (float)0.45; //from 0.05 0.65 was ok //0.15 is still too fast
 
     //for the co routines
     private IEnumerator spawn;
@@ -102,10 +102,10 @@ public class RollScript : MonoBehaviour
     static List<int> G7Chord = new List<int>() { 19, 23, 26, 29 };
     static List<int> G7ChordTone = new List<int>() { 31, 35, 38, 41 };
 
-    //D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
-    static List<int> G43Chord = new List<int>() { 14, 17, 19, 23 };
-    static List<int> G43ChordTone = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
-    static List<int> G43HalfStep = new List<int>() { 25, 30, 34 }; //removed 29 here cos of overlap
+    //D3 Fs3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
+    static List<int> G43Chord = new List<int>() { 14, 18, 19, 23 };
+    static List<int> G43ChordTone = new List<int>() { 26, 30, 31, 35, 38, 42, 43, 47 };
+    static List<int> G43HalfStep = new List<int>() { 25, 29, 34 }; //removed 30 here cos of overlap
     static List<int> G43Above = new List<int>() { 28, 33, 36 }; //removed 31 here cos of overlap
 
     //Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
@@ -300,7 +300,7 @@ public class RollScript : MonoBehaviour
                 //some destroy instructions here
 
                 //since we are 2D, we use RectTransform and get the localPosition since we are in real-time
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
@@ -388,9 +388,10 @@ public class RollScript : MonoBehaviour
         //}
         if (improvToHighlight[noteNumber] == true)
         {
-            pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
+            //==========for jazz
+            //pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
             //==========for blues
-            //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
+            pianoKeys[noteNumber].GetComponent<Image>().color = blues;
         }
         else if (melodyToHighlight[noteNumber] == true)
         {
@@ -536,14 +537,15 @@ public class RollScript : MonoBehaviour
 
         //STEP 01
         //spawn the first in the sequence
-        display_name.text = ChordNames[ctr];
-        SpawnRoll(ChordList[ctr], yellow, 1);
+        //======= if we wanna spawn jazz chords we use
+        //display_name.text = ChordNames[ctr];
+        //SpawnRoll(ChordList[ctr], yellow, 1);
 
         //======== if we wanna spawn blues we use
-        //display_name.text = BluesChordNames[ctr];
-        //SpawnRoll(EBluesScale[ctr], yellow, 1);
+        display_name.text = BluesChordNames[ctr];
+        SpawnRoll(EBluesScale[ctr], yellow, 1);
 
-
+       
         //this cleans up everything at start
         for (int i = 0; i < 61; i++)
         {
@@ -566,8 +568,8 @@ public class RollScript : MonoBehaviour
 
             //then highlight the next batch
             //==== JAZZ IMPROV Variables ====
-            HighlightLicks(ChordList[ctr], yellow, 1);
-            HighlightLicks(LickList[ctr], improvpink, 2);
+            //HighlightLicks(ChordList[ctr], yellow, 1);
+            //HighlightLicks(LickList[ctr], improvpink, 2);
 
             //===== Jazz improv with Halfstep
             //HighlightLicks(HalfStepList[ctr], belowpink, 2);
@@ -576,8 +578,8 @@ public class RollScript : MonoBehaviour
             //HighlightLicks(StepAboveList[ctr], belowpink, 3);
 
             //===== BLUES IMPROV VARIABLES ====
-            //HighlightLicks(EBluesScale[ctr], yellow, 1);
-            //HighlightLicks(EBluesImprov[ctr], blues, 2);
+            HighlightLicks(EBluesScale[ctr], yellow, 1);
+            HighlightLicks(EBluesImprov[ctr], blues, 2);
 
             //highlightNow 
             highlightNow = false;
@@ -589,8 +591,8 @@ public class RollScript : MonoBehaviour
             //Some things to control the spawning
             //then increment
             //=====jazz 
-            if (ctr < ChordList.Count - 1)
-            //if (ctr < EBluesScale.Count - 1) //==== improv
+            //if (ctr < ChordList.Count - 1)
+            if (ctr < EBluesScale.Count - 1) //==== improv
             {
                 ctr++;
             }
@@ -606,13 +608,13 @@ public class RollScript : MonoBehaviour
 
             //======jazz variables
             //spawn new based on recent counter
-            display_name.text = ChordNames[ctr];
-            SpawnRoll(ChordList[ctr], yellow, 1);
+            //display_name.text = ChordNames[ctr];
+           // SpawnRoll(ChordList[ctr], yellow, 1);
 
             //=======blues variables
             //spawn new based on recent counter
-            //display_name.text = BluesChordNames[ctr];
-            //SpawnRoll(EBluesScale[ctr], yellow, 1);
+            display_name.text = BluesChordNames[ctr];
+            SpawnRoll(EBluesScale[ctr], yellow, 1);
 
 
             spawnNew = false;
