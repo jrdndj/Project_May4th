@@ -55,6 +55,8 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [ ] logging of spatiotemporal data - correct presses
 - [ ] scoring 
 - [ ] export spatio temporal data with musicxml into csv 
+- [ ] export everything as functions 
+- [ ] toggle feature feature (yes this is not a typo)
 
 ###### single chord
 - [x] spawn a key from this chord information
