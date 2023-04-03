@@ -71,7 +71,7 @@ public class RollScript : MonoBehaviour
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
     Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
 
-    //=========== CHORD RELATED VARIABLES ==========/
+   //=========== CHORD RELATED VARIABLES ==========/
 
     //still need my enum for black key spawning
     List<int> blacklist = new List<int>() { 1, 3, 6, 8, 10, 13, 15, 18, 20, 22, 25, 27, 30, 32, 34, 37, 39, 42, 44, 46, 49, 51, 54, 56, 58 };
@@ -102,10 +102,10 @@ public class RollScript : MonoBehaviour
     static List<int> G7Chord = new List<int>() { 19, 23, 26, 29 };
     static List<int> G7ChordTone = new List<int>() { 31, 35, 38, 41 };
 
-    //D3 Fs3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
-    static List<int> G43Chord = new List<int>() { 14, 18, 19, 23 };
-    static List<int> G43ChordTone = new List<int>() { 26, 30, 31, 35, 38, 42, 43, 47 };
-    static List<int> G43HalfStep = new List<int>() { 25, 29, 34 }; //removed 30 here cos of overlap
+    //D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
+    static List<int> G43Chord = new List<int>() { 14, 17, 19, 23 };
+    static List<int> G43ChordTone = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
+    static List<int> G43HalfStep = new List<int>() { 25, 30, 34 }; //removed 29 here cos of overlap
     static List<int> G43Above = new List<int>() { 28, 33, 36 }; //removed 31 here cos of overlap
 
     //Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
@@ -127,7 +127,9 @@ public class RollScript : MonoBehaviour
     // Blues Semitone on EScale E4 G4 A4 A#4 B4 D5 E5 A#5
     static List<int> ESemiTone = new List<int>() { 28, 31, 33, 34, 35, 38, 40, 43, 45, 46, 47, 50, 52 };
     static List<int> CSemiTone = new List<int>() { 24, 27, 29, 30, 31, 34, 36, 39, 41, 42, 43, 46, 48 };
-    //extended harmonies, simply get last value then +2
+    // F4 Gs4 As4 B4 C5 Ds5 F5
+    static List<int> FSemiTone = new List<int>() { 29, 32, 34, 35, 36, 39, 41, 44, 46, 47, 48, 51, 53 };
+    static List<int> GSemiTone = new List<int>() { 31, 34, 36, 37, 38, 41, 43, 47, 49, 50, 51, 54, 56 };
 
     //list of mixed chords and their chord licks
     //aka minor chords
@@ -140,7 +142,7 @@ public class RollScript : MonoBehaviour
     static List<int> C7ChordTone = new List<int>() { 24, 28, 31, 34 };
 
     //A2 Cs3 E3 G3 - A3 Cs4 E4 G4 - ok mapped! - A4 Cs5 E5 G5
-    static List<int> A7Chord = new List<int>() { 9, 12, 16, 19 };
+    static List<int> A7Chord = new List<int>() { 9, 13, 16, 19 };
     static List<int> A7ChordTone = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 };
     //combined with the chord tone, should only show the halfsteps
     static List<int> A7HalfStep = new List<int>() { 20, 24, 27, 30 };
@@ -154,8 +156,8 @@ public class RollScript : MonoBehaviour
                                                            F7Chord, F7Chord, C7Chord, C7Chord,
                                                             G7Chord, F7Chord, C7Chord, C7Chord };
     List<List<int>> EBluesImprov = new List<List<int>>() { CSemiTone, CSemiTone, CSemiTone, CSemiTone,
-                                                            ESemiTone, ESemiTone, CSemiTone, CSemiTone,
-                                                             ESemiTone, ESemiTone, CSemiTone, CSemiTone};
+                                                            FSemiTone, FSemiTone, CSemiTone, CSemiTone,
+                                                             GSemiTone, FSemiTone, CSemiTone, CSemiTone};
 
     //sequence 1 
     //sequence Dmin7, G43, Cmaj7,
@@ -179,11 +181,11 @@ public class RollScript : MonoBehaviour
     // List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Fmaj7ChordTone, Amin7ChordTone, Dmin7ChordTone, G7ChordTone, Cmin7ChordTone, Amin7ChordTone, Emin7ChordTone, Amin7ChordTone };
 
     //==== SET 05 Chords
-    List<string> ChordNames = new List<string>() { "Dmin7", "G7", "Cmaj7", "A7", "Dmin7", "G7", "Cmaj7" };
-    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, A7Chord, Dmin7Chord, G43Chord, Cmaj7Chord };
-    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, A7ChordTone, Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone };
-    List<List<int>> HalfStepList = new List<List<int>>() { Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, A7HalfStep, Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep };
-    List<List<int>> StepAboveList = new List<List<int>>() { Dmin7Above, G43Above, CMaj7Above, A7Above, Dmin7Above, G43Above, CMaj7Above };
+    List<string> ChordNames = new List<string>() { "Dmin7", "G7", "Cmaj7", "A7", "Dmin7", "G7", "Cmaj7", "Cmaj7" };
+    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, A7Chord, Dmin7Chord, G43Chord, Cmaj7Chord, Cmaj7Chord };
+    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, A7ChordTone, Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Cmaj7ChordTone };
+    List<List<int>> HalfStepList = new List<List<int>>() { Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, A7HalfStep, Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, Cmaj7HalfStep };
+    List<List<int>> StepAboveList = new List<List<int>>() { Dmin7Above, G43Above, CMaj7Above, A7Above, Dmin7Above, G43Above, CMaj7Above, Cmaj7HalfStep };
 
     //THIS IS PART OF STEP 01
     //this method is to initialize important stuff for the piano roll
@@ -283,7 +285,6 @@ public class RollScript : MonoBehaviour
     //rolls the spawned keys to the greenline
     public void RollKeys()
     {
-
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
@@ -299,12 +300,20 @@ public class RollScript : MonoBehaviour
                 //STEP 03
                 //some destroy instructions here
 
-                //since we are 2D, we use RectTransform and get the localPosition since we are in real-time
                 if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                {
+                    //highlight here when they reach the green line
+                    highlightNow = true;
+
+                }//endif
+                 //but we destroy only when they reach destroy point
+
+                //since we are 2D, we use RectTransform and get the localPosition since we are in real-time
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
-                    highlightNow = true;
+                    //highlightNow = true;
 
                     //but we can spawn something new now
                     spawnNew = true;
