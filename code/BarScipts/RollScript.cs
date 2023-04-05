@@ -28,6 +28,9 @@ public class RollScript : MonoBehaviour
     //for the destory point
     public GameObject destroy_point;
 
+    //for spawning the line
+    public GameObject spawn_mid;
+
     //for the chord name to display
     //public GameObject chord_name; 
     [SerializeField] private Text display_name;
@@ -37,6 +40,7 @@ public class RollScript : MonoBehaviour
     public float lowerpositionlimit; //changed to float                              
     public int ctr;  //an internal counter
     public float spawnpoint; //y coord of the spawnpoint
+    public float spawnmid; //y coord for the spawndmid
     bool[] isKeyPressed = new bool[keysCount]; //for spawning
     bool[] isKeyHighLighted = new bool[keysCount]; //for error checking
     bool spawnNew = true; //flag to trigger next spawn or not
@@ -50,13 +54,16 @@ public class RollScript : MonoBehaviour
     //bool[] improvToPress = new bool[keysCount];
     bool[] improvToHighlight = new bool[keysCount];
     //int checkHighlights = 0;
+
+    List<int> lineMapList = new List<int>();
+
     //bool isHit; 
     // bool isRolling;
     //bool isNext;
     //bool greenIsHit;
     //bool nameChanged; 
 
-    float barSpeed = (float)0.47; //from 0.05 0.65 was ok //0.15 is still too fast
+    float barSpeed = (float)0.65; //from 0.05 0.65 was ok //0.15 is still too fast
 
     //for the co routines
     private IEnumerator spawn;
@@ -127,7 +134,9 @@ public class RollScript : MonoBehaviour
     // Blues Semitone on EScale E4 G4 A4 A#4 B4 D5 E5 A#5
     static List<int> ESemiTone = new List<int>() { 28, 31, 33, 34, 35, 38, 40, 43, 45, 46, 47, 50, 52 };
     static List<int> CSemiTone = new List<int>() { 24, 27, 29, 30, 31, 34, 36, 39, 41, 42, 43, 46, 48 };
-    //extended harmonies, simply get last value then +2
+    // F4 Gs4 As4 B4 C5 Ds5 F5
+    static List<int> FSemiTone = new List<int>() { 29, 32, 34, 35, 36, 39, 41, 44, 46, 47, 48, 51, 53 };
+    static List<int> GSemiTone = new List<int>() { 31, 34, 36, 37, 38, 41, 43, 47, 49, 50, 51, 54, 56 };
 
     //list of mixed chords and their chord licks
     //aka minor chords
@@ -140,7 +149,7 @@ public class RollScript : MonoBehaviour
     static List<int> C7ChordTone = new List<int>() { 24, 28, 31, 34 };
 
     //A2 Cs3 E3 G3 - A3 Cs4 E4 G4 - ok mapped! - A4 Cs5 E5 G5
-    static List<int> A7Chord = new List<int>() { 9, 12, 16, 19 };
+    static List<int> A7Chord = new List<int>() { 9, 13, 16, 19 };
     static List<int> A7ChordTone = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 };
     //combined with the chord tone, should only show the halfsteps
     static List<int> A7HalfStep = new List<int>() { 20, 24, 27, 30 };
@@ -154,8 +163,8 @@ public class RollScript : MonoBehaviour
                                                            F7Chord, F7Chord, C7Chord, C7Chord,
                                                             G7Chord, F7Chord, C7Chord, C7Chord };
     List<List<int>> EBluesImprov = new List<List<int>>() { CSemiTone, CSemiTone, CSemiTone, CSemiTone,
-                                                            ESemiTone, ESemiTone, CSemiTone, CSemiTone,
-                                                             ESemiTone, ESemiTone, CSemiTone, CSemiTone};
+                                                            FSemiTone, FSemiTone, CSemiTone, CSemiTone,
+                                                             GSemiTone, FSemiTone, CSemiTone, CSemiTone};
 
     //sequence 1 
     //sequence Dmin7, G43, Cmaj7,
@@ -179,11 +188,11 @@ public class RollScript : MonoBehaviour
     // List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Fmaj7ChordTone, Amin7ChordTone, Dmin7ChordTone, G7ChordTone, Cmin7ChordTone, Amin7ChordTone, Emin7ChordTone, Amin7ChordTone };
 
     //==== SET 05 Chords
-    List<string> ChordNames = new List<string>() { "Dmin7", "G7", "Cmaj7", "A7", "Dmin7", "G7", "Cmaj7" };
-    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, A7Chord, Dmin7Chord, G43Chord, Cmaj7Chord };
-    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, A7ChordTone, Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone };
-    List<List<int>> HalfStepList = new List<List<int>>() { Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, A7HalfStep, Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep };
-    List<List<int>> StepAboveList = new List<List<int>>() { Dmin7Above, G43Above, CMaj7Above, A7Above, Dmin7Above, G43Above, CMaj7Above };
+    List<string> ChordNames = new List<string>() { "Dmin7", "G7", "Cmaj7", "A7", "Dmin7", "G7", "Cmaj7", "Cmaj7" };
+    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, A7Chord, Dmin7Chord, G43Chord, Cmaj7Chord, Cmaj7Chord };
+    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, A7ChordTone, Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Cmaj7ChordTone };
+    List<List<int>> HalfStepList = new List<List<int>>() { Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, A7HalfStep, Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, Cmaj7HalfStep };
+    List<List<int>> StepAboveList = new List<List<int>>() { Dmin7Above, G43Above, CMaj7Above, A7Above, Dmin7Above, G43Above, CMaj7Above, Cmaj7HalfStep };
 
     //THIS IS PART OF STEP 01
     //this method is to initialize important stuff for the piano roll
@@ -197,6 +206,7 @@ public class RollScript : MonoBehaviour
         GameObject whitePrefab, blackPrefab;
         whitePrefab = (GameObject)Resources.Load("Prefab/whitekeyprefab");
         blackPrefab = (GameObject)Resources.Load("Prefab/blackkeyprefab");
+
 
         //scan through the list of keys to spawn based on type
         for (int i = 0; i < indexList.Count; i++)
@@ -214,6 +224,9 @@ public class RollScript : MonoBehaviour
             //get the transform position of the elements
             //it shouldnt matter anyway
             Vector3 keypos = pianoKeys[indexList[i]].transform.localPosition;
+
+            //add to list the index for line mapping later
+            lineMapList.Add(indexList[i]);
 
             //get the position of the element in indexList
             //if index is in blacklist, then spawn blackPrefab, else whitePrefab
@@ -283,7 +296,6 @@ public class RollScript : MonoBehaviour
     //rolls the spawned keys to the greenline
     public void RollKeys()
     {
-
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
@@ -299,20 +311,45 @@ public class RollScript : MonoBehaviour
                 //STEP 03
                 //some destroy instructions here
 
+                //when we reach the spawn mid, show the lines
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= spawn_mid.GetComponent<RectTransform>().localPosition.y)
+                {
+                    //get color then pass it too
+                    //show lines
+                    //Debug.Log("Show mapping lines");
+                    ShowMapLines(lineMapList[i], spawnedBars[i].GetComponent<Image>().color);
+
+                    //clear up keyboard
+                    CleanupKeyboard();
+
+                }//endif
+
+                //when they reach the green line
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                {
+                    //highlight here when they reach the green line
+                    //hide MapLines
+                    // Debug.Log("Hiding map lines");
+                    HideMapLines(lineMapList[i]);
+                    highlightNow = true;
+
+                }//endif
+                 //but we destroy only when they reach destroy point
+
                 //since we are 2D, we use RectTransform and get the localPosition since we are in real-time
                 if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
-                    highlightNow = true;
+                    //highlightNow = true;
+
+                    //clear map lines too
+                    //clearMapLines(lineMapList[i]);
 
                     //but we can spawn something new now
                     spawnNew = true;
 
-                    //add some timing elements here instead
-
                     spawnCount--;
-                    // isHit = true;
                     //then add stuff on improvtoHighlight
                 }//endif check contact green point
 
@@ -352,7 +389,7 @@ public class RollScript : MonoBehaviour
         //i just flipped the logic just in case 
         if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
         {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
         }//endif
         else
         {
@@ -394,7 +431,7 @@ public class RollScript : MonoBehaviour
         }
         else if (melodyToHighlight[noteNumber] == true)
         {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
         }
         else
         {
@@ -442,48 +479,6 @@ public class RollScript : MonoBehaviour
         //return lickset;
     }//endHighlightLicks
 
-    ////lights up a group of keys based on the licks 
-    //public List<int> HighlightChords(List<int> chordset)//removed Color second param
-    //{
-    //    //show all 4 as a for loop
-    //    for (int i = 0; i < chordset.Count; i++)
-    //    {
-    //        pianoKeys[chordset[i]].GetComponent<Image>().color = yellow;
-    //    }//endfors
-    //    checkHighlights++;
-    //    return chordset;
-    //}//endHighlightMelodyChords
-
-
-    //this will be reused to also unhighlight all existing higlights 
-    //when objects get destroyed, unhighlight the most recent lickset
-    //public void RemoveHighLights(List<int> highlightset)
-    //{
-    //    //show all 4 as a for loops
-    //    for (int i = 0; i < highlightset.Count; i++)
-    //    {
-    //        //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
-    //        //if pressed, show white else show pink
-    //        pianoKeys[highlightset[i]].GetComponent<Image>().color = Color.black;
-    //        //flag the appropriate flags
-
-    //        //therefore these flags should change also
-    //        improvToPress[highlightset[i]] = false; //for error checking of improv
-    //        improvToHighlight[highlightset[i]] = false;
-
-    //    }//endfor
-    //    //return lickset;
-    //}//endremovelicks
-
-    //we also need to remove the checking for correct melody pressed
-    //public void RemoveMelodyCheck(List<int> chordset)
-    //{
-    //    for (int i = 0; i < chordset.Count; i++)
-    //    {
-    //        melodyToPress[chordset[i]] = false;
-    //    }//endfor
-
-    //}//endRemoveMelodyCheck
 
     //need a cleanup function
     public void CleanupKeyboard()
@@ -496,31 +491,14 @@ public class RollScript : MonoBehaviour
         //return lickset;
     }//endremovelicks
 
-    ////something for collision with green point
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    if (collision.collider.name == "green")
-    //    {
-    //        Debug.Log("hit!");
-    //        //greenIsHit = true;
-    //        //hihglight licks
-    //        CleanupKeyboard();
-    //        HighlightLicks(ChordList[ctr], yellow);
-    //        HighlightLicks(LickList[ctr], improvpink);
-
-    //        //then change to false
-    //        greenIsHit = false; 
-
-    //    }
-    //}//end OnCollisionEnter
-
     //start is for initialization 
     void Start()
     {
         //set greenline pos
         //these values are true never change them to transform.Position
-        lowerpositionlimit = green_line.transform.localPosition.y;
+        //lowerpositionlimit = green_line.transform.localPosition.y;
         spawnpoint = spawn_top.transform.localPosition.y;
+        //spawnmid = spawn_mid.transform.localPosition.y;
         ctr = 0;
         //belowpink = (Color)improvpink * 0.75f;
         //lets try purple
@@ -538,7 +516,7 @@ public class RollScript : MonoBehaviour
         //spawn the first in the sequence
         display_name.text = ChordNames[ctr];
         SpawnRoll(ChordList[ctr], yellow, 1);
-
+        SpawnRoll(LickList[ctr], improvpink, 2);
         //======== if we wanna spawn blues we use
         //display_name.text = BluesChordNames[ctr];
         //SpawnRoll(EBluesScale[ctr], yellow, 1);
@@ -556,7 +534,7 @@ public class RollScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        RollKeys();
+        //RollKeys();
         if (highlightNow)
         {
             CleanupKeyboard();
@@ -586,6 +564,9 @@ public class RollScript : MonoBehaviour
         //when its time to trigger spawn and chordlist isnt empty
         if (spawnNew)
         {
+            //clear lines when we spawn new
+            clearMapLines();
+
             //Some things to control the spawning
             //then increment
             //=====jazz 
@@ -608,104 +589,23 @@ public class RollScript : MonoBehaviour
             //spawn new based on recent counter
             display_name.text = ChordNames[ctr];
             SpawnRoll(ChordList[ctr], yellow, 1);
+            SpawnRoll(LickList[ctr], improvpink, 2);
 
             //=======blues variables
             //spawn new based on recent counter
             //display_name.text = BluesChordNames[ctr];
             //SpawnRoll(EBluesScale[ctr], yellow, 1);
 
-
             spawnNew = false;
 
         }//endidSpawnNew
 
-        //keep rolling
-        //if spawn is new, trigger a new spawn then immediately turn off flag
-
-        //=============== old version of the code start =====================
-
-        ////if no more spawns spawn new
-        //if (spawnNew)
-        //{
-
-        //    //then increment
-        //    if (ctr < ChordList.Count - 1)
-        //    {
-        //        ctr++;
-        //    }
-        //    //revert back to 0 when over this ensures a loop 
-        //    else
-        //    {
-        //        CleanupKeyboard();
-        //        HighlightLicks(ChordList[ctr - 1], yellow);
-        //        HighlightLicks(LickList[ctr - 1], improvpink);
-        //        //clear all first before setting to zero
-        //        ctr = 0;
-        //    }
-
-        //    //spawn new based on recent counter
-        //    SpawnRoll(ChordList[ctr], yellow, 1);
-        //    // SpawnRoll(LickList[ctr], improvpink, 2);
-
-        //    //we now call HighLightLicks and Highlight Colors inside Roll
-        //    //HighlightLicks(LickList[ctr]);
-        //    //then we highlight if the flag is true
-        //    //if (highlightNow)
-        //    //{
-
-        //    //    //reused highlightlicks to be all purpose  
-        //    //    //HighlightChords(spawnHighLight);
-        //    //    HighlightLicks(spawnHighLight, yellow);
-        //    //    HighlightLicks(improvHighlight, improvpink);
-
-        //    //    //set Highlights to false right after
-        //    //    if (checkHighlights == 2)
-        //    //    {
-        //    //        highlightNow = false;
-        //    //    }//endif checkHighlights 
-        //    //}//endifhighlightNow
-
-        //    //weve spawned again so no need until destroy 
-        //   // spawnNew = false;
-        //}//endifspawnNew
-
-        ////if there are spawns then roll them
-        ////if(spawnedBars.Length > 0)
-        //if (!spawnNew)
-        //{
-        //    //then just keep rolling them
-        //    RollKeys();
-        //    //remove hihglights only if there was 
-        //    if (highlightNow && checkHighlights >= 2 && ctr >= 1) //
-        //    {
-        //        //remove highlights here
-        //        //remove first before you increment
-        //        //remove both types of highlights
-        //        RemoveHighLights(LickList[ctr - 1]);
-        //        RemoveHighLights(ChordList[ctr - 1]);
-        //        //remove the correct melody checks too
-        //        RemoveMelodyCheck(ChordList[ctr - 1]);
-        //    }
-        //    //if (ctr == 0)
-        //    //{
-        //    //    RemoveHighLights(LickList[ctr]);
-        //    //    RemoveHighLights(ChordList[ctr]);
-        //    //    //remove the correct melody checks too
-        //    //    RemoveMelodyCheck(ChordList[ctr]);
-        //    //}
-        //    //highlight now
-        //    if (highlightNow)
-        //    {
-        //        CleanupKeyboard();
-        //        HighlightLicks(ChordList[ctr], yellow);
-        //        HighlightLicks(LickList[ctr], improvpink);
-        //        highlightNow = false;
-        //    }//end if check hihglight now
-        //}//endif !spawnNew
-
-        //=============== old version of the code END =====================
-
     }//end update function
+
+    private void FixedUpdate()
+    {
+        RollKeys();
+    }
 
     public void ClearImprovs()
     {
@@ -722,5 +622,33 @@ public class RollScript : MonoBehaviour
             melodyToHighlight[i] = false;
         }
     }//endclearImprovs
+
+    public void ShowMapLines(int keyNumber, Color lineColor)
+    {
+
+        //get the index number, pass the darker color
+        //trigger change color, have a lose color when you hit the green line
+        Color darkerColor = new Color();
+        darkerColor = (Color)lineColor * 0.75f;
+        pianoKeys[keyNumber].transform.GetChild(1).GetComponent<Image>().color = darkerColor;
+        //lineMaptoRemove.Add(keyNumber);
+        //lineMapList.Remove(keyNumber);
+        // lineMap[keyNumber] = true;
+
+    }//end show map lines
+
+    public void HideMapLines(int keyNumber)
+    {
+        //when you hit the green line then call this method
+        pianoKeys[keyNumber].transform.GetChild(1).GetComponent<Image>().color = Color.black;
+
+        //when you show up, the highlights must disappear
+    }//end hidemap lines
+
+    public void clearMapLines()
+    {
+        // lineMapList.RemoveAt(keyNumber);
+        lineMapList.Clear(); //Debug.Log("Map lines clear");
+    }
 
 }//endclass
