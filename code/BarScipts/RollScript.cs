@@ -18,6 +18,7 @@ public class RollScript : MonoBehaviour
     //this is to manage spawns
     GameObject[] spawnedBars = new GameObject[keysCount]; //this was original
     //GameObject[] spawnedBars = new GameObject[1000];
+    GameObject[] spawnedLines = new GameObject[keysCount];
 
     //for the lower position limit
     public GameObject green_line;
@@ -45,6 +46,9 @@ public class RollScript : MonoBehaviour
     bool[] isKeyHighLighted = new bool[keysCount]; //for error checking
     bool spawnNew = true; //flag to trigger next spawn or not
     bool highlightNow = false; //flag to trigger higlighting
+    //bool turnOfflights = false; 
+    bool decreasing = false; //for the bars spawning
+    bool destroyed = false; 
     //some crucial variables
     public int spawnCount = 0;
 
@@ -296,16 +300,27 @@ public class RollScript : MonoBehaviour
     //rolls the spawned keys to the greenline
     public void RollKeys()
     {
+
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
+   
             //if there are bars spawned keep rolling )
             if (spawnedBars[i] != null)
             {
                 Vector3 pos = spawnedBars[i].transform.position;
+                RectTransform SpawnScale = spawnedBars[i].GetComponent<RectTransform>();
                 //var collider = spawnedBars[i].GetComponent<BoxCollider2D>();
                 //changed to -= since we need them to go down
-                pos.y -= barSpeed;
+
+                if (!decreasing)
+                {
+                    pos.y -= barSpeed;
+                }
+                else
+                {
+                    pos.y -= 0.43f;
+                }
                 spawnedBars[i].transform.position = pos;
 
                 //STEP 03
@@ -325,7 +340,7 @@ public class RollScript : MonoBehaviour
                 }//endif
 
                 //when they reach the green line
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 55) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
                     //highlight here when they reach the green line
                     //hide MapLines
@@ -333,11 +348,42 @@ public class RollScript : MonoBehaviour
                     HideMapLines(lineMapList[i]);
                     highlightNow = true;
 
-                }//endif
-                 //but we destroy only when they reach destroy point
+                    //start reducing in size
+                    SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - barSpeed * 5);
 
-                //since we are 2D, we use RectTransform and get the localPosition since we are in real-time
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
+                   
+                    //dont move it anymore
+                    decreasing = true;
+
+                    if (SpawnScale.rect.height <= 0)
+                    {
+                        CleanupKeyboard();
+                        highlightNow = false;
+                        destroyed = true; 
+                    }
+                }//endif
+                //if (destroyed)
+                //{
+                //    Destroy(spawnedBars[i]);
+                //    //highlightNow = true;
+
+                //    //clear map lines too
+                //    //clearMapLines(lineMapList[i]);
+
+                //    //but we can spawn something new now
+                //    spawnNew = true;
+                //    decreasing = false;
+
+                //    spawnCount--;
+                //    //Debug.Log("Tukaj!");
+                //}//end destroyed
+
+                //but we destroy only when they reach destroy point
+
+                //the destroying must happen here no matter what 
+
+                ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y) <= destroy_point.GetComponent<RectTransform>().localPosition.y+120)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
@@ -348,6 +394,9 @@ public class RollScript : MonoBehaviour
 
                     //but we can spawn something new now
                     spawnNew = true;
+                    decreasing = false;
+
+                    CleanupKeyboard();
 
                     spawnCount--;
                     //then add stuff on improvtoHighlight
@@ -650,5 +699,17 @@ public class RollScript : MonoBehaviour
         // lineMapList.RemoveAt(keyNumber);
         lineMapList.Clear(); //Debug.Log("Map lines clear");
     }
+
+    //public void decreaseSpawnSize()
+    //{
+    //    //the pattern code works like this
+    //    //Vector3 scale = barsPressed[i].transform.localScale;
+    //    //        scale.y += barSpeed * 2; //changed from *2 
+    //    //        barsPressed[i].transform.localScale = scale;
+    //    Vector3 SpawnScale = spawnedBars[i].transform.localScale;
+    //    SpawnScale.y += barSpeed * 2;
+    //    spawnedBars[i].transform.localScale = SpawnScale; 
+
+    //}//end decreaseSpawnSize
 
 }//endclass
