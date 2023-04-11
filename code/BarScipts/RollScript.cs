@@ -21,10 +21,10 @@ public class RollScript : MonoBehaviour
     GameObject[] spawnedLines = new GameObject[keysCount];
 
     //for the lower position limit
-    public GameObject green_line;
+    public GameObject green_line; //formerly 0 -85 0
 
     //for the spawn point
-    public GameObject spawn_top;
+    public GameObject spawn_top; // 0 350 0
 
     //for the destory point
     public GameObject destroy_point;
@@ -357,7 +357,7 @@ public class RollScript : MonoBehaviour
 
                     if (SpawnScale.rect.height <= 0)
                     {
-                        CleanupKeyboard();
+                        //CleanupKeyboard();
                         highlightNow = false;
                         destroyed = true; 
                     }
@@ -396,7 +396,7 @@ public class RollScript : MonoBehaviour
                     spawnNew = true;
                     decreasing = false;
 
-                    CleanupKeyboard();
+                    //CleanupKeyboard();
 
                     spawnCount--;
                     //then add stuff on improvtoHighlight
@@ -426,107 +426,107 @@ public class RollScript : MonoBehaviour
     // step 04b: clear spawn and highlight lists 
     // step 05: proceed to next spawn, repeat
 
-    //some auxilliary functions here that we need to call
-    public void onNoteOn(int noteNumber, float velocity)
-    {
-        //do we even need this?? 
-        //isKeyPressed[noteNumber] = true;
+    ////some auxilliary functions here that we need to call
+    //public void onNoteOn(int noteNumber, float velocity)
+    //{
+    //    //do we even need this?? 
+    //    //isKeyPressed[noteNumber] = true;
 
-        //that's it - red if not highlighted 
-        //highlights red if key pressed is not a lick or not in the roll
-        //if ((!isKeyHighLighted[noteNumber] && !improvToPress[noteNumber]) || !melodyToPress[noteNumber])
-        //i just flipped the logic just in case 
-        if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
-        {
-            // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
-        }//endif
-        else
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
-        }//endif
-         //you need to forget the melodies until a new one comes
+    //    //that's it - red if not highlighted 
+    //    //highlights red if key pressed is not a lick or not in the roll
+    //    //if ((!isKeyHighLighted[noteNumber] && !improvToPress[noteNumber]) || !melodyToPress[noteNumber])
+    //    //i just flipped the logic just in case 
+    //    if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
+    //    {
+    //        // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+    //    }//endif
+    //    else
+    //    {
+    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+    //    }//endif
+    //     //you need to forget the melodies until a new one comes
 
-        //totally something else
-        //if (melodyToHighlight[noteNumber]==true)
-        //{
-        //    melodyToHighlight[noteNumber] = false;
-        //}//end forget melody
-        //else it's wrong that simple
+    //    //totally something else
+    //    //if (melodyToHighlight[noteNumber]==true)
+    //    //{
+    //    //    melodyToHighlight[noteNumber] = false;
+    //    //}//end forget melody
+    //    //else it's wrong that simple
 
-    }//endonNoteOn;
+    //}//endonNoteOn;
 
-    public void onNoteOff(int noteNumber)
-    {
-        //FIRST! - the key is no longer pressed so set it to false duh
-        isKeyPressed[noteNumber] = false;
+    //public void onNoteOff(int noteNumber)
+    //{
+    //    //FIRST! - the key is no longer pressed so set it to false duh
+    //    isKeyPressed[noteNumber] = false;
 
-        ////THEN return to the appropriate color
+    //    ////THEN return to the appropriate color
 
-        ////if key was in lick and was pressed revert back to pink
-        ////if (improvToPress[noteNumber] && improvToHighlight[noteNumber])
-        ////if key released is in liscklist? how to say this? 
-        ////if(LickList[ctr].Contains(noteNumber) && !spawnNew)
-        ////if (improvToHighlight[noteNumber] && !melodyToPress[noteNumber] && !spawnNew)
-        // if (!isKeyHighLighted[noteNumber])
-        // {
-        //pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-        // improvToHighlight[noteNumber] = false; //change to false 
-        //}
-        if (improvToHighlight[noteNumber] == true)
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
-            //==========for blues
-            //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
-        }
-        else if (melodyToHighlight[noteNumber] == true)
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
-        }
-        else
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-        }
+    //    ////if key was in lick and was pressed revert back to pink
+    //    ////if (improvToPress[noteNumber] && improvToHighlight[noteNumber])
+    //    ////if key released is in liscklist? how to say this? 
+    //    ////if(LickList[ctr].Contains(noteNumber) && !spawnNew)
+    //    ////if (improvToHighlight[noteNumber] && !melodyToPress[noteNumber] && !spawnNew)
+    //    // if (!isKeyHighLighted[noteNumber])
+    //    // {
+    //    //pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+    //    // improvToHighlight[noteNumber] = false; //change to false 
+    //    //}
+    //    if (improvToHighlight[noteNumber] == true)
+    //    {
+    //        pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
+    //        //==========for blues
+    //        //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
+    //    }
+    //    else if (melodyToHighlight[noteNumber] == true)
+    //    {
+    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
+    //    }
+    //    else
+    //    {
+    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+    //    }
 
-        //just call the highlights again
-        //if (highlightNow)
-        //{
-        //    HighlightLicks(LickList[ctr], improvpink, 2);
-        //}
-        //if (isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
-        //{
-        //    pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
-        //}
+    //    //just call the highlights again
+    //    //if (highlightNow)
+    //    //{
+    //    //    HighlightLicks(LickList[ctr], improvpink, 2);
+    //    //}
+    //    //if (isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
+    //    //{
+    //    //    pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
+    //    //}
 
-    }//end bars pressed on note off 
+    //}//end bars pressed on note off 
 
-    //lights up a group of keys based on the licks 
-    public void HighlightLicks(List<int> lickset, Color32 highlightcolor, int spawntype)
-    {
-        //show all 4 as a for loops
-        for (int i = 0; i < lickset.Count; i++)
-        {
-            //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
+    ////lights up a group of keys based on the licks 
+    //public void HighlightLicks(List<int> lickset, Color32 highlightcolor, int spawntype)
+    //{
+    //    //show all 4 as a for loops
+    //    for (int i = 0; i < lickset.Count; i++)
+    //    {
+    //        //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
 
-            //highlight piano key based on color and spawntype
-            pianoKeys[lickset[i]].GetComponent<Image>().color = highlightcolor;
+    //        //highlight piano key based on color and spawntype
+    //        pianoKeys[lickset[i]].GetComponent<Image>().color = highlightcolor;
 
-            //store information for onNoteOff
-            if (spawntype == 2) //2 if improv
-            {
-                improvToHighlight[lickset[i]] = true;
-            }
-            else //1 if melody
-            {
-                melodyToHighlight[lickset[i]] = true;
-            }
+    //        //store information for onNoteOff
+    //        if (spawntype == 2) //2 if improv
+    //        {
+    //            improvToHighlight[lickset[i]] = true;
+    //        }
+    //        else //1 if melody
+    //        {
+    //            melodyToHighlight[lickset[i]] = true;
+    //        }
 
-            //we update flag for error checking
-            isKeyHighLighted[lickset[i]] = true; //this works never remove this
+    //        //we update flag for error checking
+    //        isKeyHighLighted[lickset[i]] = true; //this works never remove this
 
-        }//endfor
-        //checkHighlights++;
-        //return lickset;
-    }//endHighlightLicks
+    //    }//endfor
+    //    //checkHighlights++;
+    //    //return lickset;
+    //}//endHighlightLicks
 
 
     //need a cleanup function
@@ -555,7 +555,7 @@ public class RollScript : MonoBehaviour
         //start with a clean slate
         ClearMelodies();
         ClearImprovs();
-        CleanupKeyboard();
+       // CleanupKeyboard();
 
         //some crucial initialisation
         highlightNow = false;
@@ -586,15 +586,15 @@ public class RollScript : MonoBehaviour
         //RollKeys();
         if (highlightNow)
         {
-            CleanupKeyboard();
+           // CleanupKeyboard();
             //we need to clear previous improvs so they dont stain the keyboard
             ClearMelodies();
             ClearImprovs();
 
             //then highlight the next batch
             //==== JAZZ IMPROV Variables ====
-            HighlightLicks(ChordList[ctr], yellow, 1);
-            HighlightLicks(LickList[ctr], improvpink, 2);
+           // HighlightLicks(ChordList[ctr], yellow, 1);
+           // HighlightLicks(LickList[ctr], improvpink, 2);
 
             //===== Jazz improv with Halfstep
             //HighlightLicks(HalfStepList[ctr], belowpink, 2);
