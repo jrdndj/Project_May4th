@@ -1,8 +1,48 @@
 # Project_May4th
 repository for Piano 2.0 MVP v1
 
+<img src="eva-title.png">
+
+### reBuild requirements as of 11.04.2023
+
+#### design elements
+Controllers 
+ * RollScript - responsible for spawning and rolling piano roll
+ * TimeMgr - for time control, timebar generation, tempo management, time signature etc
+ * ImprovMgr - manages all highlighted keys that produces viz 
+ * InputMgr - manages scoring, timing in relation to user press and chord information
+ * VizMgr - contains all toggle-able checkboxes that produces "adaptive" dynamic options for the user
+
+Models
+ * ChordMgr - contains all chord-key piano information 
+ * CollectionMgr - contains all chord-improv-pairing information. 
+ 
+Views are integrated into the design of the classes. In principle we can see Builder, Factory, Wrapper and Iterator elements among our design. 
+
+More information about dependencies and relationships will be revealed soon as we finalise the design. 
+
+#### new targets 
+- [x] create classes
+- [x] integrate them with the piano canvas environment
+- [x] migrate existing functions from now-decommissioned RollScript.cs
+- [x] implement TimeMgr 
+- [x] implement ImprovMgr
+- [x] implement ChordMgr
+- [x] implement InputMgr
+- [x] cleanup RollScript to its new intended purpose
+- [ ] find a way to implement MapLines()
+- [ ] implement CollectionMgr
+- [ ] implement passing of information based on targetted dependencies
+- [ ] implement VizMgr and toggle 
+- [ ] demo to bosses
+- [ ] Study 1 with Improv Teachers
+- [ ] Study 2 with Improv Students
+- [ ] Study 3 on Spatiotemporal Data collection
+- [ ] Graduate
+ 
 ### MVP version ready by ~22 Aug~ ~I DONT EVEN KNOW ANYMORE~ AY WE HERE BRUH 
 
+### v1 requirements
 
 #### hardware details ===
 
@@ -18,8 +58,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 
 ~~target completion of MVP 13/11/2021 30/11/2021~~
 
-
-#### targets for an minimum viable product (MVP) 
+#### targets for an minimum viable product (MVP) - ALL DONE
 
 ##### hardware targets
 - [x] setup MIDI input with laptop
