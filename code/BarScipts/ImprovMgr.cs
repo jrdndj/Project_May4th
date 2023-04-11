@@ -5,6 +5,7 @@
  * - scoring mechanisms 
  * - detecting chord from pressed keys
  * - identifying the right improv based on detected chord
+ * - manages all visualizations related to improvisation (and keys)
  * 
  * dependent to: ChordMgr, RollManager
  * dependent of: InputMgr
@@ -140,16 +141,31 @@ public class ImprovMgr : MonoBehaviour
         //return lickset;
     }//endHighlightLicks
 
+    //need a cleanup function
+    public void CleanupKeyboard()
+    {
+        //show all 4 as a for loops
+        for (int i = 0; i < keysCount; i++)
+        {
+            pianoKeys[i].GetComponent<Image>().color = Color.black;
+        }//endfor
+        //return lickset;
+    }//endremovelicks
+
 
     // Start is called before the first frame update
     void Start()
     {
-       //we should call some functions that passes the y coordinates to RollScript 
+        //routine cleanup
+        CleanupKeyboard();
+
+        //we should call some functions that passes the y coordinates to RollScript 
     }
 
     // Update is called once per frame
     void Update()
     {
+        CleanupKeyboard();
         
     }
 

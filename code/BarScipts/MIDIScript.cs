@@ -43,7 +43,7 @@ public class MIDIScript : MonoBehaviour
                 //noteon is processed by RollManager
                 //RollManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
 
-                ImprovManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+                ImprovManager.GetComponent<ImprovMgr>().onNoteOn(note.noteNumber - keyOffset, velocity);
 
 
             }; //important onWillNoteOn function 
@@ -59,7 +59,7 @@ public class MIDIScript : MonoBehaviour
                 //noteoff is processed by rollmanager
                 //RollManager.GetComponent<RollScript>().onNoteOff(note.noteNumber - keyOffset);
 
-                ImprovManager.GetComponent<RollScript>().onNoteOff(note.noteNumber - keyOffset);
+                ImprovManager.GetComponent<ImprovMgr>().onNoteOff(note.noteNumber - keyOffset);
 
                 //decommissioning BarManager for now
                 //BarManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
