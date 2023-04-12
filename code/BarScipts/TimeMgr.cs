@@ -22,7 +22,13 @@ public class TimeMgr : MonoBehaviour
     [SerializeField] GameObject RollManager;
 
     //this will be the bar. we need an instantiate in SpawnBar and a prefab clone
-    GameObject TimeBar;
+    //GameObject TimeBar;
+    public GameObject[] TimeBar = new GameObject[4]; //max 4 at a given time
+
+    //important counters
+    public int timebarctr = 0; //counts the current number of timebars spawned
+    public int movebarctr = 0; //iterator counter so it doesnt affect current spawns
+    public int secondctr = 0; //for knowing when to spawn 
 
     //for the lower position limit
     public GameObject green_line;
@@ -44,9 +50,10 @@ public class TimeMgr : MonoBehaviour
     public int startMinutes;
     public TimeSpan start;
     public TimeSpan time;
-    public bool Started = false; 
+    public bool Started = false;
 
-    float barSpeed = (float)0.6666666667; //from 0.05 0.65 was ok //0.15 is still too fast
+    float barSpeed = (float)0.682; //from 0.05 0.65 was ok //0.15 is still too fast
+    //0.6666666667;
 
     // Start is called before the first frame update
     void Start()
@@ -74,55 +81,66 @@ public class TimeMgr : MonoBehaviour
     // we use fixed update on this so it is constant
     void FixedUpdate()
     {
-
         //this where the time should update (on a fixed rate)
-       time = TimeSpan.FromSeconds(currentTime);
+        time = TimeSpan.FromSeconds(currentTime);
 
-        //putting this here just for the monitoring. 
-        //Debug.Log("Currenttime is " + time.ToString(@"mm\:ss"));
-        //Debug.Log("next chordtime is " + ChordTimings[ctr]);
+        ////move the bars
+        //foreach(GameObject i in TimeBar){
+        //    MoveBar(i);
+        //}
+        MoveBar(TimeBar[0]);
 
-        //move the bar
-        MoveBar();
+        if (TimeBar[1] != null)
+        {
+            MoveBar(TimeBar[1]);
+        }
+       
+        //checktime here
+
+        checkTime();
+
+        //check spawnCounter
+        checkSpawnCount();
 
         //and this moves the timer so never touch this
-       currentTime += Time.deltaTime;
-
+        currentTime += Time.deltaTime;
     }
 
     //I think its best to just spawn the bar once and move them and teleport them
     public void SpawnBar()
     {
-
         //set prefab to load -- update with actual prefab
         GameObject BarPrefab;
         BarPrefab = (GameObject)Resources.Load("Prefab/barprefab");
 
         //instantiate first
-        TimeBar = Instantiate(BarPrefab);
+        TimeBar[timebarctr] = Instantiate(BarPrefab);
 
         //set parent as timemgr
-        TimeBar.transform.SetParent(TimeManager.transform, true);
+        TimeBar[timebarctr].transform.SetParent(TimeManager.transform, true);
 
         //if we changing its scale then this is where do we it
         // change scale here
-        TimeBar.transform.localScale = new Vector3(green_line.transform.localScale.x, 1, 1);
+        TimeBar[timebarctr].transform.localScale = new Vector3(green_line.transform.localScale.x, 0.5f, 1);
 
-        //then change the color here
+        //then change the color herei
         //(0.5, 0.5, 0.5, 1)
-        TimeBar.GetComponent<Image>().color = greyColor;
+        TimeBar[timebarctr].GetComponent<Image>().color = greyColor;
 
         //get the vector variable for position of the green line 
         Vector3 keypos = green_line.transform.localPosition;
 
         //then assign in initial position prior movement
-        TimeBar.transform.localPosition = new Vector3(keypos.x, spawnpoint, keypos.z);
-        //removed +50 from spawnpoint 
+        TimeBar[timebarctr].transform.localPosition = new Vector3(keypos.x, spawnpoint, keypos.z);
+        //removed +50 from spawnpoint
+
+        //increment spawnbar
+        timebarctr++;
 
     }//endSpawnBar
 
-    //this moves or rolls the bar every 3rd or 4th 
-    public void MoveBar()
+    //this should have its own counter  
+    public void MoveBar(GameObject TimeBar)
     {
         ///general algorithm
         // spawn them from SpawnBar()
@@ -132,8 +150,11 @@ public class TimeMgr : MonoBehaviour
 
         float keyStartTime = currentTime;
 
-        Vector3 pos = TimeBar.transform.position;
+        // Vector3 pos = TimeBar[movebarctr].transform.position;
         Vector3 backpos = spawn_top.transform.position;
+
+        Vector3 pos = TimeBar.transform.position;
+        //Vector3 backpos = spawn_top.transform.position;
 
         //===== this is the transform position approach ========/
         //this is the rate of movement
@@ -168,34 +189,26 @@ public class TimeMgr : MonoBehaviour
         //====== end of transform position approach =====
     }//end MoveBar
 
-    /*
-     * this is a sample LERP from ParseMIDI for reference
-     * 
-        //this is the target position vector of the LERP
-        Vector3 Ypos = gameObject.transform.GetChild(68).position;
-        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-       // float time = 0.01f;
-        float time = 0; 
+    public void checkTime()
+    {
+        //if it is divisible by 4 then spawn
+        if ((time.TotalSeconds)==2)
+        {
+            //Debug.Log("seconds is" + time.TotalSeconds);
+            SpawnBar();
+        }
 
-        //this is the start position of the object 
-        Vector3 startPosition = Note1.transform.position;
-        //the target interpolation is the y position plus half of its size 
-        Vector3 targetPosition = new Vector3(Note1.transform.position.x, Ypos.y - (Note1.transform.localScale.y /2), -1);
-        while (Note1.transform.position.y + (Note1.transform.localScale.y / 2) > YCordGreenLine)
-        //changed rom >= to >. revert if it causes issues
-            {
-            Note1.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
-            // Debug.Log("startposition" + startPosition);
-            //  Debug.Log("target" + targetPosition);
-            time += Time.deltaTime;
-            //original time
+    }//enmd check time
 
-           
-            //time = time * time * time * (time * (6f * time - 15f) + 10f);
-            yield return null;            
-        }        
-      *
-      *
-      *
-     */
-}
+    //ensures that oiur timebars are upto 4 only and dont overload the array
+    public void checkSpawnCount()
+    {
+        if (timebarctr == 4)
+        {
+            //reset
+            timebarctr = 0;
+        }
+    }//endcheckTime
+
+
+}//end TimeMgr
