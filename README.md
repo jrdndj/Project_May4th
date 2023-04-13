@@ -30,9 +30,9 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement ChordMgr
 - [x] implement InputMgr
 - [x] cleanup RollScript to its new intended purpose
-- [ ] find a way to implement MapLines()
-- [ ] implement CollectionMgr
-- [ ] implement passing of information based on targetted dependencies
+- [ ] find a way to implement MapLines() - discussed with K and M. up next. 
+- [x] implement CollectionMgr
+- [x] implement passing of information based on targetted dependencies
 - [ ] implement VizMgr and toggle 
 - [ ] demo to bosses
 - [ ] Study 1 with Improv Teachers
