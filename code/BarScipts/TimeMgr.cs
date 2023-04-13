@@ -51,9 +51,11 @@ public class TimeMgr : MonoBehaviour
     public TimeSpan start;
     public TimeSpan time;
     public bool Started = false;
+    public int beatcount = 0; 
 
+    //1.3333 fps is equiv to 80 BPM which is 4-4 time signature 
     float barSpeed = (float)0.682; //from 0.05 0.65 was ok //0.15 is still too fast
-    //0.6666666667;
+    //0.6666666667;//0.682
 
     // Start is called before the first frame update
     void Start()
@@ -65,7 +67,7 @@ public class TimeMgr : MonoBehaviour
         start = TimeSpan.Zero;
         startWatch = Time.time;
 
-        //and here is where we move time
+        //and here is where we move timek
         time = TimeSpan.FromSeconds(currentTime);
 
         //color related init
@@ -90,10 +92,10 @@ public class TimeMgr : MonoBehaviour
         //}
         MoveBar(TimeBar[0]);
 
-        if (TimeBar[1] != null)
-        {
-            MoveBar(TimeBar[1]);
-        }
+        //if (TimeBar[1] != null)
+        //{
+        //    MoveBar(TimeBar[1]);
+        //}
        
         //checktime here
 
@@ -184,6 +186,8 @@ public class TimeMgr : MonoBehaviour
             TimeBar.GetComponent<Image>().color = reducedAlpha;
             //then teleport back to back position
             TimeBar.transform.position = backpos;
+            beatcount++;
+            Debug.Log("beat count" + beatcount);
         }//end if
 
         //====== end of transform position approach =====
@@ -195,7 +199,7 @@ public class TimeMgr : MonoBehaviour
         if ((time.TotalSeconds)==2)
         {
             //Debug.Log("seconds is" + time.TotalSeconds);
-            SpawnBar();
+           // SpawnBar();
         }
 
     }//enmd check time
