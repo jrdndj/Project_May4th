@@ -30,7 +30,8 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement ChordMgr
 - [x] implement InputMgr
 - [x] cleanup RollScript to its new intended purpose
-- [ ] find a way to implement MapLines() - discussed with K and M. up next. 
+- [ ] find a way to implement MapLines() - discussed with bosses. 
+- [ ] rework RollScript.cs specifically SpawnKeys(), RollKeys() and MapLines() functions
 - [x] implement CollectionMgr
 - [x] implement passing of information based on targetted dependencies
 - [ ] implement VizMgr and toggle 
