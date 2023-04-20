@@ -8,95 +8,94 @@
  *
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CollectionMgr : MonoBehaviour
 {
-    //dictionary of chord and length sequences 
-    Dictionary<string, int> BluesSeq001 = new Dictionary<string, int>()
+    //we need to send a message to RollManager 
+    [SerializeField] GameObject ChordManager; //for the pianoroll
+
+     /*
+     * Here we describe the different sequences that the user can choose from
+     * what we need to know is every chord has a semitone or a chordtone
+     * 
+     * */
+
+    //solution was inspired from https://stackoverflow.com/questions/8002455/how-to-easily-initialize-a-list-of-tuples
+    List<(string, int)> Blues001 = new List<(string, int)>
     {
-        {"C7", 4},
-        {"F7", 2},
-        {"C7", 2},
-        {"G7", 1},
-        {"F7", 1},
-        {"C7", 2}
+        ("C7", 1),
+        ("F7", 2),
+        ("C7", 2),
+        ("G7", 1),
+        ("F7", 1),
+        ("C7", 2)
     };
 
-    Dictionary<string, int> JazzSeq001 = new Dictionary<string, int>()
+    List<(string, int)> JazzSeq001 = new List<(string, int)>
     {
-        {"Dm7", 2},
-        {"G7", 2},
-        {"CM7", 2},
-        {"rest", 2},
+        ("Dm7", 2),
+        ("G7", 2),
+        ("CM7", 2),
+        ("rest", 2)
     };
 
-    Dictionary<string, int> JazzSeq003 = new Dictionary<string, int>()
+    List<(string, int)> JazzSeq003 = new List<(string, int)>
     {
-        {"Dm7", 4},
-        {"G7", 4},
-        {"CM7", 4}
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4)
     };
 
-    Dictionary<string, int> JazzSeq004 = new Dictionary<string, int>()
+    List<(string, int)> JazzSeq004 = new List<(string, int)>
     {
-        {"Dm7", 4},
-        {"G7", 4},
-        {"C7", 2},
-        {"C7", 2},
+        ("Dm7", 4),
+        ("G7", 4),
+        ("C7", 2),
+        ("C7", 2)
     };
 
-    Dictionary<string, int> JazzSeq012 = new Dictionary<string, int>()
+    List<(string, int)> JazzSeq012 = new List<(string, int)>
     {
-        {"Dm7", 2},
-        {"G7", 2},
-        {"CM7", 2},
-        {"A7", 2},
-        {"Dm7", 1}
+        ("Dm7", 2),
+        ("G7", 2),
+        ("CM7", 2),
+        ("A7", 2),
+        ("Dm7", 1)
     };
 
-    //some function here that sends something based on what user picks
-    public Dictionary<string, int> SendToChordMgr()
+    List<(string, int)> JazzSeq013 = new List<(string, int)>
     {
-        Dictionary<string, int> SequenceToSend = new Dictionary<string, int>();
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4),
+        ("A7", 1)
+    };
 
+    //we use this to send to ChordMgr 
+    public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
+    {
+        //all this ever does is send the right sequence 
         return SequenceToSend; 
     }
-
-
-    //===== some sample dictionary codes just to help you 
-    //    //this creates the hashmap of time and key pairs for spawning
-    //    List<string> list1 = new List<string>();
-    //            try
-    //            {
-    //                for (int i = 0; i<NoteTimes[ShowUpTime].Count; i++)
-    //                {
-    //                    list1.Add(NoteTimes[ShowUpTime][i]);
-    //                }
-
-    //            }
-    //            catch (Exception e)
-    //{
-    //    //Debug.Log("came here");
-    //    //   NoteTimes[ShowUpTime] = new List<string>();
-    //    Debug.Log("Exception " + e);
-    //}
-    //list1.Add(NoteName);
-    ////Debug.Log(list1);
-    //NoteTimes[ShowUpTime] = list1;
-
 
     // Start is called before the first frame update
     void Start()
     {
+        //lets send something here - now just one sequence
+        //but soon it will be something the user picks
+        ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq004);
+        //04 for now cos 01 has rest. i have yet to deal with that 
 
     }
 
     // Update is called once per frame
     void Update()
     {
+    
 
     }
 }
