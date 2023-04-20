@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class RollMgr : MonoBehaviour
 {
+    //an important element to manage all children of spawns
+    [SerializeField] GameObject rollManager;
+
+
     // Start is called before the first frame update
     void Start()
     {

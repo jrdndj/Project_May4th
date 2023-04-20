@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq; //for ToList
 using UnityEngine.UI; //added for colors
 
 public class RollScript : MonoBehaviour
@@ -13,6 +14,7 @@ public class RollScript : MonoBehaviour
 
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
+
     //[SerializeField] GameObject piano; //should be the piano lets sees
 
     //this is to manage spawns
@@ -48,9 +50,12 @@ public class RollScript : MonoBehaviour
     bool highlightNow = false; //flag to trigger higlighting
     //bool turnOfflights = false; 
     bool decreasing = false; //for the bars spawning
-    bool destroyed = false; 
+    bool destroyed = false;
     //some crucial variables
     public int spawnCount = 0;
+
+    //height of 120 means it runs for 2 seconds.
+    //height of 60 means it runs for 1 second
 
     //to seperate melody and improv pressing
     //s bool[] melodyToPress = new bool[keysCount];
@@ -61,13 +66,15 @@ public class RollScript : MonoBehaviour
 
     List<int> lineMapList = new List<int>();
 
+    public List<int> YPlotsReceived = new List<int>();
+
     //bool isHit; 
     // bool isRolling;
     //bool isNext;
     //bool greenIsHit;
     //bool nameChanged; 
 
-    float barSpeed = (float)0.65; //from 0.05 0.65 was ok //0.15 is still too fast
+    float barSpeed = (float)0.682; //from 0.05 0.65 was ok //0.15 is still too fast
 
     //for the co routines
     private IEnumerator spawn;
@@ -82,93 +89,93 @@ public class RollScript : MonoBehaviour
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
     Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
 
-    //=========== CHORD RELATED VARIABLES ==========/
+    ////=========== CHORD RELATED VARIABLES ==========/
 
-    //still need my enum for black key spawning
+    ////still need my enum for black key spawning
     List<int> blacklist = new List<int>() { 1, 3, 6, 8, 10, 13, 15, 18, 20, 22, 25, 27, 30, 32, 34, 37, 39, 42, 44, 46, 49, 51, 54, 56, 58 };
 
-    //systematically first octave white is 0th to 6th, second octave is 7th to 13th etc
-    /**
-     * octave of 2 index is 0 to 11
-     * octave of 3 index is 12 to 23
-     * octave of 4 index is 24 to 35
-     * octave of 5 index is 36 to 47
-     * octave of 6 index is 48 to 59
-     * octave of 7 index is only 60
-     */
-    //list of some white only chords and their chord licks
-    //D3 F3 A3 C4 --- D4 F4 A4 C5 - ok mapped! - higher D5 F5 A5 C6
-    static List<int> Dmin7Chord = new List<int>() { 14, 17, 21, 24 };
-    static List<int> Dmin7ChordTone = new List<int>() { 26, 29, 33, 36, 38, 41, 45, 48 };
-    static List<int> Dmin7HalfStep = new List<int>() { 25, 28, 32, 35 };
-    static List<int> Dmin7Above = new List<int>() { 28, 31, 35, 38 };
+    ////systematically first octave white is 0th to 6th, second octave is 7th to 13th etc
+    ///**
+    // * octave of 2 index is 0 to 11
+    // * octave of 3 index is 12 to 23
+    // * octave of 4 index is 24 to 35
+    // * octave of 5 index is 36 to 47
+    // * octave of 6 index is 48 to 59
+    // * octave of 7 index is only 60
+    // */
+    ////list of some white only chords and their chord licks
+    ////D3 F3 A3 C4 --- D4 F4 A4 C5 - ok mapped! - higher D5 F5 A5 C6
+    //static List<int> Dmin7Chord = new List<int>() { 14, 17, 21, 24 };
+    //static List<int> Dmin7ChordTone = new List<int>() { 26, 29, 33, 36, 38, 41, 45, 48 };
+    //static List<int> Dmin7HalfStep = new List<int>() { 25, 28, 32, 35 };
+    //static List<int> Dmin7Above = new List<int>() { 28, 31, 35, 38 };
 
-    //C3 E3 G3 B3 --- C4 E4 G4 B4 - ok mapped! - C5 E5 G5 B5
-    static List<int> Cmaj7Chord = new List<int>() { 12, 16, 19, 23 };
-    static List<int> Cmaj7ChordTone = new List<int>() { 24, 28, 31, 35, 36, 40, 43, 47 };
-    static List<int> Cmaj7HalfStep = new List<int>() { 23, 27, 30, 34 };
-    static List<int> CMaj7Above = new List<int>() { 26, 29, 33, 36 };
+    ////C3 E3 G3 B3 --- C4 E4 G4 B4 - ok mapped! - C5 E5 G5 B5
+    //static List<int> Cmaj7Chord = new List<int>() { 12, 16, 19, 23 };
+    //static List<int> Cmaj7ChordTone = new List<int>() { 24, 28, 31, 35, 36, 40, 43, 47 };
+    //static List<int> Cmaj7HalfStep = new List<int>() { 23, 27, 30, 34 };
+    //static List<int> CMaj7Above = new List<int>() { 26, 29, 33, 36 };
 
-    //G3 B3 D4 F4 --- G4 B4 D5 F5 - ok mapped! 
-    static List<int> G7Chord = new List<int>() { 19, 23, 26, 29 };
-    static List<int> G7ChordTone = new List<int>() { 31, 35, 38, 41 };
+    ////G3 B3 D4 F4 --- G4 B4 D5 F5 - ok mapped! 
+    //static List<int> G7Chord = new List<int>() { 19, 23, 26, 29 };
+    //static List<int> G7ChordTone = new List<int>() { 31, 35, 38, 41 };
 
-    //D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
-    static List<int> G43Chord = new List<int>() { 14, 17, 19, 23 };
-    static List<int> G43ChordTone = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
-    static List<int> G43HalfStep = new List<int>() { 25, 30, 34 }; //removed 29 here cos of overlap
-    static List<int> G43Above = new List<int>() { 28, 33, 36 }; //removed 31 here cos of overlap
+    ////D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
+    //static List<int> G43Chord = new List<int>() { 14, 17, 19, 23 };
+    //static List<int> G43ChordTone = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
+    //static List<int> G43HalfStep = new List<int>() { 25, 30, 34 }; //removed 29 here cos of overlap
+    //static List<int> G43Above = new List<int>() { 28, 33, 36 }; //removed 31 here cos of overlap
 
-    //Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
-    static List<int> Amin7Chord = new List<int>() { 21, 24, 28, 31 };
-    static List<int> Amin7ChordTone = new List<int>() { 33, 36, 40, 43 };
+    ////Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
+    //static List<int> Amin7Chord = new List<int>() { 21, 24, 28, 31 };
+    //static List<int> Amin7ChordTone = new List<int>() { 33, 36, 40, 43 };
 
-    //Emin7 E3 G3 B3 D4 --- E4 G4 B4 D5 - ok mapped!
-    static List<int> Emin7Chord = new List<int>() { 16, 19, 23, 26 };
-    static List<int> Emin7ChordTone = new List<int>() { 28, 31, 35, 38 };
+    ////Emin7 E3 G3 B3 D4 --- E4 G4 B4 D5 - ok mapped!
+    //static List<int> Emin7Chord = new List<int>() { 16, 19, 23, 26 };
+    //static List<int> Emin7ChordTone = new List<int>() { 28, 31, 35, 38 };
 
-    //Fmaj7Chord F3 A3 C4 E4 --- F4 A4 C5 E 5 - ok mapped!
-    static List<int> Fmaj7Chord = new List<int>() { 17, 21, 24, 28 };
-    static List<int> Fmaj7ChordTone = new List<int>() { 29, 33, 36, 40 };
-    //extended harmonies, simply get last value then +2
+    ////Fmaj7Chord F3 A3 C4 E4 --- F4 A4 C5 E 5 - ok mapped!
+    //static List<int> Fmaj7Chord = new List<int>() { 17, 21, 24, 28 };
+    //static List<int> Fmaj7ChordTone = new List<int>() { 29, 33, 36, 40 };
+    ////extended harmonies, simply get last value then +2
 
-    //F7Chord F3 A3 C4 Ds4 --- 
-    static List<int> F7Chord = new List<int>() { 17, 21, 24, 27 };
+    ////F7Chord F3 A3 C4 Ds4 --- 
+    //static List<int> F7Chord = new List<int>() { 17, 21, 24, 27 };
 
-    // Blues Semitone on EScale E4 G4 A4 A#4 B4 D5 E5 A#5
-    static List<int> ESemiTone = new List<int>() { 28, 31, 33, 34, 35, 38, 40, 43, 45, 46, 47, 50, 52 };
-    static List<int> CSemiTone = new List<int>() { 24, 27, 29, 30, 31, 34, 36, 39, 41, 42, 43, 46, 48 };
-    // F4 Gs4 As4 B4 C5 Ds5 F5
-    static List<int> FSemiTone = new List<int>() { 29, 32, 34, 35, 36, 39, 41, 44, 46, 47, 48, 51, 53 };
-    static List<int> GSemiTone = new List<int>() { 31, 34, 36, 37, 38, 41, 43, 47, 49, 50, 51, 54, 56 };
+    //// Blues Semitone on EScale E4 G4 A4 A#4 B4 D5 E5 A#5
+    //static List<int> ESemiTone = new List<int>() { 28, 31, 33, 34, 35, 38, 40, 43, 45, 46, 47, 50, 52 };
+    //static List<int> CSemiTone = new List<int>() { 24, 27, 29, 30, 31, 34, 36, 39, 41, 42, 43, 46, 48 };
+    //// F4 Gs4 As4 B4 C5 Ds5 F5
+    //static List<int> FSemiTone = new List<int>() { 29, 32, 34, 35, 36, 39, 41, 44, 46, 47, 48, 51, 53 };
+    //static List<int> GSemiTone = new List<int>() { 31, 34, 36, 37, 38, 41, 43, 47, 49, 50, 51, 54, 56 };
 
-    //list of mixed chords and their chord licks
-    //aka minor chords
-    //Cmin7 C3 D#3 G3 As3 -- C4 D#4 G4 As4 - ok mapped!
-    static List<int> Cmin7Chord = new List<int>() { 12, 15, 19, 22 };
-    static List<int> Cmin7ChordTone = new List<int>() { 24, 27, 31, 34 };
+    ////list of mixed chords and their chord licks
+    ////aka minor chords
+    ////Cmin7 C3 D#3 G3 As3 -- C4 D#4 G4 As4 - ok mapped!
+    //static List<int> Cmin7Chord = new List<int>() { 12, 15, 19, 22 };
+    //static List<int> Cmin7ChordTone = new List<int>() { 24, 27, 31, 34 };
 
-    //C7 C3 E3 G3 A#3 - C4 E4 G4 A#4 - ok mapped! 
-    static List<int> C7Chord = new List<int>() { 12, 16, 19, 22 };
-    static List<int> C7ChordTone = new List<int>() { 24, 28, 31, 34 };
+    ////C7 C3 E3 G3 A#3 - C4 E4 G4 A#4 - ok mapped! 
+    //static List<int> C7Chord = new List<int>() { 12, 16, 19, 22 };
+    //static List<int> C7ChordTone = new List<int>() { 24, 28, 31, 34 };
 
-    //A2 Cs3 E3 G3 - A3 Cs4 E4 G4 - ok mapped! - A4 Cs5 E5 G5
-    static List<int> A7Chord = new List<int>() { 9, 13, 16, 19 };
-    static List<int> A7ChordTone = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 };
-    //combined with the chord tone, should only show the halfsteps
-    static List<int> A7HalfStep = new List<int>() { 20, 24, 27, 30 };
-    static List<int> A7Above = new List<int>() { 23, 26, 29, 33 };
+    ////A2 Cs3 E3 G3 - A3 Cs4 E4 G4 - ok mapped! - A4 Cs5 E5 G5
+    //static List<int> A7Chord = new List<int>() { 9, 13, 16, 19 };
+    //static List<int> A7ChordTone = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 };
+    ////combined with the chord tone, should only show the halfsteps
+    //static List<int> A7HalfStep = new List<int>() { 20, 24, 27, 30 };
+    //static List<int> A7Above = new List<int>() { 23, 26, 29, 33 };
 
-    //====== SOME BLUES IMPROV variables =====
-    List<string> BluesChordNames = new List<string>() { "C7", "C7", "C7", "C7",
-                                                           "F7", "F7", "C7", "C7",
-                                                              "G7", "F7", "C7", "C7",};
-    List<List<int>> EBluesScale = new List<List<int>>() { C7Chord, C7Chord, C7Chord, C7Chord,
-                                                           F7Chord, F7Chord, C7Chord, C7Chord,
-                                                            G7Chord, F7Chord, C7Chord, C7Chord };
-    List<List<int>> EBluesImprov = new List<List<int>>() { CSemiTone, CSemiTone, CSemiTone, CSemiTone,
-                                                            FSemiTone, FSemiTone, CSemiTone, CSemiTone,
-                                                             GSemiTone, FSemiTone, CSemiTone, CSemiTone};
+    ////====== SOME BLUES IMPROV variables =====
+    //List<string> BluesChordNames = new List<string>() { "C7", "C7", "C7", "C7",
+    //                                                       "F7", "F7", "C7", "C7",
+    //                                                          "G7", "F7", "C7", "C7",};
+    //List<List<int>> EBluesScale = new List<List<int>>() { C7Chord, C7Chord, C7Chord, C7Chord,
+    //                                                       F7Chord, F7Chord, C7Chord, C7Chord,
+    //                                                        G7Chord, F7Chord, C7Chord, C7Chord };
+    //List<List<int>> EBluesImprov = new List<List<int>>() { CSemiTone, CSemiTone, CSemiTone, CSemiTone,
+    //                                                        FSemiTone, FSemiTone, CSemiTone, CSemiTone,
+    //                                                         GSemiTone, FSemiTone, CSemiTone, CSemiTone};
 
     //sequence 1 
     //sequence Dmin7, G43, Cmaj7,
@@ -191,14 +198,40 @@ public class RollScript : MonoBehaviour
     //List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, Fmaj7Chord, Amin7Chord, Dmin7Chord, G7Chord, Cmin7Chord, Amin7Chord, Emin7Chord, Amin7Chord };
     // List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Fmaj7ChordTone, Amin7ChordTone, Dmin7ChordTone, G7ChordTone, Cmin7ChordTone, Amin7ChordTone, Emin7ChordTone, Amin7ChordTone };
 
-    //==== SET 05 Chords
-    List<string> ChordNames = new List<string>() { "Dmin7", "G7", "Cmaj7", "A7", "Dmin7", "G7", "Cmaj7", "Cmaj7" };
-    List<List<int>> ChordList = new List<List<int>>() { Dmin7Chord, G43Chord, Cmaj7Chord, A7Chord, Dmin7Chord, G43Chord, Cmaj7Chord, Cmaj7Chord };
-    List<List<int>> LickList = new List<List<int>>() { Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, A7ChordTone, Dmin7ChordTone, G43ChordTone, Cmaj7ChordTone, Cmaj7ChordTone };
-    List<List<int>> HalfStepList = new List<List<int>>() { Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, A7HalfStep, Dmin7HalfStep, G43HalfStep, Cmaj7HalfStep, Cmaj7HalfStep };
-    List<List<int>> StepAboveList = new List<List<int>>() { Dmin7Above, G43Above, CMaj7Above, A7Above, Dmin7Above, G43Above, CMaj7Above, Cmaj7HalfStep };
+    ////I need you but I will need to refactor you
+    List<string> ChordNames = new List<string>();
+    public List<List<int>> ChordList = new List<List<int>>();
+    public List<List<int>> LickList = new List<List<int>>();
+    public List<List<int>> HalfStepList = new List<List<int>>();
+    public List<List<int>> StepAboveList = new List<List<int>>();
+    //public List<int> YPlots = new List<int>();
+
+    //a function that receives from ImprovMgr
+    public void ListReceiver(List<List<int>> List1, List<List<int>> List2)
+    {
+        //assign chordlist
+        foreach (var item in List1)
+        {
+            Debug.Log("Passing " + item);
+            ChordList.Add(item);
+        }//endchordlist
+
+        //assign licklist
+        foreach (var item in List2)
+        {
+            Debug.Log("Passing " + item);
+            LickList.Add(item);
+        }//endlicklist 
+
+        //return ListReceived;
+    }//endListReceiver
+
+
 
     //THIS IS PART OF STEP 01
+    //=== we need to change this - we spawn everything at once and it is lined up
+    //there. this we dont have any exception and we just roll everything down
+    //destroy them as well 
     //this method is to initialize important stuff for the piano roll
     public void SpawnRoll(List<int> indexList, Color32 spawncolor, int spawntype)
     {
@@ -215,15 +248,6 @@ public class RollScript : MonoBehaviour
         //scan through the list of keys to spawn based on type
         for (int i = 0; i < indexList.Count; i++)
         {
-            ////immediate add them to their correct highlight list 
-            //if (spawntype == 1)
-            //{
-            //    spawnHighLight.Add(indexList[i]);
-            //}
-            //else
-            //{
-            //    improvHighlight.Add(indexList[i]);
-            //}
 
             //get the transform position of the elements
             //it shouldnt matter anyway
@@ -272,9 +296,9 @@ public class RollScript : MonoBehaviour
 
             //puts spawn in it proper position
             spawnedBars[spawnCount].transform.localPosition = new Vector3(keypos.x, spawnpoint + 50, keypos.z);
-
-            //add colliders
-            // spawnedBars[spawnCount].AddComponent<BoxCollider2D>();
+            //here, they must be positioned based on their sequence
+            //upnext: a visual way to arrange them considering the time it takes
+            // = how long does it take to arrive 
 
             //increase count of spawn cos of serializedfield
             spawnCount++;
@@ -290,10 +314,6 @@ public class RollScript : MonoBehaviour
             spawnNew = false;
         }
 
-        // yield return spawnNew = false;
-        //pass it
-        //yield return indexList;
-
     }//end spawnRoll
 
     //STEP 02
@@ -304,7 +324,7 @@ public class RollScript : MonoBehaviour
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
-   
+
             //if there are bars spawned keep rolling )
             if (spawnedBars[i] != null)
             {
@@ -326,32 +346,32 @@ public class RollScript : MonoBehaviour
                 //STEP 03
                 //some destroy instructions here
 
-                //when we reach the spawn mid, show the lines
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= spawn_mid.GetComponent<RectTransform>().localPosition.y)
-                {
-                    //get color then pass it too
-                    //show lines
-                    //Debug.Log("Show mapping lines");
-                    ShowMapLines(lineMapList[i], spawnedBars[i].GetComponent<Image>().color);
+                ////when we reach the spawn mid, show the lines
+                //if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= spawn_mid.GetComponent<RectTransform>().localPosition.y)
+                //{
+                //    //get color then pass it too
+                //    //show lines
+                //    //Debug.Log("Show mapping lines");
+                //   // ShowMapLines(lineMapList[i], spawnedBars[i].GetComponent<Image>().color);
 
-                    //clear up keyboard
-                    CleanupKeyboard();
+                //    //clear up keyboard
+                //    CleanupKeyboard();
 
-                }//endif
+                //}//endif
 
                 //when they reach the green line
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 55) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 30) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
                     //highlight here when they reach the green line
                     //hide MapLines
                     // Debug.Log("Hiding map lines");
-                    HideMapLines(lineMapList[i]);
+                    // HideMapLines(lineMapList[i]);
                     highlightNow = true;
 
                     //start reducing in size
                     SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - barSpeed * 5);
 
-                   
+
                     //dont move it anymore
                     decreasing = true;
 
@@ -359,7 +379,7 @@ public class RollScript : MonoBehaviour
                     {
                         //CleanupKeyboard();
                         highlightNow = false;
-                        destroyed = true; 
+                        destroyed = true;
                     }
                 }//endif
                 //if (destroyed)
@@ -383,7 +403,7 @@ public class RollScript : MonoBehaviour
                 //the destroying must happen here no matter what 
 
                 ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y) <= destroy_point.GetComponent<RectTransform>().localPosition.y+120)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y) <= destroy_point.GetComponent<RectTransform>().localPosition.y + 120)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
@@ -426,123 +446,25 @@ public class RollScript : MonoBehaviour
     // step 04b: clear spawn and highlight lists 
     // step 05: proceed to next spawn, repeat
 
-    ////some auxilliary functions here that we need to call
-    //public void onNoteOn(int noteNumber, float velocity)
-    //{
-    //    //do we even need this?? 
-    //    //isKeyPressed[noteNumber] = true;
-
-    //    //that's it - red if not highlighted 
-    //    //highlights red if key pressed is not a lick or not in the roll
-    //    //if ((!isKeyHighLighted[noteNumber] && !improvToPress[noteNumber]) || !melodyToPress[noteNumber])
-    //    //i just flipped the logic just in case 
-    //    if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
-    //    {
-    //        // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
-    //    }//endif
-    //    else
-    //    {
-    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
-    //    }//endif
-    //     //you need to forget the melodies until a new one comes
-
-    //    //totally something else
-    //    //if (melodyToHighlight[noteNumber]==true)
-    //    //{
-    //    //    melodyToHighlight[noteNumber] = false;
-    //    //}//end forget melody
-    //    //else it's wrong that simple
-
-    //}//endonNoteOn;
-
-    //public void onNoteOff(int noteNumber)
-    //{
-    //    //FIRST! - the key is no longer pressed so set it to false duh
-    //    isKeyPressed[noteNumber] = false;
-
-    //    ////THEN return to the appropriate color
-
-    //    ////if key was in lick and was pressed revert back to pink
-    //    ////if (improvToPress[noteNumber] && improvToHighlight[noteNumber])
-    //    ////if key released is in liscklist? how to say this? 
-    //    ////if(LickList[ctr].Contains(noteNumber) && !spawnNew)
-    //    ////if (improvToHighlight[noteNumber] && !melodyToPress[noteNumber] && !spawnNew)
-    //    // if (!isKeyHighLighted[noteNumber])
-    //    // {
-    //    //pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-    //    // improvToHighlight[noteNumber] = false; //change to false 
-    //    //}
-    //    if (improvToHighlight[noteNumber] == true)
-    //    {
-    //        pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
-    //        //==========for blues
-    //        //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
-    //    }
-    //    else if (melodyToHighlight[noteNumber] == true)
-    //    {
-    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
-    //    }
-    //    else
-    //    {
-    //        pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-    //    }
-
-    //    //just call the highlights again
-    //    //if (highlightNow)
-    //    //{
-    //    //    HighlightLicks(LickList[ctr], improvpink, 2);
-    //    //}
-    //    //if (isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
-    //    //{
-    //    //    pianoKeys[noteNumber].GetComponent<Image>().color = improvpink;
-    //    //}
-
-    //}//end bars pressed on note off 
-
-    ////lights up a group of keys based on the licks 
-    //public void HighlightLicks(List<int> lickset, Color32 highlightcolor, int spawntype)
+    ////need a cleanup function
+    //public void CleanupKeyboard()
     //{
     //    //show all 4 as a for loops
-    //    for (int i = 0; i < lickset.Count; i++)
+    //    for (int i = 0; i < keysCount; i++)
     //    {
-    //        //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
-
-    //        //highlight piano key based on color and spawntype
-    //        pianoKeys[lickset[i]].GetComponent<Image>().color = highlightcolor;
-
-    //        //store information for onNoteOff
-    //        if (spawntype == 2) //2 if improv
-    //        {
-    //            improvToHighlight[lickset[i]] = true;
-    //        }
-    //        else //1 if melody
-    //        {
-    //            melodyToHighlight[lickset[i]] = true;
-    //        }
-
-    //        //we update flag for error checking
-    //        isKeyHighLighted[lickset[i]] = true; //this works never remove this
-
+    //        pianoKeys[i].GetComponent<Image>().color = Color.black;
     //    }//endfor
-    //    //checkHighlights++;
     //    //return lickset;
-    //}//endHighlightLicks
-
-
-    //need a cleanup function
-    public void CleanupKeyboard()
-    {
-        //show all 4 as a for loops
-        for (int i = 0; i < keysCount; i++)
-        {
-            pianoKeys[i].GetComponent<Image>().color = Color.black;
-        }//endfor
-        //return lickset;
-    }//endremovelicks
+    //}//endremovelicks
 
     //start is for initialization 
     void Start()
     {
+        //receiving functions
+        //ReceiveYPlots();
+       // ReceiveLists(ChordList);
+       // ReceiveLists(LickList);
+
         //set greenline pos
         //these values are true never change them to transform.Position
         //lowerpositionlimit = green_line.transform.localPosition.y;
@@ -555,7 +477,7 @@ public class RollScript : MonoBehaviour
         //start with a clean slate
         ClearMelodies();
         ClearImprovs();
-       // CleanupKeyboard();
+        // CleanupKeyboard();
 
         //some crucial initialisation
         highlightNow = false;
@@ -563,9 +485,9 @@ public class RollScript : MonoBehaviour
 
         //STEP 01
         //spawn the first in the sequence
-        display_name.text = ChordNames[ctr];
-        SpawnRoll(ChordList[ctr], yellow, 1);
-        SpawnRoll(LickList[ctr], improvpink, 2);
+       // display_name.text = ChordNames[ctr];
+       // SpawnRoll(ChordList[ctr], yellow, 1);
+      //  SpawnRoll(LickList[ctr], improvpink, 2);
         //======== if we wanna spawn blues we use
         //display_name.text = BluesChordNames[ctr];
         //SpawnRoll(EBluesScale[ctr], yellow, 1);
@@ -586,15 +508,15 @@ public class RollScript : MonoBehaviour
         //RollKeys();
         if (highlightNow)
         {
-           // CleanupKeyboard();
+            // CleanupKeyboard();
             //we need to clear previous improvs so they dont stain the keyboard
             ClearMelodies();
             ClearImprovs();
 
             //then highlight the next batch
             //==== JAZZ IMPROV Variables ====
-           // HighlightLicks(ChordList[ctr], yellow, 1);
-           // HighlightLicks(LickList[ctr], improvpink, 2);
+            // HighlightLicks(ChordList[ctr], yellow, 1);
+            // HighlightLicks(LickList[ctr], improvpink, 2);
 
             //===== Jazz improv with Halfstep
             //HighlightLicks(HalfStepList[ctr], belowpink, 2);
@@ -636,9 +558,9 @@ public class RollScript : MonoBehaviour
 
             //======jazz variables
             //spawn new based on recent counter
-            display_name.text = ChordNames[ctr];
-            SpawnRoll(ChordList[ctr], yellow, 1);
-            SpawnRoll(LickList[ctr], improvpink, 2);
+            //display_name.text = ChordNames[ctr];
+        //    SpawnRoll(ChordList[ctr], yellow, 1);
+        //    SpawnRoll(LickList[ctr], improvpink, 2);
 
             //=======blues variables
             //spawn new based on recent counter
@@ -672,6 +594,9 @@ public class RollScript : MonoBehaviour
         }
     }//endclearImprovs
 
+    //change algo. map lines get spawned but change in active color
+    //also they shrink over time
+    //they key is to guide the user for the NEXT
     public void ShowMapLines(int keyNumber, Color lineColor)
     {
 
@@ -698,18 +623,31 @@ public class RollScript : MonoBehaviour
     {
         // lineMapList.RemoveAt(keyNumber);
         lineMapList.Clear(); //Debug.Log("Map lines clear");
-    }
+    }//end clearmaplines
 
-    //public void decreaseSpawnSize()
+    public void ReceiveYPlots(List <int> List3)
+    {
+        foreach (var item in List3)
+        {
+            Debug.Log("Offset saved " + item );
+            YPlotsReceived.Add(item);
+        }//end foreach
+
+        //return YPlotsReceived;
+    }//end receive y plots
+
+    //public List<List<int>> ReceiveLists(List<List<int>> ListReceived)
     //{
-    //    //the pattern code works like this
-    //    //Vector3 scale = barsPressed[i].transform.localScale;
-    //    //        scale.y += barSpeed * 2; //changed from *2 
-    //    //        barsPressed[i].transform.localScale = scale;
-    //    Vector3 SpawnScale = spawnedBars[i].transform.localScale;
-    //    SpawnScale.y += barSpeed * 2;
-    //    spawnedBars[i].transform.localScale = SpawnScale; 
 
-    //}//end decreaseSpawnSize
+    //    Debug.Log("List has " + ListReceived.Count);
+    //    foreach (var item in ListReceived)
+    //    {
+    //        Debug.Log("Offset of " + item);
+    //    }//end foreach
+
+    //    return ListReceived;
+
+    //}//end receivelists
+
 
 }//endclass

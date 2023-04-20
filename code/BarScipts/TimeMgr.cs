@@ -19,7 +19,7 @@ using UnityEngine.UI; //for the color
 public class TimeMgr : MonoBehaviour
 {
     [SerializeField] GameObject TimeManager;
-    [SerializeField] GameObject RollManager;
+    // [SerializeField] GameObject RollManager;
 
     //this will be the bar. we need an instantiate in SpawnBar and a prefab clone
     //GameObject TimeBar;
@@ -46,12 +46,21 @@ public class TimeMgr : MonoBehaviour
     private float startWatch;
     public float keyStartTime;
     public TimeSpan songTime;
+
+    //this is for the stopwatch
     public float currentTime;
     public int startMinutes;
+
+    //time elapsed related variable
+    public int startmark = 0;
+    public int elapsedtime = 0;
+
     public TimeSpan start;
     public TimeSpan time;
     public bool Started = false;
-    public int beatcount = 0; 
+    public int beatcount = 0;
+    public string currentTimeText; 
+
 
     //1.3333 fps is equiv to 80 BPM which is 4-4 time signature 
     float barSpeed = (float)0.682; //from 0.05 0.65 was ok //0.15 is still too fast
@@ -63,9 +72,12 @@ public class TimeMgr : MonoBehaviour
         // have some time-related declarations here
         //time related inits
         currentTime = 0.000f; //current time is stored in seconds, start at 00
+       // timeStarted = timeElapsed * 60; 
         keyStartTime = currentTime;
         start = TimeSpan.Zero;
         startWatch = Time.time;
+
+        //StartTimer();
 
         //and here is where we move timek
         time = TimeSpan.FromSeconds(currentTime);
@@ -83,8 +95,20 @@ public class TimeMgr : MonoBehaviour
     // we use fixed update on this so it is constant
     void FixedUpdate()
     {
+
+       // //timer 
+       // if (timerActive)
+       // {
+       //     timeStarted -= Time.deltaTime; 
+       // }
+       //// TimeSpan time = TimeSpan.FromSeconds(timeStarted);
+       // currentTimeText = timeStarted.ToString();
+       // Debug.Log("Time elapsed " + currentTimeText);
+
+        //stopwatch
         //this where the time should update (on a fixed rate)
         time = TimeSpan.FromSeconds(currentTime);
+       
 
         ////move the bars
         //foreach(GameObject i in TimeBar){
@@ -92,11 +116,11 @@ public class TimeMgr : MonoBehaviour
         //}
         MoveBar(TimeBar[0]);
 
-        //if (TimeBar[1] != null)
-        //{
-        //    MoveBar(TimeBar[1]);
-        //}
-       
+        if (TimeBar[1] != null)
+        {
+            MoveBar(TimeBar[1]);
+        }
+
         //checktime here
 
         checkTime();
@@ -178,7 +202,7 @@ public class TimeMgr : MonoBehaviour
         //if it reaches the "destroy point" then teleport back to top
         if ((TimeBar.GetComponent<RectTransform>().localPosition.y) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
         {
-            Debug.Log("time reached " + time.ToString(@"mm\:ss\:fff"));
+           // Debug.Log("time reached " + time.ToString(@"mm\:ss\:fff"));
 
             //revert alpha then teleport back
             Color reducedAlpha = TimeBar.GetComponent<Image>().color;
@@ -187,19 +211,25 @@ public class TimeMgr : MonoBehaviour
             //then teleport back to back position
             TimeBar.transform.position = backpos;
             beatcount++;
-            Debug.Log("beat count" + beatcount);
+            //Debug.Log("beat count" + beatcount);
         }//end if
 
         //====== end of transform position approach =====
     }//end MoveBar
 
+    //this is the function that most methods and classes will use 
+    public TimeSpan GetTime()
+    {
+        return time; 
+    }//end getTime
+
     public void checkTime()
     {
         //if it is divisible by 4 then spawn
-        if ((time.TotalSeconds)==2)
+        if ((time.TotalSeconds) == 2)
         {
             //Debug.Log("seconds is" + time.TotalSeconds);
-           // SpawnBar();
+            SpawnBar();
         }
 
     }//enmd check time
@@ -213,6 +243,16 @@ public class TimeMgr : MonoBehaviour
             timebarctr = 0;
         }
     }//endcheckTime
+
+    //public void StartTimer()
+    //{
+    //    timerActive = true; 
+    //}//end startimer
+
+    //public void StopTimer()
+    //{
+    //    timerActive = false; 
+    //}//end stop timer 
 
 
 }//end TimeMgr
