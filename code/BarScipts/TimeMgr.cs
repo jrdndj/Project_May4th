@@ -19,6 +19,8 @@ using UnityEngine.UI; //for the color
 public class TimeMgr : MonoBehaviour
 {
     [SerializeField] GameObject TimeManager;
+    [SerializeField] GameObject RollManager;
+    [SerializeField] GameObject ImprovManager;
     // [SerializeField] GameObject RollManager;
 
     //this will be the bar. we need an instantiate in SpawnBar and a prefab clone
@@ -93,7 +95,7 @@ public class TimeMgr : MonoBehaviour
     }
 
     // we use fixed update on this so it is constant
-    void FixedUpdate()
+    void Update()
     {
 
        // //timer 
@@ -234,6 +236,24 @@ public class TimeMgr : MonoBehaviour
 
     }//enmd check time
 
+    public void checkImprovTiming()
+    {
+        var localtime = TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds;
+
+
+       // check if the difference to the time now is the same as in the elapsedlist
+        if ((localtime - ImprovManager.GetComponent<ImprovMgr>().TimeStart) < ImprovManager.GetComponent<ImprovMgr>().ElapsedList[RollManager.GetComponent<RollScript>().GetProgramCounter()])
+        {
+            //if their difference is same in the list then it is expired thus not valid
+            // highlightNow = true;
+            //then move to the next element in the counter
+            RollManager.GetComponent<RollScript>().SetProgramCounter(+1);
+            RollManager.GetComponent<RollScript>().SetHighlightStatus(true);
+            // highlightNow = true;
+            Debug.Log("OUT ");
+        }//end check valid
+    }
+
     //ensures that oiur timebars are upto 4 only and dont overload the array
     public void checkSpawnCount()
     {
@@ -243,16 +263,5 @@ public class TimeMgr : MonoBehaviour
             timebarctr = 0;
         }
     }//endcheckTime
-
-    //public void StartTimer()
-    //{
-    //    timerActive = true; 
-    //}//end startimer
-
-    //public void StopTimer()
-    //{
-    //    timerActive = false; 
-    //}//end stop timer 
-
 
 }//end TimeMgr

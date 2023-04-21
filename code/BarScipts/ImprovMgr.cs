@@ -31,7 +31,7 @@ public class ImprovMgr : MonoBehaviour
     public int ctr;  //an internal counter
     int ListStop;
     int TimeCount = 0; //this is for the different elements
-    int TimeStart = 0; //for the accumulated time for time list
+    public int TimeStart = 0; //for the accumulated time for time list
     int TimePassed = 0;
 
     //this helps the mapping of keys similar to that midi hardware
@@ -42,12 +42,13 @@ public class ImprovMgr : MonoBehaviour
     bool[] melodyToHighlight = new bool[keysCount];
     bool[] isKeyHighLighted = new bool[keysCount]; //for error checking
     bool[] isKeyPressed = new bool[keysCount]; //for spawning
-    bool highlightNow = false;
+    //bool highlightNow = false;
 
     //========== IMPROV RELATED VARIABLES ======/
 
     public List<List<int>> ChordList = new List<List<int>>();
     public List<List<int>> LickList = new List<List<int>>();
+    public List<List<int>> BluesList = new List<List<int>>();
     public List<int> ElapsedList = new List<int>(); //for computing validity 
     List<int> TimeList = new List<int>(); // for the list of times to check for validity
     List<int> YListPlotter = new List<int>(); //this is for the Y positions of the spawns that RollMgr will need
@@ -66,7 +67,7 @@ public class ImprovMgr : MonoBehaviour
     //==== receiver functions ========/
 
     //a function that receives from ChordMgr
-    public void ListReceiver(List<List<int>> List1, List<List<int>> List2)
+    public void ListReceiver(List<List<int>> List1, List<List<int>> List2, List<List<int>> List3) 
     {
         //Debug.Log("We made it here ");
         //assign chordlist
@@ -81,6 +82,13 @@ public class ImprovMgr : MonoBehaviour
         {
             //Debug.Log("Passing " + item);
             LickList.Add(item);
+        }//endlicklist
+
+        //assign licklist
+        foreach (var item in List3)
+        {
+            //Debug.Log("Passing " + item);
+            BluesList.Add(item);
         }//endlicklist 
 
         //return ListReceived;
@@ -107,7 +115,7 @@ public class ImprovMgr : MonoBehaviour
         //    ElapsedList.Add(item);
         //}
 
-    }//endListReceiver
+    }//endTimeReceiver
 
     /*
      * this function gets the chord sequences from **/
@@ -215,16 +223,15 @@ public class ImprovMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         //init ctr
-        ctr = 0;
-        ListStop = ChordList.Count;
+        //ctr = 0;
+        //ListStop = ChordList.Count;
 
-        //map data for sending 
-        //MapSpawnYCoords();
+        ////map data for sending 
+        ////MapSpawnYCoords();
 
-        //routine cleanup
-        CleanupKeyboard();
+        ////routine cleanup
+        //CleanupKeyboard();
 
         // StartCoroutine(CheckValid());
     }
@@ -232,21 +239,21 @@ public class ImprovMgr : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        //check validity 
-        CheckTime();
+        ////check validity 
+        //CheckTime();
 
-   //i need  a way to move to the next ctr 
-        
-        CleanupKeyboard();
-   
-        if (highlightNow)
-        {
-            // CleanupKeyboard();
-          //  HighlightLicks(ChordList[ctr], yellow, 1);
-         //   HighlightLicks(LickList[ctr], improvpink, 2);
+        //CleanupKeyboard();
 
-            //Debug.Log("licks highlighted at " + TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds);
-        }//end if check get time
+        //JazzMode();
+        //BluesMode();
+        //if (RollManager.GetComponent<RollScript>().GetHighlightStatus())
+        //{
+        //    // CleanupKeyboard();
+        //    HighlightLicks(ChordList[ctr], yellow, 1);
+        //    HighlightLicks(LickList[ctr], yellow, 2);
+        //   // HighlightLicks(BluesList[ctr], blues, 2);
+        //    //Debug.Log("licks highlighted at " + TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds);
+        //}//end if check get time
 
         //it will be here - and the time is managed by TimeMgr
         ////=== general algorithm looks like this
@@ -257,24 +264,24 @@ public class ImprovMgr : MonoBehaviour
         //    ClearMelodies();
         //    ClearImprovs();
 
-        //    //then highlight the next batch
-        //    //==== JAZZ IMPROV Variables ====
-        //    // HighlightLicks(ChordList[ctr], yellow, 1);
-        //    // HighlightLicks(LickList[ctr], improvpink, 2);
+            //    //then highlight the next batch
+            //    //==== JAZZ IMPROV Variables ====
+            //    // HighlightLicks(ChordList[ctr], yellow, 1);
+            //    // HighlightLicks(LickList[ctr], improvpink, 2);
 
-        //    //===== Jazz improv with Halfstep
-        //    //HighlightLicks(HalfStepList[ctr], belowpink, 2);
+            //    //===== Jazz improv with Halfstep
+            //    //HighlightLicks(HalfStepList[ctr], belowpink, 2);
 
-        //    //==== Jazz improv with Scale above
-        //    //HighlightLicks(StepAboveList[ctr], belowpink, 3);
+            //    //==== Jazz improv with Scale above
+            //    //HighlightLicks(StepAboveList[ctr], belowpink, 3);
 
-        //    //===== BLUES IMPROV VARIABLES ====
-        //    //HighlightLicks(EBluesScale[ctr], yellow, 1);
-        //    //HighlightLicks(EBluesImprov[ctr], blues, 2);
+            //    //===== BLUES IMPROV VARIABLES ====
+            //    //HighlightLicks(EBluesScale[ctr], yellow, 1);
+            //    //HighlightLicks(EBluesImprov[ctr], blues, 2);
 
-        //    //highlightNow 
-        //    highlightNow = false;
-        //}//end if check hihglight now
+            //    //highlightNow 
+            //    highlightNow = false;
+            //}//end if check hihglight now
 
     }
 
@@ -298,18 +305,18 @@ public class ImprovMgr : MonoBehaviour
         //Debug.Log("timestart is " + TimeStart);
         if (localtime == TimeList[ctr])
         {
-            highlightNow = true;
+           // highlightNow = true;
             TimeStart = (int) TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds;
             //save the time
             //get the time
             // TimeStart = (int) TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds;
-            Debug.Log("IN " );
+            //Debug.Log("IN " );
         }
         //return highlightNow;
     }//end checkTime;
 
     //this checks how much time has passed since then so we can unhighlight 
-    public bool CheckValid()
+    public void CheckValid()
     {
         var localtime = TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds;
         //var timeToWait = TimeList[ctr];
@@ -324,18 +331,19 @@ public class ImprovMgr : MonoBehaviour
         if ((localtime - TimeStart) < ElapsedList[ctr])
         {
             //if their difference is same in the list then it is expired thus not valid
-            highlightNow = true;
+           // highlightNow = true;
             //then move to the next element in the counter
-            // ctr++;
+            ctr++;
+            RollManager.GetComponent<RollScript>().SetHighlightStatus(true);
             // highlightNow = true;
             Debug.Log("OUT ");
         }//end check valid
         else
         {
-            highlightNow = false;
+           // highlightNow = false;
         }
 
-       return highlightNow; 
+      // return highlightNow; 
 
     }//end check valid
 
@@ -367,14 +375,35 @@ public class ImprovMgr : MonoBehaviour
             YListPlotter.Add(ElapsedList[i-1]*offset); //should be of the previous one
         }//end for loop yplotter
 
-        //then send everything to RollMgr
-        //RollManager.GetComponent<RollScript>().ChordList = RollManager.GetComponent<RollScript>().ReceiveLists(ChordList);
-        //RollManager.GetComponent<RollScript>().ListReceiver(ChordList, LickList);
+        //then send everything to RollMg
         RollManager.GetComponent<RollScript>().ReceiveYPlots(YListPlotter);
 
-        // RollManager.GetComponent<RollScript>().LickList = RollManager.GetComponent<RollScript>().ReceiveLists(LickList);
-        //RollManager.GetComponent<RollScript>().YPlotsReceived = RollManager.GetComponent<RollScript>().ReceiveYPlots(YListPlotter); 
-        //RollManager.GetComponent<RollScript>().ReceiveYPlots(YListPlotter);
-
     }//end MapSpawnYCoords
+
+    public void JazzMode()
+    {
+        if (RollManager.GetComponent<RollScript>().GetHighlightStatus())
+        {
+            // CleanupKeyboard();
+            HighlightLicks(ChordList[ctr], yellow, 1);
+            HighlightLicks(LickList[ctr], improvpink, 2);
+            // HighlightLicks(BluesList[ctr], blues, 2);
+            //Debug.Log("licks highlighted at " + TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds);
+        }//end if check get time
+    }//end jazz mode
+
+
+    public void BluesMode()
+    {
+        if (RollManager.GetComponent<RollScript>().GetHighlightStatus())
+        {
+            // CleanupKeyboard();
+            HighlightLicks(ChordList[ctr], yellow, 1);
+            //HighlightLicks(LickList[ctr], yellow, 2);
+            HighlightLicks(BluesList[ctr], blues, 2);
+            //Debug.Log("licks highlighted at " + TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds);
+        }//end if check get time
+    }//end blues mode 
+
+
 }//endclass 

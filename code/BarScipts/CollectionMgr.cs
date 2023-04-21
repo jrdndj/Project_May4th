@@ -18,6 +18,8 @@ public class CollectionMgr : MonoBehaviour
     //we need to send a message to RollManager 
     [SerializeField] GameObject ChordManager; //for the pianoroll
 
+  
+
      /*
      * Here we describe the different sequences that the user can choose from
      * what we need to know is every chord has a semitone or a chordtone
@@ -27,12 +29,21 @@ public class CollectionMgr : MonoBehaviour
     //solution was inspired from https://stackoverflow.com/questions/8002455/how-to-easily-initialize-a-list-of-tuples
     List<(string, int)> Blues001 = new List<(string, int)>
     {
-        ("C7", 1),
+        ("C7", 4),
         ("F7", 2),
         ("C7", 2),
         ("G7", 1),
         ("F7", 1),
         ("C7", 2)
+    };
+    List<(string, int)> Blues002 = new List<(string, int)>
+    {
+        ("C7", 8),
+        ("F7", 4),
+        ("C7", 4),
+        ("G7", 2),
+        ("F7", 2),
+        ("C7", 4)
     };
 
     List<(string, int)> JazzSeq001 = new List<(string, int)>
@@ -75,6 +86,19 @@ public class CollectionMgr : MonoBehaviour
         ("A7", 1)
     };
 
+    List<(string, int)> JazzSeq014 = new List<(string, int)>
+    {
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4),
+        ("A7", 1),
+        ("CM7", 4),
+        ("CM7", 4),
+        ("Dm7", 4),
+        ("G7", 4),
+        ("A7", 4),
+    };
+
     //we use this to send to ChordMgr 
     public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
     {
@@ -87,7 +111,8 @@ public class CollectionMgr : MonoBehaviour
     {
         //lets send something here - now just one sequence
         //but soon it will be something the user picks
-        ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq004);
+       ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq014);
+       //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
         //04 for now cos 01 has rest. i have yet to deal with that 
 
     }
