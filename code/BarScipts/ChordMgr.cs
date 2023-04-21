@@ -19,6 +19,8 @@ public class ChordMgr : MonoBehaviour
     [SerializeField] GameObject RollManager;
     //[SerializeField] GameObject CollectionManager; //improv controls
 
+    int improvmode = 0; //0 if jazz, 1 if blues 
+
     //=========== ENVIRONMENT RELATED VARIABLES ==========/
 
     //where the chords are mapped
@@ -26,6 +28,7 @@ public class ChordMgr : MonoBehaviour
     List<List<int>> ChordListToSend = new List<List<int>>();
     List<List<int>> JazzListToSend = new List<List<int>>();
     List<List<int>> BluesListToSend = new List<List<int>>();
+    List<string> ChordNamesToSend = new List<string>();
     List<int> LengthListToSend = new List<int>();
     List<int> YListPlotter = new List<int>(); //this is for the Y positions of the spawns that RollMgr will need
 
@@ -121,7 +124,7 @@ public class ChordMgr : MonoBehaviour
         //iterate through each in the list and then assign or map
         foreach (var chord in ReceivedList)
         {
-            Debug.Log("Mapping " + chord );
+            //Debug.Log("Mapping " + chord );
             //use .Item1 is the name of the string, .Item2 is the length
             //Debug.Log(chord.Item1);
 
@@ -135,6 +138,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(C7);
                         JazzListToSend.Add(C7ct);
                         BluesListToSend.Add(C7st);
+                        ChordNamesToSend.Add("C7");
                         break;
                     }//end Cm7
                 case "Cm7":
@@ -142,6 +146,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(Cm7);
                         JazzListToSend.Add(Cm7ct);
                         BluesListToSend.Add(C7st);
+                        ChordNamesToSend.Add("Cm7");
                         break;
                     }//end Cm7
                 case "CM7":
@@ -149,6 +154,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(CM7);
                         JazzListToSend.Add(CM7ct);
                         BluesListToSend.Add(C7st);
+                        ChordNamesToSend.Add("CM7");
                         break;
                     }//end CM7
                 case "Dm7":
@@ -156,6 +162,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(Dm7);
                         JazzListToSend.Add(Dm7ct);
                         BluesListToSend.Add(Dm7st);
+                        ChordNamesToSend.Add("Dm7");
                         break;
                     }//end Dm7
                 case "Em7":
@@ -163,13 +170,23 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(Em7);
                         JazzListToSend.Add(Em7ct);
                         BluesListToSend.Add(E7st);
+                        ChordNamesToSend.Add("Em7");
                         break;
                     }//end Em7
+                case "F7":
+                    {
+                        ChordListToSend.Add(F7);
+                        JazzListToSend.Add(FM7ct);
+                        BluesListToSend.Add(F7st);
+                        ChordNamesToSend.Add("F7");
+                        break;
+                    }//end FM7
                 case "FM7":
                     {
                         ChordListToSend.Add(FM7);
                         JazzListToSend.Add(FM7ct);
                         BluesListToSend.Add(F7st);
+                        ChordNamesToSend.Add("FM7");
                         break;
                     }//end FM7
                 case "G7":
@@ -177,6 +194,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(G7);
                         JazzListToSend.Add(G7ct);
                         BluesListToSend.Add(G7st);
+                        ChordNamesToSend.Add("G7");
                         break;
                     }//end G7
                 case "A7":
@@ -184,6 +202,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(A7);
                         JazzListToSend.Add(A7ct);
                         BluesListToSend.Add(A7st);
+                        ChordNamesToSend.Add("A7");
                         break;
                     }//end A7 
                 case "Am7":
@@ -191,6 +210,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(Am7);
                         JazzListToSend.Add(Am7ct);
                         BluesListToSend.Add(Am7st);
+                        ChordNamesToSend.Add("Am7");
                         break;
                     }//end Am7
 
@@ -202,6 +222,7 @@ public class ChordMgr : MonoBehaviour
                         ChordListToSend.Add(Am7);
                         JazzListToSend.Add(Am7ct);
                         BluesListToSend.Add(Am7st);
+                        ChordNamesToSend.Add("rest");
                         break;
                     }//end default and rest case
             }//end switch
@@ -212,27 +233,28 @@ public class ChordMgr : MonoBehaviour
         }//end foreach scan of received list
 
         //now that we have the details we need to send them to InputMgr and ImprovMgr
-        //for final sequencing
-        //InputManager.GetComponent<InputMgr>().ListReceiver(ChordListToSend);
 
-        //pass things to ImprovManager -we did this cos we received two things
-        // ImprovManager.GetComponent<ImprovMgr>().ChordList = ChordListToSend;
-        //   ImprovManager.GetComponent<ImprovMgr>().LickList = JazzListToSend;
-
-        //we also need to send the time details!
-        //   ImprovManager.GetComponent<ImprovMgr>().TimeReceiver(LengthListToSend);
-
-        //we send to ImprovMgr for the keys to highlight
-        ImprovManager.GetComponent<ImprovMgr>().ListReceiver(ChordListToSend, JazzListToSend);
+        //SEND KEY INFORMATION
+        ImprovManager.GetComponent<ImprovMgr>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend);
         //also send it straight to RollManager for the keys to spawn 
-        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend);
+        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend);
 
-
+        //extra step to compute offset 
         //map ycoords of spawn and pass to RollMgr too
         MapSpawnYCoords();
 
-        //ImprovManager still needs lengthlist for the validity 
+
+        //we also need to send the time details!
+        //SEND TIME INFORMATION 
         ImprovManager.GetComponent<ImprovMgr>().TimeReceiver(LengthListToSend);
+        RollManager.GetComponent<RollScript>().TimeReceiver(LengthListToSend);
+
+        //also send the chord names!
+        RollManager.GetComponent<RollScript>().NamesReceiver(ChordNamesToSend);
+        RollManager.GetComponent<RollScript>().GetMode(improvmode);
+
+        //we dont need to send time to RollScript because the offset manages the time information of the spawnsb 
+
 
         //our work is done 
     }//end ChordMapper
@@ -262,15 +284,34 @@ public class ChordMgr : MonoBehaviour
         //ChordListToSend as ChordList
 
         int offset = 60; //the first elements will have no offset
+        int previousOffset = 0; //there is no existing offset
+        int newOffset = 0; 
         //int multiplier = 60; //for the scale based on their length
 
         //store the 0 offset for the 0th element immediately
-        YListPlotter.Add(offset);
-        //we use for loop instead for for each so we control stuff
-        for (int i = 1; i <= LengthListToSend.Count; i++) //yes begin at 1
+        YListPlotter.Add(0);
+        //we use for loop instead for for each so we control stuff 
+        for (int i = 1; i < LengthListToSend.Count; i++) //yes begin at 1
         {
-            YListPlotter.Add(LengthListToSend[i - 1] * offset); //should be of the previous one
+            //formula should be
+            //previous one x offset then divide by 2
+            // (LengthListToSend[i - 1] * offset)/2 = 240/2 = 120
+            // then current one x offset then divide by 2
+            // (LengthListToSend[i] * offset)/2 = 60
+            //then add them together
+            // ((LengthListToSend[i - 1] * offset)/2) + ((LengthListToSend[i] * offset)/2)
+
+            // Debug.Log("Offset to multiply" + LengthListToSend[i-1]);
+            newOffset = ((LengthListToSend[i - 1] * offset) / 2) + ((LengthListToSend[i] * offset) / 2) + previousOffset;
+            YListPlotter.Add(newOffset); //should be of the previous one
+
+            //store the previous one for the next round
+            previousOffset = newOffset;
+            //previousOffset = LengthListToSend[i - 1] * offset;
+           //
+           //Debug.Log("New y coord is " + newOffset);
         }//end for loop yplotter
+        // we use < so we only care about these spawns
 
         //then send everything to RollMgr
         RollManager.GetComponent<RollScript>().ReceiveYPlots(YListPlotter);
