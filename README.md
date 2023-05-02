@@ -21,6 +21,11 @@ Views are integrated into the design of the classes. In principle we can see Bui
 
 More information about dependencies and relationships will be revealed soon as we finalise the design. 
 
+#### forms of visualisation
+- [x] falling piano roll with recommended improv licks
+- [ ] press-detected improvisation (and valid while still on press)\
+- [ ] highlighting of sample improvisation licks 
+
 #### new targets 
 - [x] create classes
 - [x] integrate them with the piano canvas environment
