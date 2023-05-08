@@ -23,8 +23,8 @@ More information about dependencies and relationships will be revealed soon as w
 
 #### forms of visualisation
 - [x] falling piano roll with recommended improv licks
-- [ ] press-detected improvisation (and valid while still on press)\
-- [ ] highlighting of sample improvisation licks 
+- [x] press-detected improvisation (and valid while still on press)\
+- [x] highlighting of sample improvisation licks 
 
 #### new targets 
 - [x] create classes
@@ -35,11 +35,11 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement ChordMgr
 - [x] implement InputMgr
 - [x] cleanup RollScript to its new intended purpose
-- [ ] find a way to implement MapLines() - discussed with bosses. 
+- [?] find a way to implement MapLines() - discussed with bosses. 
 - [x] rework RollScript.cs specifically SpawnKeys(), RollKeys() and ~~MapLines()~~ functions
 - [x] implement CollectionMgr
 - [x] implement passing of information based on targetted dependencies
-- [ ] implement VizMgr and toggle 
+- [x] implement VizMgr and toggle 
 - [ ] demo to bosses
 - [ ] Study 1 with Improv Teachers
 - [ ] Study 2 with Improv Students
