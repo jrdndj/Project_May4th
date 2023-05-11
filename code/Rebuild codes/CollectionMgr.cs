@@ -118,6 +118,18 @@ public class CollectionMgr : MonoBehaviour
         ("CM7", 4)
     };
 
+    List<(string, int)> JazzSeq016 = new List<(string, int)>
+    {
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4),
+        ("A7", 4),
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4),
+        ("CM7", 4)
+    };
+
     //we use this to send to ChordMgr 
     public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
     {
@@ -139,7 +151,7 @@ public class CollectionMgr : MonoBehaviour
         //    ToggleValueChanged(rollmodelistener);
         //});
 
-        ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq015);
+        ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq016);
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
         //04 for now cos 01 has rest. i have yet to deal with that 
 

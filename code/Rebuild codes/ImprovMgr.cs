@@ -51,6 +51,8 @@ public class ImprovMgr : MonoBehaviour
     public List<List<int>> ChordList = new List<List<int>>();
     public List<List<int>> LickList = new List<List<int>>();
     public List<List<int>> BluesList = new List<List<int>>();
+    public List<List<int>> HalfStepList = new List<List<int>>();
+    public List<List<int>> StepAboveList = new List<List<int>>();
     public List<int> ElapsedList = new List<int>(); //for computing validity 
     List<int> TimeList = new List<int>(); // for the list of times to check for validity
     List<int> YListPlotter = new List<int>(); //this is for the Y positions of the spawns that RollMgr will need
@@ -67,22 +69,20 @@ public class ImprovMgr : MonoBehaviour
 
 
     //==== receiver functions ========/
-
-    //a function that receives from ChordMgr
-    public void ListReceiver(List<List<int>> List1, List<List<int>> List2, List<List<int>> List3) 
+    //a function that receives from ImprovMgr
+    public void ListReceiver(List<List<int>> List1, List<List<int>> List2, List<List<int>> List3, List<List<int>> List4, List<List<int>> List5)
     {
-        //Debug.Log("We made it here ");
         //assign chordlist
         foreach (var item in List1)
         {
-           // Debug.Log("Passing " + item );
+            //  Debug.Log("Passing " + item);
             ChordList.Add(item);
         }//endchordlist
 
         //assign licklist
         foreach (var item in List2)
         {
-            //Debug.Log("Passing " + item);
+            //   Debug.Log("Passing " + item);
             LickList.Add(item);
         }//endlicklist
 
@@ -91,6 +91,18 @@ public class ImprovMgr : MonoBehaviour
         {
             //Debug.Log("Passing " + item);
             BluesList.Add(item);
+        }//endlicklist
+
+        foreach (var item in List4)
+        {
+            //Debug.Log("Passing " + item);
+            HalfStepList.Add(item);
+        }//endlicklist
+
+        foreach (var item in List5)
+        {
+            //Debug.Log("Passing " + item);
+            StepAboveList.Add(item);
         }//endlicklist 
 
         //return ListReceived;
@@ -249,49 +261,7 @@ public class ImprovMgr : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        ////check validity 
-        //CheckTime();
-
-        //CleanupKeyboard();
-
-        //JazzMode();
-        //BluesMode();
-        //if (RollManager.GetComponent<RollScript>().GetHighlightStatus())
-        //{
-        //    // CleanupKeyboard();
-        //    HighlightLicks(ChordList[ctr], yellow, 1);
-        //    HighlightLicks(LickList[ctr], yellow, 2);
-        //   // HighlightLicks(BluesList[ctr], blues, 2);
-        //    //Debug.Log("licks highlighted at " + TimeManager.GetComponent<TimeMgr>().GetTime().TotalSeconds);
-        //}//end if check get time
-
-        //it will be here - and the time is managed by TimeMgr
-        ////=== general algorithm looks like this
-        //if (highlightNow)
-        //{
-        //    // CleanupKeyboard();
-        //    //we need to clear previous improvs so they dont stain the keyboard
-        //    ClearMelodies();
-        //    ClearImprovs();
-
-            //    //then highlight the next batch
-            //    //==== JAZZ IMPROV Variables ====
-            //    // HighlightLicks(ChordList[ctr], yellow, 1);
-            //    // HighlightLicks(LickList[ctr], improvpink, 2);
-
-            //    //===== Jazz improv with Halfstep
-            //    //HighlightLicks(HalfStepList[ctr], belowpink, 2);
-
-            //    //==== Jazz improv with Scale above
-            //    //HighlightLicks(StepAboveList[ctr], belowpink, 3);
-
-            //    //===== BLUES IMPROV VARIABLES ====
-            //    //HighlightLicks(EBluesScale[ctr], yellow, 1);
-            //    //HighlightLicks(EBluesImprov[ctr], blues, 2);
-
-            //    //highlightNow 
-            //    highlightNow = false;
-            //}//end if check hihglight now
+       
 
     }
 
@@ -425,12 +395,12 @@ public class ImprovMgr : MonoBehaviour
             //start with a clean slate
             CleanupKeyboard();
 
-            RollManager.GetComponent<RollScript>().display_name.text = "Press Mode Selected. Play a Chord to begin"; 
+           // RollManager.GetComponent<RollScript>().display_name.text = "Press Mode Selected. Play a Chord to begin"; 
         }
         else
         {
         
-            RollManager.GetComponent<RollScript>().display_name.text = "Press Mode Deactivated. Select viz mode";
+           // RollManager.GetComponent<RollScript>().display_name.text = "Press Mode Deactivated. Select viz mode";
             Debug.Log("Press Mode Deactivated. Select viz mode");
         }
     }//end rollvaluemode changed

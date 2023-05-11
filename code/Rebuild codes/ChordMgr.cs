@@ -31,6 +31,8 @@ public class ChordMgr : MonoBehaviour
     List<List<int>> ChordListToSend = new List<List<int>>();
     List<List<int>> JazzListToSend = new List<List<int>>();
     List<List<int>> BluesListToSend = new List<List<int>>();
+    List<List<int>> HalfStepToSend = new List<List<int>>();
+    List<List<int>> StepAboveToSend = new List<List<int>>();
     List<string> ChordNamesToSend = new List<string>();
     List<int> LengthListToSend = new List<int>();
     List<int> YListPlotter = new List<int>(); //this is for the Y positions of the spawns that RollMgr will need
@@ -48,14 +50,14 @@ public class ChordMgr : MonoBehaviour
     //D3 F3 A3 C4 --- D4 F4 A4 C5 - ok mapped! - higher D5 F5 A5 C6
     static List<int> Dm7 = new List<int>() { 14, 17, 21, 24 };
     static List<int> Dm7ct = new List<int>() { 26, 29, 33, 36, 38, 41, 45, 48 };
-    static List<int> Dm7hs = new List<int>() { 25, 28, 32, 35 };
+    static List<int> Dm7hs = new List<int>() { 25, 28, 32, 35, 37, 40, 44, 47 };
     static List<int> Dm7sa = new List<int>() { 28, 31, 35, 38 };
     static List<int> Dm7st = new List<int>() { 26, 29, 33, 36, 38, 41, 45, 48 }; //fix this! 
 
     //C3 E3 G3 B3 --- C4 E4 G4 B4 - ok mapped! - C5 E5 G5 B5
     static List<int> CM7 = new List<int>() { 12, 16, 19, 23 };
     static List<int> CM7ct = new List<int>() { 24, 28, 31, 35, 36, 40, 43, 47 };
-    static List<int> CM7hs = new List<int>() { 23, 27, 30, 34 };
+    static List<int> CM7hs = new List<int>() { 23, 27, 30, 34, 35, 39, 42, 46 };
     static List<int> CM7sa = new List<int>() { 26, 29, 33, 36 };
 
     //we decommission this since we use G43-second inversion instead for better crabbing of G7
@@ -66,7 +68,7 @@ public class ChordMgr : MonoBehaviour
     //D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
     static List<int> G7 = new List<int>() { 14, 17, 19, 23 };
     static List<int> G7ct = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
-    static List<int> G7hs = new List<int>() { 25, 30, 34 }; //removed 29 here cos of overlap
+    static List<int> G7hs = new List<int>() { 25, 29, 30, 34, 37, 40, 42, 46 }; 
     static List<int> G7sa = new List<int>() { 28, 33, 36 };
 
     //Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
@@ -110,7 +112,7 @@ public class ChordMgr : MonoBehaviour
     static List<int> A7 = new List<int>() { 9, 13, 16, 19 };
     static List<int> A7ct = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 };
     //combined with the chord tone, should only show the halfsteps
-    static List<int> A7hs = new List<int>() { 20, 24, 27, 30 };
+    static List<int> A7hs = new List<int>() { 20, 24, 27, 30, 32, 36, 39, 42 };
     static List<int> A7sa = new List<int>() { 23, 26, 29, 33 };
     static List<int> A7st = new List<int>() { 21, 25, 28, 31, 33, 37, 40, 43 }; //fix this
 
@@ -145,6 +147,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(C7ct);
                         BluesListToSend.Add(C7st);
                         ChordNamesToSend.Add("C7");
+                        HalfStepToSend.Add(CM7hs);
+                        StepAboveToSend.Add(CM7sa); 
                         break;
                     }//end Cm7
                 case "Cm7":
@@ -153,6 +157,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(Cm7ct);
                         BluesListToSend.Add(C7st);
                         ChordNamesToSend.Add("Cm7");
+                        HalfStepToSend.Add(CM7hs);
+                        StepAboveToSend.Add(CM7sa);
                         break;
                     }//end Cm7
                 case "CM7":
@@ -161,6 +167,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(CM7ct);
                         BluesListToSend.Add(C7st);
                         ChordNamesToSend.Add("CM7");
+                        HalfStepToSend.Add(CM7hs);
+                        StepAboveToSend.Add(CM7sa);
                         break;
                     }//end CM7
                 case "Dm7":
@@ -169,6 +177,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(Dm7ct);
                         BluesListToSend.Add(Dm7st);
                         ChordNamesToSend.Add("Dm7");
+                        HalfStepToSend.Add(Dm7hs);
+                        StepAboveToSend.Add(Dm7sa);
                         break;
                     }//end Dm7
                 case "Em7":
@@ -201,6 +211,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(G7ct);
                         BluesListToSend.Add(G7st);
                         ChordNamesToSend.Add("G7");
+                        HalfStepToSend.Add(G7hs);
+                        StepAboveToSend.Add(G7sa);
                         break;
                     }//end G7
                 case "A7":
@@ -209,6 +221,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(A7ct);
                         BluesListToSend.Add(A7st);
                         ChordNamesToSend.Add("A7");
+                        HalfStepToSend.Add(A7hs);
+                        StepAboveToSend.Add(A7sa);
                         break;
                     }//end A7 
                 case "Am7":
@@ -217,6 +231,8 @@ public class ChordMgr : MonoBehaviour
                         JazzListToSend.Add(Am7ct);
                         BluesListToSend.Add(Am7st);
                         ChordNamesToSend.Add("Am7");
+                        HalfStepToSend.Add(A7hs);
+                        StepAboveToSend.Add(A7sa);
                         break;
                     }//end Am7
 
@@ -241,9 +257,9 @@ public class ChordMgr : MonoBehaviour
         //now that we have the details we need to send them to InputMgr and ImprovMgr
 
         //SEND KEY INFORMATION
-        ImprovManager.GetComponent<ImprovMgr>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend);
+        ImprovManager.GetComponent<ImprovMgr>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend, HalfStepToSend, StepAboveToSend);
         //also send it straight to RollManager for the keys to spawn 
-        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend);
+        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend,HalfStepToSend, StepAboveToSend);
 
         //extra step to compute offset 
         //map ycoords of spawn and pass to RollMgr too
