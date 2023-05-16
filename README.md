@@ -23,7 +23,7 @@ More information about dependencies and relationships will be revealed soon as w
 
 #### forms of visualisation
 - [x] falling piano roll with recommended improv licks
-- [x] press-detected improvisation (and valid while still on press)\
+- [x] press-detected improvisation (and valid while still on press)
 - [x] highlighting of sample improvisation licks 
 
 #### new targets 
@@ -40,8 +40,8 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement CollectionMgr
 - [x] implement passing of information based on targetted dependencies
 - [x] implement VizMgr and toggle 
-- [ ] demo to bosses
-- [ ] Study 1 with Improv Teachers
+- [x] demo to bosses
+- [ ] Study 1 with Improv Teachers - UPCOMING !!!!! 
 - [ ] Study 2 with Improv Students
 - [ ] Study 3 on Spatiotemporal Data collection
 - [ ] Graduate
