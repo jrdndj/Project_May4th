@@ -392,7 +392,7 @@ public class RollScript : MonoBehaviour
 
                 //============= CHECK IF IT REACHES DESTROY POSITION =====/
                 ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time               // /2 here
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y-20)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
@@ -453,8 +453,10 @@ public class RollScript : MonoBehaviour
             }//endif
         }//endviz mode 1
 
-        if (VizMode == 2)
+        if (VizMode == 2) //vizmode is expert press 
         {
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
             //clear validpress to be sure
             UserPress.Add(noteNumber);
             if (UserPress.Count == 4) //if there are at least three presses then go
@@ -584,6 +586,10 @@ public class RollScript : MonoBehaviour
             else //1 if melody
             {
                 melodyToHighlight[lickset[i]] = true;
+                //show names of chord progression
+                pianoKeys[lickset[i]].GetComponentInChildren<Text>().text = ChordNames[ctr];
+                //also show the name
+
             }//if melody higlight
 
             //we update flag for error checking
@@ -980,7 +986,7 @@ public class RollScript : MonoBehaviour
         RectTransform SpawnScale = spawnedBars.GetComponent<RectTransform>();
         //==== this is using size delta approach ===== /
         //start reducing in size                                                    // * 5
-        SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - barSpeed);
+        SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - (barSpeed/2));
 
         //dont move me anymore
         decreasing = true;
@@ -1114,6 +1120,8 @@ public class RollScript : MonoBehaviour
             //change to default vizmode
             genre = 1;
             Debug.Log("Blues Improvs will be shown");
+            //
+            //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
         }
     }//end blues values toggle
 
