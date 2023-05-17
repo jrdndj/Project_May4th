@@ -19,7 +19,7 @@ public class CollectionMgr : MonoBehaviour
     //we need to send a message to RollManager 
     [SerializeField] GameObject ChordManager; //for the pianoroll
 
-
+    public int genre = 0; //1 if jazz 2 if blues
     /*
     * Here we describe the different sequences that the user can choose from
     * what we need to know is every chord has a semitone or a chordtone
@@ -130,6 +130,13 @@ public class CollectionMgr : MonoBehaviour
         ("CM7", 4)
     };
 
+    List<(string, int)> PracticeJazz01 = new List<(string, int)>
+    {
+        ("Dm7", 4),
+        ("G7", 4),
+        ("CM7", 4)
+    };
+
     //we use this to send to ChordMgr 
     public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
     {
@@ -150,7 +157,8 @@ public class CollectionMgr : MonoBehaviour
         //{
         //    ToggleValueChanged(rollmodelistener);
         //});
-
+        //ChordManager.GetComponent<ChordMgr>().ChordMapper(PracticeJazz01);
+        //ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq014);
         ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq016);
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
         //04 for now cos 01 has rest. i have yet to deal with that 
@@ -160,8 +168,12 @@ public class CollectionMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (genre == 2)
+        {
+            ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
+        }
 
-    }
+    }//end update
 
     //======== toggle related functions begin here
 
