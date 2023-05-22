@@ -42,6 +42,8 @@ public class RollScript : MonoBehaviour
 
     public bool shiftedTypes = false;
 
+    public bool improvdiscovered = false; 
+
     //for the chord name to display
     //public GameObject chord_name; 
     [SerializeField] public Text display_name;
@@ -63,7 +65,7 @@ public class RollScript : MonoBehaviour
     //some crucial variables
     public int spawnCount = 0;
     public int genre = 0;
-    public int VizMode = 9; //1 is roll, 2 if pressed
+    public int VizMode = 9; //1 is roll, 2 if expert press, 3 if guided
     public bool showLickCount = false;
     public bool enablehalfstep = false;
     public bool enablestepabove = false;
@@ -440,12 +442,12 @@ public class RollScript : MonoBehaviour
         isKeyPressed[noteNumber] = true;
 
         //that's it - red if not highlighted 
-        if (VizMode == 1) //this condition should be if error check is on
+        if (VizMode == 1 || VizMode == 3) //this condition should be if error check is on
         {
             if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
             {
                 //if correct toggle is on show this
-                // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
             }//endif
             else
             {
@@ -453,9 +455,22 @@ public class RollScript : MonoBehaviour
             }//endif
         }//endviz mode 1
 
-        if (VizMode == 2) //vizmode is expert press 
+        else if (VizMode == 2) //vizmode is expert press 
         {
+            //if validation mode is off then this one
             pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
+            //if validation mode is on this one
+            if (improvdiscovered && isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
+            {
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            }
+            else if (improvdiscovered && !isKeyHighLighted[noteNumber] || !improvToHighlight[noteNumber])
+            {
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+            }
+  
+
 
             //clear validpress to be sure
             UserPress.Add(noteNumber);
@@ -468,10 +483,10 @@ public class RollScript : MonoBehaviour
             else validpress = false;
             //UserPress.Clear();
         }//end viz mode 2
-        if (VizMode == 3)
-        {
+       // if (VizMode == 3)
+        //{
             //do something? 
-        }
+        //}
     }//endonNoteOn;
 
     //when user releases a pressed key as per MIDIScript 
@@ -496,12 +511,16 @@ public class RollScript : MonoBehaviour
         }
         if (VizMode == 2)
         {
+            //clear user press too
+            UserPress.Clear();
             display_name.text = "Press any chord to continue";
             //remove any content and be ready to be populated again
             if (validpress)
             {
                 //OnPressLicks.Clear();
                 ClearImprovs();
+               // improvdiscovered = false;
+                CleanupKeyboard();
             }//ednvalid press
              // CleanupKeyboard();
         }//endvismode2
@@ -522,6 +541,10 @@ public class RollScript : MonoBehaviour
             {
                 //then we move to the next by triggering spawnNew
                 spawnNew = true;
+
+                //cleanupKeyboard
+                CleanupKeyboard();
+                ClearImprovs();
 
                 //then refresh melodyKeyreleased
                 melodyKeyreleased = 0;
@@ -815,10 +838,15 @@ public class RollScript : MonoBehaviour
             CleanupKeyboard();
             ClearMelodies();
             ClearImprovs();
+            //change the pressed ones to white 
+            //recolorHighlights();
+            HighlightLicks(UserPress, Color.white, 1);
             HighlightLicks(OnPressLicks, improvpink, 2);
+            //improvdiscovered = true; 
             if (UserPress.Count >= 4)
             {
                 UserPress.Clear();
+               // recolorHighlights();
             }//enduserpress count
 
         }//ifvizmode2
@@ -840,10 +868,22 @@ public class RollScript : MonoBehaviour
         if (VizMode == 2) // on press
         {
             // Debug.Log("On-Press Mode");
+            // CleanupKeyboard();
+            //recolor highlights
+            //if (validpress)
+            //{
+            //    recolorHighlights();
+            //}
+            //if (melodyKeyreleased==0)
+            //{
+            //    CleanupKeyboard();
+            //    ClearImprovs();
+            //}
+            
         }
         if (VizMode == 3) // guided press
         {
-
+           
         }
 
     }//endfixupdate
@@ -1056,6 +1096,8 @@ public class RollScript : MonoBehaviour
 
             ClearImprovs();
             ClearMelodies();
+            //clear user press too
+            UserPress.Clear();
 
             //set ctr to 0
             ctr = 0;
@@ -1077,6 +1119,9 @@ public class RollScript : MonoBehaviour
 
             ClearImprovs();
             CleanupKeyboard();
+
+            //clear user press too
+            UserPress.Clear();
         }
 
     }//end onpressvaluechanged
@@ -1100,6 +1145,9 @@ public class RollScript : MonoBehaviour
             ClearMelodies();
             ClearImprovs();
             CleanupKeyboard();
+
+            //clear user press too
+            UserPress.Clear();
 
             //set counter to 0 for roll purpose
             ctr = 0;
@@ -1184,6 +1232,22 @@ public class RollScript : MonoBehaviour
             enablestepabove = false;
         }
     }//end keynamevaluechanged
+
+    //a function to recolor every key
+    public void recolorHighlights()
+    {
+        foreach (var item in UserPress)
+        {
+            if (pianoKeys[item])
+            {
+                pianoKeys[item].GetComponent<Image>().color = Color.white;
+            }
+
+        }
+
+       
+
+    }//end recolorHighlights
 
 
 }//endclass
