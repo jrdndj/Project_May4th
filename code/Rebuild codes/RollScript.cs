@@ -17,8 +17,10 @@ public class RollScript : MonoBehaviour
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
 
-    public Toggle rollmodeListener, onpressmodelistener, guidedlistener, jazzlistener, blueslistener, HSlistener, SAlistener, Whitelistener, RedListener;
-    public Toggle chordnamelistener, endresolvelistener, maplinelistener, keynamelistener;
+    //viz modes 1 to 4 should be in this script 
+    public Toggle rollmodeListener, onpressmodelistener, guidedlistener, onwaitlistener;
+    //jazzlistener, blueslistener, HSlistener, SAlistener, Whitelistener, RedListener;
+    //public Toggle chordnamelistener, endresolvelistener, maplinelistener, keynamelistener;
 
     //this is to manage spawns
     public GameObject[] spawnedBars = new GameObject[keysCount]; //this w as original
@@ -42,7 +44,7 @@ public class RollScript : MonoBehaviour
 
     public bool shiftedTypes = false;
 
-    public bool improvdiscovered = false; 
+    public bool improvdiscovered = false;
 
     //for the chord name to display
     //public GameObject chord_name; 
@@ -65,10 +67,15 @@ public class RollScript : MonoBehaviour
     //some crucial variables
     public int spawnCount = 0;
     public int genre = 0;
-    public int VizMode = 9; //1 is roll, 2 if expert press, 3 if guided
+    public int VizMode = 9; //1 is roll, 2 if expert press, 3 if guided, 4 if on-wait
     public bool showLickCount = false;
     public bool enablehalfstep = false;
     public bool enablestepabove = false;
+    public bool movementEnabled = true; //set default to true
+    private bool isReleased = false; // if true it means it can keep moving
+    private bool isPressed = false;
+    private bool isTouched = false;
+
 
     //height of 120 means it runs for 2 seconds.
     //height of 60 means it runs for 1 second
@@ -325,15 +332,14 @@ public class RollScript : MonoBehaviour
                 //    pos.y -= 0;
                 //    //ShrinkBars(spawnedBars[i]);
                 //}
-            //    if (!decreasing)
-              //  {
-                    pos.y -= barSpeed;
-             //   }
-            //    else
-             //   {
-                    //ideally they should stop at the bar when they reach the green line
-               //   pos.y -= 0.43f; //0.43f         
-              //  }
+
+                pos.y -= barSpeed;
+
+                //    else
+                //   {
+                //ideally they should stop at the bar when they reach the green line
+                //   pos.y -= 0.43f; //0.43f         
+                //  }
 
                 spawnedBars[i].transform.position = pos;
 
@@ -359,45 +365,64 @@ public class RollScript : MonoBehaviour
                 //if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
+                   //Debug.Log("Bong");
 
-                   // pos.y -= 0;
-                   //highlight here when they reach the green line
-                    //hide MapLines
-                    // Debug.Log("Hiding map lines");
-                    // HideMapLines(lineMapList[i]);
+                    //indicate touch first 
+                    isTouched = true;
+
+                    //then check if touch and press is there 
+                    //if (monitorTouch())
+                    //{
+                    //   // Debug.Log("Here!");
+                    //    movementEnabled = true;
+                    //}
+                    //else movementEnabled = false;
+                    movementEnabled = false;
+
                     highlightNow = true;
 
                     //==== this never work so never do this again
                     //spawnedBars[i].transform.localScale -= new Vector3(0, barSpeed, 0);
 
- 
                     //dont move me anymore
                     //decreasing = true;
 
-                    ShrinkBars(spawnedBars[i]);
+                    // ShrinkBars(spawnedBars[i]);
 
-                    if (SpawnScale.rect.height <= 0)
-                    {
-                        CleanupKeyboard();
-                        highlightNow = false;
-                        destroyed = true;
-                        //spawnNew = true;
-                        // ctr++;
+                    //===== we are not shrinking anymore so we dont need this 
+                    //if (SpawnScale.rect.height <= 0)
+                    //{
+                    //    CleanupKeyboard();
+                    //    highlightNow = false;
+                    //    destroyed = true;
 
-                        //remove all of these when it fails
-                        //  Destroy(spawnedBars[i]);
-                        // spawnNew = true;
-                        //   decreasing = false;
-                        // spawnCount--;
-                    }
+                    //    //spawnNew = true;
+                    //    // ctr++;
+
+                    //    //remove all of these when it fails
+                    //    //  Destroy(spawnedBars[i]);
+                    //    // spawnNew = true;
+                    //    //   decreasing = false;
+                    //    // spawnCount--;
+                    //}
                 }//endif
 
                 //============= CHECK IF IT REACHES DESTROY POSITION =====/
                 ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time               // /2 here
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y-20)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y - 20)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
+
+            
+                    //enable movement of the rest until it touches 
+                    movementEnabled = true;
+
+                    //set to false everything else 
+                    isTouched = false;
+                    isReleased = false;
+                    isPressed = false;
+
                     //spawnedBars[i].SetActive(false);
                     highlightNow = false;
 
@@ -469,8 +494,6 @@ public class RollScript : MonoBehaviour
             {
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }
-  
-
 
             //clear validpress to be sure
             UserPress.Add(noteNumber);
@@ -483,9 +506,18 @@ public class RollScript : MonoBehaviour
             else validpress = false;
             //UserPress.Clear();
         }//end viz mode 2
-       // if (VizMode == 3)
+        else if (VizMode == 4) //onwait 
+        {
+            // movementEnabled = true;
+            if (isKeyPressed[noteNumber] == melodyToHighlight[noteNumber])
+            {
+                isPressed = true;
+            }
+
+        }
+        // if (VizMode == 3)
         //{
-            //do something? 
+        //do something? 
         //}
     }//endonNoteOn;
 
@@ -519,7 +551,7 @@ public class RollScript : MonoBehaviour
             {
                 //OnPressLicks.Clear();
                 ClearImprovs();
-               // improvdiscovered = false;
+                // improvdiscovered = false;
                 CleanupKeyboard();
             }//ednvalid press
              // CleanupKeyboard();
@@ -552,6 +584,17 @@ public class RollScript : MonoBehaviour
 
 
         }//end vizmode 3
+        //still keep moving on release
+        if (VizMode == 4) //onwait 
+        {
+            if (isKeyPressed[noteNumber] == melodyToHighlight[noteNumber])
+            {
+                isPressed = true;
+                isReleased = true; 
+            }
+
+          //  isReleased = true;
+        }
 
         //if (showLickCount)
         //{
@@ -661,6 +704,7 @@ public class RollScript : MonoBehaviour
     //start is for initialization 
     void Start()
     {
+        movementEnabled = true;
         Debug.Log("initial viz mode is " + VizMode);
         //set greenline pos
         //these values are true never change them to transform.Position
@@ -672,61 +716,68 @@ public class RollScript : MonoBehaviour
         //lets try purple
 
 
-        //rollmode toggle listener
+        //rollmode toggle listener viz mode 1 
         rollmodeListener.GetComponent<Toggle>();
         rollmodeListener.onValueChanged.AddListener(delegate
         {
             RollModeValueChanged(rollmodeListener);
         });
 
-        //on press mode toggle listener
+        //on press mode toggle listener viz mode 2 
         onpressmodelistener.GetComponent<Toggle>();
         onpressmodelistener.onValueChanged.AddListener(delegate
         {
             OnPressValueChanged(onpressmodelistener);
         });
 
-        //guided press mode toggle listener
+        //guided press mode toggle listener viz mode 3
         guidedlistener.GetComponent<Toggle>();
         guidedlistener.onValueChanged.AddListener(delegate
         {
             GuidedValueChanged(guidedlistener);
         });
 
-        //jazz improv listener
-        jazzlistener.GetComponent<Toggle>();
-        jazzlistener.onValueChanged.AddListener(delegate
+        //for on wait viz mode 3
+        onwaitlistener.GetComponent<Toggle>();
+        onwaitlistener.onValueChanged.AddListener(delegate
         {
-            JazzValueChanged(jazzlistener);
+            OnWaitValueChanged(onwaitlistener);
         });
 
-        //blues improv listener
-        blueslistener.GetComponent<Toggle>();
-        blueslistener.onValueChanged.AddListener(delegate
-        {
-            BluesValueChanged(blueslistener);
-        });
+        ////jazz improv listener
+        //jazzlistener.GetComponent<Toggle>();
+        //jazzlistener.onValueChanged.AddListener(delegate
+        //{
+        //    JazzValueChanged(jazzlistener);
+        //});
 
-        //bkeyname lick count listener
-        keynamelistener.GetComponent<Toggle>();
-        keynamelistener.onValueChanged.AddListener(delegate
-        {
-            KeyNameValueChanged(keynamelistener);
-        });
+        ////blues improv listener
+        //blueslistener.GetComponent<Toggle>();
+        //blueslistener.onValueChanged.AddListener(delegate
+        //{
+        //    BluesValueChanged(blueslistener);
+        //});
 
-        //halfstep listener
-        HSlistener.GetComponent<Toggle>();
-        HSlistener.onValueChanged.AddListener(delegate
-        {
-            HSValueChanged(HSlistener);
-        });
+        ////bkeyname lick count listener
+        //keynamelistener.GetComponent<Toggle>();
+        //keynamelistener.onValueChanged.AddListener(delegate
+        //{
+        //    KeyNameValueChanged(keynamelistener);
+        //});
 
-        //halfstep listener
-        SAlistener.GetComponent<Toggle>();
-        SAlistener.onValueChanged.AddListener(delegate
-        {
-            SAValuechanged(SAlistener);
-        });
+        ////halfstep listener
+        //HSlistener.GetComponent<Toggle>();
+        //HSlistener.onValueChanged.AddListener(delegate
+        //{
+        //    HSValueChanged(HSlistener);
+        //});
+
+        ////halfstep listener
+        //SAlistener.GetComponent<Toggle>();
+        //SAlistener.onValueChanged.AddListener(delegate
+        //{
+        //    SAValuechanged(SAlistener);
+        //});
 
         //STEP 01
         //spawn the first in the sequence
@@ -749,12 +800,12 @@ public class RollScript : MonoBehaviour
 
     }//end start function
 
-    // Update is called once per frame
+    // for the higlighting of the licks
     void Update()
     {
         // CleanupKeyboard();
 
-        if (VizMode == 1 || VizMode == 3)
+        if (VizMode == 1 || VizMode == 3 || VizMode == 4)
         {
             //spawn
             // SpawnKeys();
@@ -814,7 +865,7 @@ public class RollScript : MonoBehaviour
                 else
                 {
                     ctr = 0;
-                    if (VizMode == 1)
+                    if (VizMode == 1 || VizMode == 4)
                     {
                         SpawnKeys();
                     }
@@ -833,6 +884,7 @@ public class RollScript : MonoBehaviour
 
             }//endidSpawnNew
         }//endvizmode 1 rollmode
+
         if (VizMode == 2 && validpress)
         {
             CleanupKeyboard();
@@ -846,7 +898,7 @@ public class RollScript : MonoBehaviour
             if (UserPress.Count >= 4)
             {
                 UserPress.Clear();
-               // recolorHighlights();
+                // recolorHighlights();
             }//enduserpress count
 
         }//ifvizmode2
@@ -858,33 +910,33 @@ public class RollScript : MonoBehaviour
         //CleanupKeyboard();
     }//end update function
 
+    //for the continuous rolling of the keys 
     private void FixedUpdate()
     {
-        if (VizMode == 1) //roll
+
+        switch (VizMode)
         {
-            RollKeys();
-            CleanupKeyboard();
+            case 1:
+                {
+                    RollKeys();
+                    CleanupKeyboard();
+                    break;
+                }
+            case 4:
+                {
+                    if (movementEnabled || monitorTouch())
+                    {
+                        RollKeys();
+                        CleanupKeyboard();
+                    }//end onwait control condition
+                    break;
+                }
+            default: break; 
+
         }
-        if (VizMode == 2) // on press
-        {
-            // Debug.Log("On-Press Mode");
-            // CleanupKeyboard();
-            //recolor highlights
-            //if (validpress)
-            //{
-            //    recolorHighlights();
-            //}
-            //if (melodyKeyreleased==0)
-            //{
-            //    CleanupKeyboard();
-            //    ClearImprovs();
-            //}
-            
-        }
-        if (VizMode == 3) // guided press
-        {
-           
-        }
+
+
+       
 
     }//endfixupdate
 
@@ -1026,7 +1078,7 @@ public class RollScript : MonoBehaviour
         RectTransform SpawnScale = spawnedBars.GetComponent<RectTransform>();
         //==== this is using size delta approach ===== /
         //start reducing in size                                                    // * 5
-        SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - (barSpeed/2));
+        SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y - (barSpeed / 2));
 
         //dont move me anymore
         decreasing = true;
@@ -1056,7 +1108,6 @@ public class RollScript : MonoBehaviour
 
     public void RollModeValueChanged(Toggle change)
     {
-
         //things to do when RollMode is changed
         if (change.isOn)
         {
@@ -1085,7 +1136,7 @@ public class RollScript : MonoBehaviour
 
             //set to one to trigger other roll update events
             VizMode = 1;
-        }
+        }//end if
         else
         {
             //change to default vizmode then destroy everything else
@@ -1093,6 +1144,7 @@ public class RollScript : MonoBehaviour
             shiftedTypes = true;
             DestroySpawns();
             Debug.Log("Deactivated rolling. Spawns destroyed. ");
+            display_name.text = "select viz mode";
 
             ClearImprovs();
             ClearMelodies();
@@ -1101,7 +1153,7 @@ public class RollScript : MonoBehaviour
 
             //set ctr to 0
             ctr = 0;
-        }
+        }//endelse
     }//end rollvaluemode changed
 
     public void OnPressValueChanged(Toggle change)
@@ -1110,19 +1162,21 @@ public class RollScript : MonoBehaviour
         {
             VizMode = 2;
             Debug.Log("Selected On Press Mode.");
-        }
+            display_name.text = "Press a Chord to show licks";
+        }//endif 
         else
         {
             //change to default vizmode
             VizMode = 9;
             Debug.Log("Deactivated On press mode.");
+            display_name.text = "select viz mode";
 
             ClearImprovs();
             CleanupKeyboard();
 
             //clear user press too
             UserPress.Clear();
-        }
+        }//endelse 
 
     }//end onpressvaluechanged
 
@@ -1132,6 +1186,7 @@ public class RollScript : MonoBehaviour
         {
             VizMode = 3;
             Debug.Log("Guided Press Mode");
+            display_name.text = "play chords and improvise along the way";
 
             //restart it to 0 just to be sure
             ctr = 0;
@@ -1141,6 +1196,7 @@ public class RollScript : MonoBehaviour
             //change to default vizmode
             VizMode = 9;
             Debug.Log("Deactivated Guided mode.");
+            display_name.text = "select viz mode";
 
             ClearMelodies();
             ClearImprovs();
@@ -1154,84 +1210,133 @@ public class RollScript : MonoBehaviour
         }
     }//end onpressvaluechanged
 
-    public void JazzValueChanged(Toggle change)
+    public void OnWaitValueChanged(Toggle change)
     {
-        // ctr = 0; 
+        //its like RollMode but wait for press before Rollings
         if (change.isOn)
         {
-            genre = 0;
-            Debug.Log("Jazz Improvs will be shown");
+            //set ctr to 0 to have a good start
+            ctr = 0;
 
-        }
+            Debug.Log("OnWait Press Mode.");
+            //start with a clean slate
+            CleanupKeyboard();
+            ClearMelodies();
+            ClearImprovs();
+
+            display_name.text = "OnWait Press Mode";
+
+            //SPAWN
+            //  if (!shiftedTypes) {
+            SpawnKeys();
+            // }
+            //  else
+            //  {
+            //      ReactiveSpawns();
+            //  }
+            //some crucial initialisation
+            highlightNow = false;
+            // isNext = false;
+
+            //4 is onwait 
+            VizMode = 4;
+        }//end if
         else
         {
-            //change to default vizmode
-            genre = 1;
-            Debug.Log("Blues Improvs will be shown");
-            //
-            //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
-        }
-    }//end blues values toggle
+            //change to default vizmode then destroy everything else
+            VizMode = 9;
+            shiftedTypes = true;
+            DestroySpawns();
+            //Debug.Log("Deactivated rolling. Spawns destroyed. ");
+            display_name.text = "select viz mode";
+            ClearImprovs();
+            ClearMelodies();
+            //clear user press too
+            UserPress.Clear();
 
-    public void BluesValueChanged(Toggle change)
-    {
-        //ctr = 0; 
-        if (change.isOn)
-        {
-            genre = 1;
-            Debug.Log("Blues Improvs will be shown");
+            //set ctr to 0
+            ctr = 0;
+        }//endelse
+    }//end onpressvaluechanged
+
+    //public void JazzValueChanged(Toggle change)
+    //{
+    //    // ctr = 0; 
+    //    if (change.isOn)
+    //    {
+    //        genre = 0;
+    //        Debug.Log("Jazz Improvs will be shown");
+
+    //    }
+    //    else
+    //    {
+    //        //change to default vizmode
+    //        genre = 1;
+    //        Debug.Log("Blues Improvs will be shown");
+    //        //
+    //        //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
+    //    }
+    //}//end blues values toggle
+
+    //public void BluesValueChanged(Toggle change)
+    //{
+    //    //ctr = 0; 
+    //    if (change.isOn)
+    //    {
+    //        genre = 1;
+    //        Debug.Log("Blues Improvs will be shown");
 
 
-        }
-        else
-        {
+    //    }
+    //    else
+    //    {
 
-            genre = 0;
-            Debug.Log("Jazz Improvs will be shown");
+    //        genre = 0;
+    //        Debug.Log("Jazz Improvs will be shown");
 
-        }
-    }//end bluesvalues toggle
+    //    }
+    //}//end bluesvalues toggle
 
-    public void KeyNameValueChanged(Toggle change)
-    {
-        if (change.isOn)
-        {
-            showLickCount = true;
-        }//end
-        else
-        {
-            showLickCount = false;
-        }
-    }//end keynamevaluechanged
+    //public void KeyNameValueChanged(Toggle change)
+    //{
+    //    if (change.isOn)
+    //    {
+    //        showLickCount = true;
+    //    }//end
+    //    else
+    //    {
+    //        showLickCount = false;
+    //    }
+    //}//end keynamevaluechanged
 
     public int getBluesSequence(int order)
     {
         return bluessequence[order];
     }//end getBlues sequence number
 
-    public void HSValueChanged(Toggle change)
-    {
-        if (change.isOn)
-        {
-            enablehalfstep = true;
-        }//end
-        else
-        {
-            enablehalfstep = false;
-        }
-    }//end keynamevaluechanged
+    //public void HSValueChanged(Toggle change)
+    //{
+    //    if (change.isOn)
+    //    {
+    //        enablehalfstep = true;
+    //    }//end
+    //    else
+    //    {
+    //        enablehalfstep = false;
+    //    }
+    //}//end keynamevaluechanged
 
-    public void SAValuechanged(Toggle change)
-    {
-        if (change.isOn)
-        {
-            enablestepabove = true;
-        }//end
-        else
-        {
-            enablestepabove = false;
-        }
-    }//end keynamevaluechanged
+    //public void SAValuechanged(Toggle change)
+    //{
+    //    if (change.isOn)
+    //    {
+    //        enablestepabove = true;
+    //    }//end
+    //    else
+    //    {
+    //        enablestepabove = false;
+    //    }
+    //}//end keynamevaluechanged
 
     //a function to recolor every key
     public void recolorHighlights()
@@ -1242,12 +1347,22 @@ public class RollScript : MonoBehaviour
             {
                 pianoKeys[item].GetComponent<Image>().color = Color.white;
             }
+        }
+    }//end recolorHighlights
 
+    public bool monitorTouch()
+    {
+        if (isTouched && (isReleased || isPressed))
+        {
+            return true;
         }
 
-       
+        else
+        {
+            return false;
+        }
 
-    }//end recolorHighlights
+    }//end monitorTouch
 
 
 }//endclass
