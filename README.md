@@ -139,7 +139,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 - [x] port to v 2017.4.8.f1 
 
 ##### integration targets
-- [ ] setup external speakers to play synthesized sound
+- [x] setup external speakers to play synthesized sound
 - [ ] run pilot user study 
 - [x] measure projection board hind legs
 - [z] acquire materials for projection board hind legs 
