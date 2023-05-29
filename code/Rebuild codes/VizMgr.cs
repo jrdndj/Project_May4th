@@ -21,29 +21,6 @@ public class VizMgr : MonoBehaviour
 
         //initialize all toggles here
 
-        ////rollmode toggle listener
-
-        //====== these things stay in RollScript 
-        //rollmodeListener.GetComponent<Toggle>();
-        //rollmodeListener.onValueChanged.AddListener(delegate
-        //{
-        //    RollModeValueChanged(rollmodeListener);
-        //});
-
-        ////on press mode toggle listener
-        //onpressmodelistener.GetComponent<Toggle>();
-        //onpressmodelistener.onValueChanged.AddListener(delegate
-        //{
-        //    OnPressValueChanged(onpressmodelistener);
-        //});
-
-        ////guided press mode toggle listener
-        //guidedlistener.GetComponent<Toggle>();
-        //guidedlistener.onValueChanged.AddListener(delegate
-        //{
-        //    GuidedValueChanged(guidedlistener);
-        //});
-
         //jazz improv listener
         jazzlistener.GetComponent<Toggle>();
         jazzlistener.onValueChanged.AddListener(delegate
@@ -84,19 +61,19 @@ public class VizMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }//end update
 
     //the ValueChanged functions here
 
-   
+
 
     public void JazzValueChanged(Toggle change)
     {
         // ctr = 0; 
         if (change.isOn)
         {
-            RollManager.GetComponent<RollScript>().genre = 0; 
+            RollManager.GetComponent<RollScript>().genre = 0;
             //genre = 0;
             Debug.Log("Jazz Improvs will be shown");
 
