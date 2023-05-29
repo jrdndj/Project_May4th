@@ -40,6 +40,7 @@ public class ChordMgr : MonoBehaviour
                                                 // we will put all the following lists in a masterlist for easy comparison
     List<List<int>> ManyLists = new List<List<int>>() { C7, Cm7, CM7, Dm7, G7, Am7, Em7, FM7, F7, A7 };
 
+    List<int> tempPressed = new List<int>();
 
     //=========== CHORD RELATED VARIABLES ==========/
 
@@ -68,7 +69,7 @@ public class ChordMgr : MonoBehaviour
     //D3 F3 G3 B3 --- D4 Fs4 G4 B4 - ok mapped! - D5 Fs5 G5 B5
     static List<int> G7 = new List<int>() { 14, 17, 19, 23 };
     static List<int> G7ct = new List<int>() { 26, 29, 31, 35, 38, 41, 43, 47 };
-    static List<int> G7hs = new List<int>() { 25, 29, 30, 34, 37, 40, 42, 46 }; 
+    static List<int> G7hs = new List<int>() { 25, 29, 30, 34, 37, 40, 42, 46 };
     static List<int> G7sa = new List<int>() { 28, 33, 36 };
 
     //Amin7 A3 C4 E4 G4 --- A4 C5 E5 G5 - ok mapped!
@@ -148,7 +149,7 @@ public class ChordMgr : MonoBehaviour
                         BluesListToSend.Add(C7st);
                         ChordNamesToSend.Add("C7");
                         HalfStepToSend.Add(CM7hs);
-                        StepAboveToSend.Add(CM7sa); 
+                        StepAboveToSend.Add(CM7sa);
                         break;
                     }//end Cm7
                 case "Cm7":
@@ -259,7 +260,7 @@ public class ChordMgr : MonoBehaviour
         //SEND KEY INFORMATION
         ImprovManager.GetComponent<ImprovMgr>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend, HalfStepToSend, StepAboveToSend);
         //also send it straight to RollManager for the keys to spawn 
-        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend,HalfStepToSend, StepAboveToSend);
+        RollManager.GetComponent<RollScript>().ListReceiver(ChordListToSend, JazzListToSend, BluesListToSend, HalfStepToSend, StepAboveToSend);
 
         //extra step to compute offset 
         //map ycoords of spawn and pass to RollMgr too
@@ -340,18 +341,78 @@ public class ChordMgr : MonoBehaviour
     //maps the notenumber to the equivalent musical key
 
     //identifies the press and returns the lick list 
-    public void PressMapper(List<int> userPress)
+    public void PressMapper(List<int> userPress, List<int> correctPress)
     {
-        //produces the highlights on the spot
-        //it should call HighlightLicks
-        //detect the first key and light up its key tones
+        switch (RollManager.GetComponent<RollScript>().VizMode)
+        {
+            case 2: CheckIfAChord(userPress); break;
+            case 3:
+                {
+                    RollManager.GetComponent<RollScript>().validpress = CheckIfCorrect(userPress, correctPress);
+                    //if valid then remember it
+                    if (CheckIfCorrect(userPress, correctPress))
+                    {
+                        tempPressed = userPress.ToList();
+                    }
 
-        //general algorithm
-        //check chord or pressed key
-        //return appropriate chord tone or semitone (as a list)
-        //==== NEW ALGO
-        CheckIfAChord(userPress);
+                    break;
+                }
+            case 4:
+                {
+                    RollManager.GetComponent<RollScript>().validpress = CheckIfCorrect(userPress, correctPress);
+                    RollManager.GetComponent<RollScript>().isPressed = true;
+                    //  RollManager.GetComponent<RollScript>().isReleased = true;
+
+                    //if valid then remember it
+                    if (CheckIfCorrect(userPress, correctPress))
+                    {
+                        tempPressed = userPress.ToList();
+                    }
+
+                    //then trigger next hihglight
+                    //RollManager.GetComponent<RollScript>().highlightNow = true;
+                    break;
+                }
+            default: break;
+        }//end switch PressMapper
+
     } //end PressMapper
+
+    //chord checker function
+    public bool CheckIfCorrect(List<int> userinput, List<int> correctPress)
+    {
+        //print contents to be sure
+        foreach (int element in userinput)
+        {
+            Debug.Log("Pressed " + element);
+        }
+
+        foreach (int element in correctPress)
+        {
+            Debug.Log("Should match with " + element);
+            if (!userinput.Contains(element))
+            {
+                return false; // Exit and return false if an element is not found
+            }
+        }
+        return true; // All elements are found
+    }
+    //end check if correct
+
+    //check if released
+    public bool CheckifCorrectReleased(List<int> userreleased)
+    {
+        foreach (int element in userreleased)
+        {
+            Debug.Log("Should match with " + element);
+            if (!tempPressed.Contains(element))
+            {
+                return false; // Exit and return false if an element is not found
+            }
+        }
+        return true; // All elements are found
+
+    }
 
     //chord comparer function
     public void CheckIfAChord(List<int> userinput)
@@ -383,7 +444,7 @@ public class ChordMgr : MonoBehaviour
         else if (userinput.Contains(12) && userinput.Contains(16) && userinput.Contains(19) && userinput.Contains(23))
         {
             RollManager.GetComponent<RollScript>().OnPressLicks.Clear();
-            copyList(CM7ct,1);
+            copyList(CM7ct, 1);
             copyList(C7st, 2);
             RollManager.GetComponent<RollScript>().validpress = true;
             RollManager.GetComponent<RollScript>().display_name.text = "CM7 chord tones";
@@ -416,7 +477,7 @@ public class ChordMgr : MonoBehaviour
         else if (userinput.Contains(17) && userinput.Contains(21) && userinput.Contains(24) && userinput.Contains(27))
         {
             RollManager.GetComponent<RollScript>().OnPressLicks.Clear();
-            copyList(FM7ct,1);
+            copyList(FM7ct, 1);
             copyList(FM7st, 2);
             RollManager.GetComponent<RollScript>().validpress = true;
             RollManager.GetComponent<RollScript>().display_name.text = "F7 chord tones";
@@ -428,7 +489,7 @@ public class ChordMgr : MonoBehaviour
             RollManager.GetComponent<RollScript>().display_name.text = "Unrecognised chord";
         }
 
-    }//end checkifa chord thank you chat gpt for doing this 
+    }//end checkifa chord thank you chat gpt for doing this function
 
     //chord sender function
     public void copyList(List<int> cloneMe, int type)

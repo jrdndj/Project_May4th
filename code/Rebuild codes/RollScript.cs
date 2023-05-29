@@ -73,8 +73,11 @@ public class RollScript : MonoBehaviour
     public bool enablestepabove = false;
     public bool movementEnabled = true; //set default to true
     private bool isReleased = false; // if true it means it can keep moving
-    private bool isPressed = false;
+    public bool isPressed = false;
     private bool isTouched = false;
+
+    //list needed for the guided press mode
+    public List<int> guidedPressList = new List<int>();
 
 
     //height of 120 means it runs for 2 seconds.
@@ -126,6 +129,7 @@ public class RollScript : MonoBehaviour
 
     //this remembers what the user pressed0
     public List<int> UserPress = new List<int>();
+    public List<int> UserReleased = new List<int>();
     public bool validpress = false;
     public List<int> OnPressLicks = new List<int>();
     public List<int> OnPressBlues = new List<int>();
@@ -193,13 +197,26 @@ public class RollScript : MonoBehaviour
          * then iterate with new offset from length[i+1] and so on
          * **/
 
+        //regular sequence if proper roll
         //i can recycle spawnRoll and iterate thru it
-        for (int ctr = 0; ctr < ChordList.Count; ctr++)
+        if (VizMode == 1)
         {
-            SpawnRoll(ChordList[ctr], yellow, 1, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
-            // SpawnRoll(LickList[ctr], improvpink, 2, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
-            //Debug.Log("Spawned chords" + ChordList[ctr]);
-        }//end spawn
+            for (int ctr = 0; ctr < ChordList.Count; ctr++)
+            {
+                SpawnRoll(ChordList[ctr], yellow, 1, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
+            }
+
+        }
+        //start at 1th to the nth if vizmode 4
+        if (VizMode == 4)
+        {
+            for (int ctr = 1; ctr < ChordList.Count; ctr++)
+            {
+                SpawnRoll(ChordList[ctr], yellow, 1, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
+                // SpawnRoll(LickList[ctr], improvpink, 2, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
+
+            }
+        }
 
         //then end all spawns
         return false;
@@ -363,9 +380,10 @@ public class RollScript : MonoBehaviour
                 //========= CHECK IF IT TOUCHES GREEN LINE =======/
                 //when they reach the green line                //there was a -30 here 
                 //if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - 60) <= green_line.GetComponent<RectTransform>().localPosition.y)
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                //if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height))) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
-                   //Debug.Log("Bong");
+                    //Debug.Log("Bong");
 
                     //indicate touch first 
                     isTouched = true;
@@ -387,7 +405,7 @@ public class RollScript : MonoBehaviour
                     //dont move me anymore
                     //decreasing = true;
 
-                    // ShrinkBars(spawnedBars[i]);
+                    //ShrinkBars(spawnedBars[i]);
 
                     //===== we are not shrinking anymore so we dont need this 
                     //if (SpawnScale.rect.height <= 0)
@@ -414,7 +432,7 @@ public class RollScript : MonoBehaviour
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
 
-            
+
                     //enable movement of the rest until it touches 
                     movementEnabled = true;
 
@@ -499,7 +517,7 @@ public class RollScript : MonoBehaviour
             UserPress.Add(noteNumber);
             if (UserPress.Count == 4) //if there are at least three presses then go
             {
-                ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress);
+                ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
                 //then immediately clear user press
                 UserPress.Clear();
             }//end if userpress
@@ -508,13 +526,30 @@ public class RollScript : MonoBehaviour
         }//end viz mode 2
         else if (VizMode == 4) //onwait 
         {
-            // movementEnabled = true;
-            if (isKeyPressed[noteNumber] == melodyToHighlight[noteNumber])
+            if (isKeyHighLighted[noteNumber] && melodyToHighlight[noteNumber] && isKeyPressed[noteNumber])
             {
-                isPressed = true;
-            }
+                //if correct toggle is on show this
+                //pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
 
-        }
+                //add to list of presses to check
+                UserPress.Add(noteNumber);
+
+            }//endif
+            else
+            {
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+            }//endif
+
+            //if we have 4 then check 
+            if (UserPress.Count == 4) //if there are at least three presses then go
+            {
+                ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
+                //then immediately clear user press
+                UserPress.Clear();
+            }//end if userpress
+            else validpress = false;
+
+        }//end vizmode 4
         // if (VizMode == 3)
         //{
         //do something? 
@@ -585,16 +620,30 @@ public class RollScript : MonoBehaviour
 
         }//end vizmode 3
         //still keep moving on release
-        if (VizMode == 4) //onwait 
+        else if (VizMode == 4) //onwait 
         {
-            if (isKeyPressed[noteNumber] == melodyToHighlight[noteNumber])
+            //only remember the valid releases
+            if (isKeyHighLighted[noteNumber] && melodyToHighlight[noteNumber] && isKeyPressed[noteNumber])
             {
-                isPressed = true;
-                isReleased = true; 
+                UserReleased.Add(noteNumber);
             }
 
-          //  isReleased = true;
-        }
+            //check if we have four
+            if (UserReleased.Count == 4)
+            {
+                //then check chordmapper
+                isReleased = ChordManager.GetComponent<ChordMgr>().CheckifCorrectReleased(UserReleased);
+                //clear when done
+                UserReleased.Clear();
+                movementEnabled = true;
+            }//end
+
+            //clear anyway
+            UserReleased.Clear();
+
+            //else do nothing
+
+        }//end viz mode
 
         //if (showLickCount)
         //{
@@ -907,6 +956,19 @@ public class RollScript : MonoBehaviour
             highlightNow = true;
 
         }//end viz mode 3
+
+        if (VizMode == 4)
+        {
+            highlightNow = true;
+
+            if (spawnCount == 0)
+            {
+                spawnNew = true;
+                // SpawnKeys();
+            }
+
+        }//end vizmode 4
+
         //CleanupKeyboard();
     }//end update function
 
@@ -918,10 +980,14 @@ public class RollScript : MonoBehaviour
         {
             case 1:
                 {
+
                     RollKeys();
                     CleanupKeyboard();
+
                     break;
+
                 }
+
             case 4:
                 {
                     if (movementEnabled || monitorTouch())
@@ -931,12 +997,12 @@ public class RollScript : MonoBehaviour
                     }//end onwait control condition
                     break;
                 }
-            default: break; 
+            default: break;
 
         }
 
 
-       
+
 
     }//endfixupdate
 
@@ -1122,6 +1188,9 @@ public class RollScript : MonoBehaviour
 
             display_name.text = "rest";
 
+            //set to one to trigger other roll update events
+            VizMode = 1;
+
             //SPAWN
             //  if (!shiftedTypes) {
             SpawnKeys();
@@ -1134,8 +1203,7 @@ public class RollScript : MonoBehaviour
             highlightNow = false;
             // isNext = false;
 
-            //set to one to trigger other roll update events
-            VizMode = 1;
+            
         }//end if
         else
         {
@@ -1226,6 +1294,9 @@ public class RollScript : MonoBehaviour
 
             display_name.text = "OnWait Press Mode";
 
+            //4 is onwait 
+            VizMode = 4;
+
             //SPAWN
             //  if (!shiftedTypes) {
             SpawnKeys();
@@ -1238,8 +1309,7 @@ public class RollScript : MonoBehaviour
             highlightNow = false;
             // isNext = false;
 
-            //4 is onwait 
-            VizMode = 4;
+          
         }//end if
         else
         {
@@ -1363,6 +1433,18 @@ public class RollScript : MonoBehaviour
         }
 
     }//end monitorTouch
+
+    //this function gets the current list of guided press and adds it for error checking
+    public void getGuidedPressList()
+    {
+        for (int i = 0; i < melodyToHighlight.Count(); i++)
+        {
+            if (melodyToHighlight[i])
+            {
+                guidedPressList.Add(i);
+            }
+        }
+    }//end getguidedpresslist
 
 
 }//endclass
