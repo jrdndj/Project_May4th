@@ -72,9 +72,10 @@ public class RollScript : MonoBehaviour
     public bool enablehalfstep = false;
     public bool enablestepabove = false;
     public bool movementEnabled = true; //set default to true
-    private bool isReleased = false; // if true it means it can keep moving
+    public bool isReleased = false; // if true it means it can keep moving
     public bool isPressed = false;
     private bool isTouched = false;
+    public bool isPaused = true;
 
     //list needed for the guided press mode
     public List<int> guidedPressList = new List<int>();
@@ -93,6 +94,8 @@ public class RollScript : MonoBehaviour
 
     public List<int> YPlotsReceived = new List<int>();
     public List<int> KeyLengthsReceived = new List<int>();
+    public List<int> OnWaitKeyLengths = new List<int>();
+    public List<int> OnWaitYPlots = new List<int>();
 
     float barSpeed = (float)0.682; //0.682
 
@@ -210,10 +213,13 @@ public class RollScript : MonoBehaviour
         //start at 1th to the nth if vizmode 4
         if (VizMode == 4)
         {
+            //set onwait keylengths
+            SetOnWaitKeyLenghts();
+
             for (int ctr = 1; ctr < ChordList.Count; ctr++)
             {
-                SpawnRoll(ChordList[ctr], yellow, 1, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
-                // SpawnRoll(LickList[ctr], improvpink, 2, KeyLengthsReceived[ctr], YPlotsReceived[ctr]);
+                SpawnRoll(ChordList[ctr], yellow, 1, OnWaitKeyLengths[ctr], OnWaitYPlots[ctr]);
+                SpawnRoll(LickList[ctr], improvpink, 2, OnWaitKeyLengths[ctr], OnWaitYPlots[ctr]);
 
             }
         }
@@ -388,14 +394,12 @@ public class RollScript : MonoBehaviour
                     //indicate touch first 
                     isTouched = true;
 
-                    //then check if touch and press is there 
-                    //if (monitorTouch())
+                    //// movementEnabled = false;
+                    //if (!isReleased)
                     //{
-                    //   // Debug.Log("Here!");
-                    //    movementEnabled = true;
+                    //    movementEnabled = false;
                     //}
-                    //else movementEnabled = false;
-                    movementEnabled = false;
+                    //else movementEnabled = true;
 
                     highlightNow = true;
 
@@ -434,7 +438,7 @@ public class RollScript : MonoBehaviour
 
 
                     //enable movement of the rest until it touches 
-                    movementEnabled = true;
+                    // movementEnabled = true;
 
                     //set to false everything else 
                     isTouched = false;
@@ -485,7 +489,8 @@ public class RollScript : MonoBehaviour
         isKeyPressed[noteNumber] = true;
 
         //that's it - red if not highlighted 
-        if (VizMode == 1 || VizMode == 3) //this condition should be if error check is on
+        if (VizMode == 1)
+        //if (VizMode == 1 || VizMode == 3) //this condition should be if error check is on
         {
             if (isKeyHighLighted[noteNumber] && (melodyToHighlight[noteNumber] || improvToHighlight[noteNumber]))
             {
@@ -496,22 +501,40 @@ public class RollScript : MonoBehaviour
             {
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }//endif
+
+            ////=== some checking mechanism here
+            ////clear validpress to be sure
+            //UserPress.Add(noteNumber);
+            //if (UserPress.Count >= 3) //if there are at least three presses then go
+            //{
+            //    ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
+            //    //then immediately clear user press
+            //    UserPress.Clear();
+            //    // highlightNow = true; 
+
+            //}//end if userpress
+            //else validpress = false;
+            //UserPress.Clear();
         }//endviz mode 1
 
         else if (VizMode == 2) //vizmode is expert press 
         {
             //if validation mode is off then this one
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
-
-            //if validation mode is on this one
-            if (improvdiscovered && isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
+            if (!improvdiscovered)
             {
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
             }
+
+            //if validation mode is on this one
+            else if (improvdiscovered && isKeyHighLighted[noteNumber] && improvToHighlight[noteNumber])
+            {
+                //  pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            }
             else if (improvdiscovered && !isKeyHighLighted[noteNumber] || !improvToHighlight[noteNumber])
             {
-                pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+                //  pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }
+            // else pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
 
             //clear validpress to be sure
             UserPress.Add(noteNumber);
@@ -520,9 +543,12 @@ public class RollScript : MonoBehaviour
                 ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
                 //then immediately clear user press
                 UserPress.Clear();
+                // highlightNow = true; 
+
             }//end if userpress
             else validpress = false;
             //UserPress.Clear();
+
         }//end viz mode 2
         else if (VizMode == 4) //onwait 
         {
@@ -532,7 +558,7 @@ public class RollScript : MonoBehaviour
                 //pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
 
                 //add to list of presses to check
-                UserPress.Add(noteNumber);
+                //  UserPress.Add(noteNumber);
 
             }//endif
             else
@@ -540,20 +566,9 @@ public class RollScript : MonoBehaviour
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }//endif
 
-            //if we have 4 then check 
-            if (UserPress.Count == 4) //if there are at least three presses then go
-            {
-                ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
-                //then immediately clear user press
-                UserPress.Clear();
-            }//end if userpress
-            else validpress = false;
-
+         
         }//end vizmode 4
-        // if (VizMode == 3)
-        //{
-        //do something? 
-        //}
+   
     }//endonNoteOn;
 
     //when user releases a pressed key as per MIDIScript 
@@ -568,14 +583,15 @@ public class RollScript : MonoBehaviour
             //==========for blues
             //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
         }
-        else if (melodyToHighlight[noteNumber] == true)
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
-        }
+        //else if (melodyToHighlight[noteNumber] == true)
+        //{
+        //    pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
+        //}0
         else
         {
             pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
         }
+
         if (VizMode == 2)
         {
             //clear user press too
@@ -599,56 +615,46 @@ public class RollScript : MonoBehaviour
             {
                 //if they are the same then release it
                 melodyToHighlight[noteNumber] = false;
-                melodyKeyreleased++;
+                //melodyKeyreleased++;
                 // display_name.text = "Release the next chord to release";
             }//end check key compared and melody to release
 
-            //if all melody is released then move to next highlight
-            if (melodyKeyreleased == 4)
-            {
-                //then we move to the next by triggering spawnNew
-                spawnNew = true;
+            ////if all melody is released then move to next highlight
+            //if (melodyKeyreleased == 4)
+            //{
+            //    //then we move to the next by triggering spawnNew
+            //    spawnNew = true;
 
-                //cleanupKeyboard
-                CleanupKeyboard();
-                ClearImprovs();
+            //    //cleanupKeyboard
+            //    CleanupKeyboard();
+            //    ClearImprovs();
 
-                //then refresh melodyKeyreleased
-                melodyKeyreleased = 0;
-            }//end check melody key count 
+            //    //then refresh melodyKeyreleased
+            //    melodyKeyreleased = 0;
+            //    isReleased = true;
+            //}//end check melody key count 
 
 
         }//end vizmode 3
         //still keep moving on release
-        else if (VizMode == 4) //onwait 
+        if (VizMode == 4) //onwait 
         {
-            //only remember the valid releases
-            if (isKeyHighLighted[noteNumber] && melodyToHighlight[noteNumber] && isKeyPressed[noteNumber])
-            {
-                UserReleased.Add(noteNumber);
-            }
+
+            //add every press to UserRelease
+            UserReleased.Add(noteNumber);
 
             //check if we have four
-            if (UserReleased.Count == 4)
+            if (UserReleased.Count >= 3)
             {
+                //  Debug.Log("Here");
                 //then check chordmapper
-                isReleased = ChordManager.GetComponent<ChordMgr>().CheckifCorrectReleased(UserReleased);
-                //clear when done
-                UserReleased.Clear();
-                movementEnabled = true;
-            }//end
+                //  ChordManager.GetComponent<ChordMgr>().CheckifCorrectReleased(UserReleased, guidedPressList);
+                isReleased = true;
+                //clear when don
+                                //  UserReleased.Clear();
 
-            //clear anyway
-            UserReleased.Clear();
-
-            //else do nothing
-
+            }
         }//end viz mode
-
-        //if (showLickCount)
-        //{
-        //    pianoKeys[noteNumber].GetComponentInChildren<Text>().text = "";
-        //}
 
         //PUTTING THIS TO LAST SO WE DONT FORGET - the key is no longer pressed so set it to false duh
         isKeyPressed[noteNumber] = false;
@@ -853,8 +859,98 @@ public class RollScript : MonoBehaviour
     void Update()
     {
         // CleanupKeyboard();
+        //if (VizMode == 4)
+        //{
 
-        if (VizMode == 1 || VizMode == 3 || VizMode == 4)
+        //    OnWaitRollKeys();
+        //    CleanupKeyboard();
+
+
+        //}//endvizmode4
+
+        //exclusive to vizmode 4 now, merge later 
+        if (VizMode == 4)
+        {
+
+            OnWaitRollKeys();
+            CleanupKeyboard();
+
+            //  Debug.Log("chord list has " + ChordList.Count);
+
+            //add some conditions here when we are on the last thing
+            if (ctr == ChordList.Count - 1)
+            {
+
+                //await a spacebar press here then
+                //triggering the spacebar would restart everything
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    ctr = 0; //set zero
+                             //set spawnNew
+                             //clear spawns
+                    spawnCount = 0;
+
+                    //then spawnew
+                    SpawnKeys();
+
+                    //then false
+                    spawnNew = false;
+
+                    //disable movement
+                    isPaused = true;
+                    movementEnabled = false;
+
+                }//end check spacebar
+            }//end check ctr say if its a 3
+
+            if (highlightNow)
+            {
+                // CleanupKeyboard();
+                //we need to clear previous improvs so they dont stain the keyboard
+                ClearMelodies();
+                ClearImprovs();
+
+                if (genre == 0)
+                {
+                    JazzMode();
+                }
+                else
+                {
+                    BluesMode();
+                }
+
+            }//end if check hihglight now
+
+            //trigger spawn when a spacebar is pressed and there are no spawns
+            if (spawnNew)
+            {
+
+                if (ctr <= ChordList.Count) //removed -1 here 
+                {
+                    ctr++;
+                }
+                //revert back to 0 when over this ensures a loop 
+                else
+                {
+                    //still 0 
+                    ctr = 0;
+                    //then spawnkeys now for viz 4
+                    SpawnKeys();
+                }
+
+                if (ChordNames.Count != 0)
+                {
+                    display_name.text = ChordNames[ctr];
+                }
+                //crucial stuff
+                spawnNew = false;
+
+            }//endidSpawnNew
+        }//endvizmode 4
+
+
+        //this will now be for viz mode 1 and 3 only. duplicate revise for 4
+        if (VizMode == 1 || VizMode == 3)
         {
             //spawn
             // SpawnKeys();
@@ -875,38 +971,13 @@ public class RollScript : MonoBehaviour
                 {
                     BluesMode();
                 }
-                //BluesMode();
 
-                //then highlight the next batch
-                //==== JAZZ IMPROV Variables ====
-                // HighlightLicks(ChordList[ctr], yellow, 1);
-                // HighlightLicks(LickList[ctr], improvpink, 2);
-
-                //===== Jazz improv with Halfstep
-                //HighlightLicks(HalfStepList[ctr], belowpink, 2);
-
-                //==== Jazz improv with Scale above
-                //HighlightLicks(StepAboveList[ctr], belowpink, 3);
-
-                //===== BLUES IMPROV VARIABLES ====
-                //HighlightLicks(EBluesScale[ctr], yellow, 1);
-                //HighlightLicks(EBluesImprov[ctr], blues, 2);
-
-                //highlightNow 
-                // highlightNow = false;
             }//end if check hihglight now
 
             ////when its time to trigger spawn and chordlist isnt empty
             if (spawnNew)
             {
-                //clear lines when we spawn new
-                // clearMapLines();
-
-                //Some things to control the spawning
-                //then increment
-                //=====jazz 
                 if (ctr < ChordList.Count - 1)
-
                 {
                     ctr++;
                 }
@@ -914,25 +985,20 @@ public class RollScript : MonoBehaviour
                 else
                 {
                     ctr = 0;
-                    if (VizMode == 1 || VizMode == 4)
+                    if (VizMode == 1) //removed || VizMode == 4, revert if fcked up
                     {
                         SpawnKeys();
                     }
 
                 }
-
-                //======jazz variables
-                //spawn new based on recent counter
-                //show their name
                 if (ChordNames.Count != 0)
                 {
                     display_name.text = ChordNames[ctr];
                 }
                 //crucial stuff
                 spawnNew = false;
-
             }//endidSpawnNew
-        }//endvizmode 1 rollmode
+        }//endvizmode 1 and 3
 
         if (VizMode == 2 && validpress)
         {
@@ -951,11 +1017,19 @@ public class RollScript : MonoBehaviour
             }//enduserpress count
 
         }//ifvizmode2
+
         if (VizMode == 3)
         {
             highlightNow = true;
 
-        }//end viz mode 3
+            //triggered by space now
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // highlightNow = true;
+                spawnNew = true; 
+            }
+
+          }//end viz mode 3
 
         if (VizMode == 4)
         {
@@ -975,35 +1049,17 @@ public class RollScript : MonoBehaviour
     //for the continuous rolling of the keys 
     private void FixedUpdate()
     {
-
         switch (VizMode)
         {
             case 1:
                 {
-
                     RollKeys();
                     CleanupKeyboard();
-
                     break;
+                }//end case 1
 
-                }
-
-            case 4:
-                {
-                    if (movementEnabled || monitorTouch())
-                    {
-                        RollKeys();
-                        CleanupKeyboard();
-                    }//end onwait control condition
-                    break;
-                }
             default: break;
-
         }
-
-
-
-
     }//endfixupdate
 
     //==== some housekeeping functions 
@@ -1060,6 +1116,17 @@ public class RollScript : MonoBehaviour
         {
             //Debug.Log("Offset saved " + item );
             YPlotsReceived.Add(item);
+        }//end foreach
+
+        //return YPlotsReceived;
+    }//end receive y plots
+
+    public void ReceiveOnWaitYPlots(List<int> List3)
+    {
+        foreach (var item in List3)
+        {
+            //Debug.Log("Offset saved " + item );
+            OnWaitYPlots.Add(item);
         }//end foreach
 
         //return YPlotsReceived;
@@ -1151,6 +1218,18 @@ public class RollScript : MonoBehaviour
 
     }//endshrinkbars
 
+    public void ResizeBars(GameObject spawnedBars)
+    {
+        RectTransform SpawnScale = spawnedBars.GetComponent<RectTransform>();
+
+        if (!decreasing)
+        {
+            SpawnScale.sizeDelta = new Vector2(SpawnScale.sizeDelta.x, SpawnScale.sizeDelta.y / 2);
+            //dont move me anymore
+            decreasing = true;
+        }
+    }//endshrinkbars
+
     public void DestroySpawns()
     {
         //for(int i = 0; i< spawnedBars.Length; i++)
@@ -1179,6 +1258,7 @@ public class RollScript : MonoBehaviour
         {
             //set ctr to 0 to have a good start
             ctr = 0;
+            spawnCount = 0;
 
             Debug.Log("Selected Roll Mode.");
             //start with a clean slate
@@ -1190,6 +1270,10 @@ public class RollScript : MonoBehaviour
 
             //set to one to trigger other roll update events
             VizMode = 1;
+
+
+            //set new spawnpoint
+            spawnpoint = spawn_top.transform.localPosition.y;
 
             //SPAWN
             //  if (!shiftedTypes) {
@@ -1203,7 +1287,7 @@ public class RollScript : MonoBehaviour
             highlightNow = false;
             // isNext = false;
 
-            
+
         }//end if
         else
         {
@@ -1216,6 +1300,7 @@ public class RollScript : MonoBehaviour
 
             ClearImprovs();
             ClearMelodies();
+            CleanupKeyboard();
             //clear user press too
             UserPress.Clear();
 
@@ -1231,6 +1316,7 @@ public class RollScript : MonoBehaviour
             VizMode = 2;
             Debug.Log("Selected On Press Mode.");
             display_name.text = "Press a Chord to show licks";
+            CleanupKeyboard();
         }//endif 
         else
         {
@@ -1239,11 +1325,15 @@ public class RollScript : MonoBehaviour
             Debug.Log("Deactivated On press mode.");
             display_name.text = "select viz mode";
 
+            ClearMelodies();
             ClearImprovs();
             CleanupKeyboard();
 
             //clear user press too
             UserPress.Clear();
+
+            //set ctr to 0 to have a good start
+            ctr = 0;
         }//endelse 
 
     }//end onpressvaluechanged
@@ -1254,7 +1344,7 @@ public class RollScript : MonoBehaviour
         {
             VizMode = 3;
             Debug.Log("Guided Press Mode");
-            display_name.text = "play chords and improvise along the way";
+            display_name.text = "press a chord";
 
             //restart it to 0 just to be sure
             ctr = 0;
@@ -1285,6 +1375,7 @@ public class RollScript : MonoBehaviour
         {
             //set ctr to 0 to have a good start
             ctr = 0;
+            spawnCount = 0;
 
             Debug.Log("OnWait Press Mode.");
             //start with a clean slate
@@ -1294,8 +1385,15 @@ public class RollScript : MonoBehaviour
 
             display_name.text = "OnWait Press Mode";
 
+            //set new spawnpoint
+            // spawnpoint = green_line.GetComponent<RectTransform>().localPosition.y;
+            spawnpoint = destroy_point.GetComponent<RectTransform>().localPosition.y - 60;
+
             //4 is onwait 
             VizMode = 4;
+
+            //disable movement by default until event changes is
+            movementEnabled = false;
 
             //SPAWN
             //  if (!shiftedTypes) {
@@ -1309,7 +1407,7 @@ public class RollScript : MonoBehaviour
             highlightNow = false;
             // isNext = false;
 
-          
+
         }//end if
         else
         {
@@ -1321,6 +1419,7 @@ public class RollScript : MonoBehaviour
             display_name.text = "select viz mode";
             ClearImprovs();
             ClearMelodies();
+            CleanupKeyboard();
             //clear user press too
             UserPress.Clear();
 
@@ -1423,6 +1522,7 @@ public class RollScript : MonoBehaviour
     public bool monitorTouch()
     {
         if (isTouched && (isReleased || isPressed))
+        //if (isTouched || isReleased)
         {
             return true;
         }
@@ -1445,6 +1545,104 @@ public class RollScript : MonoBehaviour
             }
         }
     }//end getguidedpresslist
+
+    //meant specifically for  on wait rollkeys
+    public void OnWaitRollKeys()
+    {
+        //show their name
+        if (ChordNames.Count != 0)
+        {
+            display_name.text = ChordNames[ctr];
+        }//displaying of chordnames 
+
+        //this is good already
+        if (isPaused || !movementEnabled)
+        {
+            // Debug.Log("Looking for the spacebar press now");
+            //if (Input.anyKeyDown)
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                isPaused = false;  // Resume movement if spacebar is pressed
+                isPressed = true; //and tell us its been pressed 
+                                  //  Debug.Log("spacebar pressed!");
+                movementEnabled = true;
+            }//end if keycode space
+        }//end if isPaused 
+
+        //else keep moving
+        else
+        {
+            //roll the objects spawns downward
+            for (int i = 0; i < spawnedBars.Length; i++)
+            {// Move the objects downward
+                if (spawnedBars[i] != null)
+                {
+                    Vector3 pos = spawnedBars[i].transform.position;
+                    RectTransform SpawnScale = spawnedBars[i].GetComponent<RectTransform>();
+                    pos.y -= barSpeed;
+                    spawnedBars[i].transform.position = pos;
+
+                    // Check if objects have reached the green line
+                    //if (((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height))) <= green_line.GetComponent<RectTransform>().localPosition.y))
+                    if (spawnedBars[i].GetComponent<RectTransform>().localPosition.y < green_line.GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height))
+                    {
+                        if (isPressed)
+                        {
+                            isPaused = false;
+                        }
+                        else
+                        {
+                            //  Debug.Log("TOUCHED! Press space to continue ");
+                            isPaused = true;  // Pause objects at the green line
+
+                        }
+                        highlightNow = true;
+                        //should i disable movement here? answer is no
+                        //  movementEnabled = false;
+                    }//end if touch green line
+
+                    //now check if it touches the destroy point
+                    //============= CHECK IF IT REACHES DESTROY POSITION =====/
+                    ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time               // /2 here
+                    if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y - 20)
+                    {
+                        //destroy then highlight 
+                        Destroy(spawnedBars[i]);
+
+                        //enable movement of the rest until it touches 
+                        movementEnabled = false;
+
+                        //set to false everything else 
+                        isTouched = false;
+
+                        //spawnedBars[i].SetActive(false);
+                        highlightNow = false;
+
+                        //but we can spawn something new now
+                        spawnNew = true;
+
+
+
+                        //commented this 
+                        //spawnCount--;
+
+                    }//endif check contact green point
+
+                }//end if spawnedbars != null 
+            }//end else if not ispaused 
+        }//end loop for all spawns
+    }//end onwait roll keys
+
+    //set onwait keylengths
+    public void SetOnWaitKeyLenghts()
+    {
+        foreach (var item in ChordList)
+        {
+            OnWaitKeyLengths.Add(2);
+            //OnWaitYPlots.Add(120);
+        }
+
+    }//end set wait on keylenghts
 
 
 }//endclass
