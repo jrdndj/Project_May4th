@@ -38,6 +38,7 @@ public class ChordMgr : MonoBehaviour
     List<int> YListPlotter = new List<int>(); //this is for the Y positions of the spawns that RollMgr will need
     List<int> LickListToSend = new List<int>(); //this is for highlight licklist of press mapper
                                                 // we will put all the following lists in a masterlist for easy comparison
+    List<int> OnWaitYListPlotter = new List<int>();
     List<List<int>> ManyLists = new List<List<int>>() { C7, Cm7, CM7, Dm7, G7, Am7, Em7, FM7, F7, A7 };
 
     List<int> tempPressed = new List<int>();
@@ -336,6 +337,30 @@ public class ChordMgr : MonoBehaviour
 
         //then send everything to RollMgr
         RollManager.GetComponent<RollScript>().ReceiveYPlots(YListPlotter);
+
+        //then do the same but for onwait ylist
+
+        //start fresh
+       offset = 60; //the first elements will have no offset
+        previousOffset = 0; //there is no existing offset
+        newOffset = 0;
+        OnWaitYListPlotter.Add(0);
+        for (int i = 1; i < LengthListToSend.Count; i++) //yes begin at 1
+        {
+           
+            // Debug.Log("Offset to multiply" + LengthListToSend[i-1]);
+            newOffset = ((2 * offset) / 2) + ((2 * offset) / 2) + previousOffset;
+            OnWaitYListPlotter.Add(newOffset); //should be of the previous one
+
+            //store the previous one for the next round
+            previousOffset = newOffset;
+            //previousOffset = LengthListToSend[i - 1] * offset;
+            //
+            //Debug.Log("New y coord is " + newOffset);
+        }//end for loop yplotter
+
+        RollManager.GetComponent<RollScript>().ReceiveOnWaitYPlots(OnWaitYListPlotter);
+
     }//end MapSpawnYCoords
 
     //maps the notenumber to the equivalent musical key
@@ -384,12 +409,12 @@ public class ChordMgr : MonoBehaviour
         //print contents to be sure
         foreach (int element in userinput)
         {
-            Debug.Log("Pressed " + element);
+            //Debug.Log("Pressed " + element);
         }
 
         foreach (int element in correctPress)
         {
-            Debug.Log("Should match with " + element);
+           // Debug.Log("Should match with " + element);
             if (!userinput.Contains(element))
             {
                 return false; // Exit and return false if an element is not found
@@ -400,17 +425,39 @@ public class ChordMgr : MonoBehaviour
     //end check if correct
 
     //check if released
-    public bool CheckifCorrectReleased(List<int> userreleased)
+    public bool CheckifCorrectReleased(List<int> userreleased, List<int> guidedpresslist)
     {
+        int ctr = 0;
+
+        //print contents to be sure
+        foreach (int element in guidedpresslist)
+        {
+            Debug.Log("Checking with " + element);
+        }
+
         foreach (int element in userreleased)
         {
-            Debug.Log("Should match with " + element);
-            if (!tempPressed.Contains(element))
+           //Debug.Log("Should match with " + element);
+            if (guidedpresslist.Contains(element))
             {
-                return false; // Exit and return false if an element is not found
+                Debug.Log("Released " + element );
+                ctr++;
             }
         }
-        return true; // All elements are found
+
+        if (ctr == 4)
+        {
+            RollManager.GetComponent<RollScript>().UserReleased.Clear();
+            RollManager.GetComponent<RollScript>().isReleased = true; 
+            return true;
+            
+        }
+        else {
+            RollManager.GetComponent<RollScript>().UserReleased.Clear();
+            RollManager.GetComponent<RollScript>().isReleased = false;
+            return false;
+            // All elements are found
+             }
 
     }
 
@@ -463,7 +510,7 @@ public class ChordMgr : MonoBehaviour
             copyList(G7ct, 1);
             copyList(G7st, 2);
             RollManager.GetComponent<RollScript>().validpress = true;
-            RollManager.GetComponent<RollScript>().display_name.text = "D second inv chord tones";
+            RollManager.GetComponent<RollScript>().display_name.text = "G second inv chord tones";
         }
         else if (userinput.Contains(16) && userinput.Contains(19) && userinput.Contains(23) && userinput.Contains(26))
         {

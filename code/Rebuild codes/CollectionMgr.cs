@@ -152,6 +152,15 @@ public class CollectionMgr : MonoBehaviour
         ("G7", 4),
         ("CM7", 4),
         ("A7", 4)
+    
+    };
+
+    List<(string, int)> PracticeJazz03 = new List<(string, int)>
+    {
+        ("Dm7", 2),
+        ("G7", 2),
+        ("CM7", 2),
+        ("A7", 2)
     };
 
     //we use this to send to ChordMgr 
