@@ -41,7 +41,8 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement passing of information based on targetted dependencies
 - [x] implement VizMgr and toggle 
 - [x] demo to bosses
-- [ ] Study 1 with Improv Teachers - ONGOING !!!!! 
+- [x] Study 1 with Improv Teachers
+- [ ] Develop Post-Study Version
 - [ ] Study 2 with Improv Students
 - [ ] Study 3 on Spatiotemporal Data collection
 - [ ] Graduate
