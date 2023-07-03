@@ -4,26 +4,29 @@ repository for Piano 2.0 MVP v1
 <img src="eva-title.png">
 
 ### Post Study Release Targets 
-- [ ] Lesson 1: Play Swing Through Modes
+- [x] Lesson 1: Play Swing Through Modes
 - [ ] Lesson 2: Learn Motifs Through Repetition
 - [ ] Lesson 3: Practice Concepts Through QnA Mode
 - [ ] Lesson 4: Apply Lessons Through Sequencing on Different Notes
 
+### open issues
+- [ ] sync timing with recorded elements
+
 #### for each lessons, the following modes will be designed and implemented
 Modes and Features
-* Watch and Listen Mode
-* Try Mode
-* Test Mode
-* Toggles for Content (C) only, Content and Rhythm (CR) only, Content and Rhythm and Harmony (CHR) only and Content and Rhythm and Harmony and Metronome (CHRM) only
+- [x] Watch and Listen Mode
+- [x] Try Mode
+- [x] Test Mode
+- [x] Toggles for Content (C) only, Content and Rhythm (CR) only, Content and Rhythm and Harmony (CHR) only and Content and Rhythm and Harmony and Metronome (CHRM) only
 
 New Assets Needed
 * recordings from iRealPro
 * recordings of the different C, R, H, M
 
 Newer classes will be implemented to apply these changes
-* ModeMgr - manages the different Modes namely WaL, Try and Test
-* LessonMgr - manages the content of the lesson based on the toggled C,R, H, M
-* VizMgr - will be revised to reflect the new version of toggles in the prototype. 
+- [x] ModeMgr - manages the different Modes namely WaL, Try and Test
+- [x] LessonMgr - manages the content of the lesson based on the toggled C,R, H, M
+- [x] VizMgr - will be revised to reflect the new version of toggles in the prototype. 
 
 ### reBuild requirements as of 11.04.2023
 
