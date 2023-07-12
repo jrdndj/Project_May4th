@@ -643,6 +643,8 @@ public class ChordMgr : MonoBehaviour
         //based on timing
         //Debug.Log("Getting swing mode of " + rootKey);
 
+
+        //adding a method here that gives the return scale for easy changing 
         //check for rootkey
         switch (rootKey)
         {
@@ -672,6 +674,9 @@ public class ChordMgr : MonoBehaviour
         //store starting number so we can iterate
         currentNumber = startingnumber;
 
+        //save it for Rollmanager to use
+        RollManager.GetComponent<RollScript>().rootKeyIndex = startingnumber;
+
         //now compute the rest of the whitekeys while skipping stuff in blacklist
         while (count < 8) //cos it gets everything
         {
@@ -700,5 +705,41 @@ public class ChordMgr : MonoBehaviour
 
 
     }//end getswinglist
+
+    //here is a generic yplot plotter
+    public List<int> GenericYPlotter(List<int> List3, int size)
+    {
+        //clear onwaitylistplotter to be safe
+        OnWaitYListPlotter.Clear();
+
+        int offset = 60; //the first elements will have no offset
+        int previousOffset = 0; //there is no existing offset
+        int newOffset = 0;
+
+        //then do the same but for onwait ylist
+
+        //start fresh
+        offset = 60; //the first elements will have no offset
+        previousOffset = 0; //there is no existing offset
+        newOffset = 0;
+        OnWaitYListPlotter.Add(0);
+        for (int i = 1; i < List3.Count; i++) //yes begin at 1
+        {
+
+            // Debug.Log("Offset to multiply" + LengthListToSend[i-1]);
+            newOffset = ((size * offset) / 2) + ((size * offset) / 2) + previousOffset;
+            OnWaitYListPlotter.Add(newOffset); //should be of the previous one
+
+            //store the previous one for the next round
+            previousOffset = newOffset;
+            //previousOffset = LengthListToSend[i - 1] * offset;
+            //
+            //Debug.Log("New y coord is " + newOffset);
+        }//end for loop yplotter
+
+        return OnWaitYListPlotter; //pass to RollScript 
+
+    }//end GenericYPlotter
+
 
 }//end ChordMgr

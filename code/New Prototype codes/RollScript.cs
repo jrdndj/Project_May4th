@@ -85,6 +85,16 @@ public class RollScript : MonoBehaviour
     public bool isPressed = false;
     private bool isTouched = false;
     public bool isPaused = true;
+    public bool WaLisPrinting = false; //play first then pause by default
+    public float beatInterval = 0.5f; //for 2 out of 4 timesignature 0.5f
+    public int WaLSwingCount = 0;
+
+    private float WaLelapsedTime = 0f;
+
+    public string rootKey = "C"; //to make things less sticky
+    public int rootKeyIndex; // get the index for easy WaL animations
+
+
 
     //list needed for the guided press mode
     public List<int> guidedPressList = new List<int>();
@@ -106,7 +116,7 @@ public class RollScript : MonoBehaviour
     public List<int> OnWaitKeyLengths = new List<int>();
     public List<int> OnWaitYPlots = new List<int>();
 
-    float barSpeed = (float)0.682; //0.682
+    float barSpeed = (float)0.5; //0.682 original but 0.5f is 2-4 timesignature
 
     //for the co routines
     private IEnumerator spawn;
@@ -114,6 +124,11 @@ public class RollScript : MonoBehaviour
 
     //swing related variable
     List<int> SwingListAcquired = new List<int>();
+
+    //for swing spawning purposes
+    public List<List<int>> SwingList = new List<List<int>>();
+    public List<int> SwingYPlots = new List<int>();
+
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -226,7 +241,7 @@ public class RollScript : MonoBehaviour
         if (VizMode == 4)
         {
             //set onwait keylengths
-            SetOnWaitKeyLenghts();
+            SetOnWaitKeyLenghts(2, ChordList);
 
             for (int ctr = 1; ctr < ChordList.Count; ctr++)
             {
@@ -514,19 +529,7 @@ public class RollScript : MonoBehaviour
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }//endif
 
-            ////=== some checking mechanism here
-            ////clear validpress to be sure
-            //UserPress.Add(noteNumber);
-            //if (UserPress.Count >= 3) //if there are at least three presses then go
-            //{
-            //    ChordManager.GetComponent<ChordMgr>().PressMapper(UserPress, guidedPressList);
-            //    //then immediately clear user press
-            //    UserPress.Clear();
-            //    // highlightNow = true; 
 
-            //}//end if userpress
-            //else validpress = false;
-            //UserPress.Clear();
         }//endviz mode 1
 
         else if (VizMode == 2) //vizmode is expert press 
@@ -578,8 +581,22 @@ public class RollScript : MonoBehaviour
                 pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
             }//endif
 
-
         }//end vizmode 4
+
+        else if (module == 2 || accompaniment == 3) //if Try mode
+        {
+
+            //some error checking
+            if (improvToHighlight[noteNumber] || melodyToHighlight[noteNumber])
+            {
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
+            }
+            else
+            {
+                pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
+            }
+        }
 
     }//endonNoteOn;
 
@@ -595,16 +612,21 @@ public class RollScript : MonoBehaviour
             //==========for blues
             //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
         }
+
+        //for checking of melody
+        else if (melodyToHighlight[noteNumber] == true)
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = yellow;
+            //==========for blues
+            //pianoKeys[noteNumber].GetComponent<Image>().color = blues;
+        }
+
         //else if (melodyToHighlight[noteNumber] == true)
         //{
         //    pianoKeys[noteNumber].GetComponent<Image>().color = Color.yellow;
         //}0
-        else
-        {
-            pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-        }
 
-        if (VizMode == 2)
+        else if (VizMode == 2)
         {
             //clear user press too
             UserPress.Clear();
@@ -620,7 +642,7 @@ public class RollScript : MonoBehaviour
              // CleanupKeyboard();
         }//endvismode2
 
-        if (VizMode == 3)
+        else if (VizMode == 3)
         {
             //check if key pressed is same in the melody to press
             if (isKeyPressed[noteNumber] == melodyToHighlight[noteNumber])
@@ -629,27 +651,11 @@ public class RollScript : MonoBehaviour
                 melodyToHighlight[noteNumber] = false;
                 //melodyKeyreleased++;
                 // display_name.text = "Release the next chord to release";
-            }//end check key compared and melody to release
-
-            ////if all melody is released then move to next highlight
-            //if (melodyKeyreleased == 4)
-            //{
-            //    //then we move to the next by triggering spawnNew
-            //    spawnNew = true;
-
-            //    //cleanupKeyboard
-            //    CleanupKeyboard();
-            //    ClearImprovs();
-
-            //    //then refresh melodyKeyreleased
-            //    melodyKeyreleased = 0;
-            //    isReleased = true;
-            //}//end check melody key count 
-
+            }//end check key compared and melody to release       
 
         }//end vizmode 3
         //still keep moving on release
-        if (VizMode == 4) //onwait 
+        else if (VizMode == 4) //onwait 
         {
 
             //add every press to UserRelease
@@ -667,6 +673,19 @@ public class RollScript : MonoBehaviour
 
             }
         }//end viz mode
+
+        ////new modules
+        //if (module == 2) //if Try mode
+        //{
+        //    pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
+        //}
+
+        //everything else, go back upon release
+        else
+        {
+            pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+        }
 
         //PUTTING THIS TO LAST SO WE DONT FORGET - the key is no longer pressed so set it to false duh
         isKeyPressed[noteNumber] = false;
@@ -865,16 +884,7 @@ public class RollScript : MonoBehaviour
     // for the higlighting of the licks
     void Update()
     {
-        // CleanupKeyboard();
-        //if (VizMode == 4)
-        //{
-
-        //    OnWaitRollKeys();
-        //    CleanupKeyboard();
-
-
-        //}//endvizmode4
-
+     
         //exclusive to vizmode 4 now, merge later 
         if (VizMode == 4)
         {
@@ -1050,6 +1060,34 @@ public class RollScript : MonoBehaviour
 
         }//end vizmode 4
 
+        ////have some timing control here for WaL mode - swing
+        if (module == 1 && lesson == 1)
+        {
+            //rollswing
+           // GenericRollKeys();
+
+       
+               // HighlightLicks(LickList[ctr], improvpink, 2);
+
+   
+        }//end WalMode swing
+
+        //have some timing control here for WaL mode - motifs
+
+        //have some timing control here for WaL mode - phrases
+
+        //have some timing control here for WaL mode - sequences
+
+        //have some logical control here of try mode - swing
+
+        //have some logical control here of try mode - motifs
+
+
+        //have some logical control here of try mode - phrases
+
+
+        //have some logical control here of try mode - sequences
+
         //CleanupKeyboard();
     }//end update function
 
@@ -1067,6 +1105,14 @@ public class RollScript : MonoBehaviour
 
             default: break;
         }
+
+        ////have some timing control here for WaL mode - swing
+        if (module == 1 && lesson == 1)
+        {
+            GenericRollKeys();
+
+        }//end WalMode swing
+
     }//endfixupdate
 
     //==== some housekeeping functions 
@@ -1472,7 +1518,7 @@ public class RollScript : MonoBehaviour
         {
             module = 2; //try mode
             Debug.Log("Selected Try Mode");
-            display_name.text = "Select which lesson 01-04 to watch";
+            display_name.text = "Select which lesson 01-04 to try";
             CleanupKeyboard();
 
             //then check for which lesson
@@ -1480,6 +1526,8 @@ public class RollScript : MonoBehaviour
             //show swing 
             if (lesson == 1)
             {
+                //spawn piano roll swing keys 
+
                 //show the keys
                 HighlightSwing(improvpink);
             }//endlesson1
@@ -1510,6 +1558,9 @@ public class RollScript : MonoBehaviour
             ClearImprovs();
             CleanupKeyboard();
 
+            //destroy any spawns
+            //destroy WaLSwing spawns 
+
             //clear user press too
             UserPress.Clear();
 
@@ -1525,7 +1576,7 @@ public class RollScript : MonoBehaviour
         {
             module = 3; //test mode
             Debug.Log("Selected Test Mode");
-            display_name.text = "Select which lesson 01-04 to watch";
+            display_name.text = "Select which lesson 01-04 to test";
             CleanupKeyboard();
         }//endif 
         else
@@ -1557,8 +1608,20 @@ public class RollScript : MonoBehaviour
             display_name.text = "Play Jazz with thru modoes";
             CleanupKeyboard();
 
-            //show the keys
-            HighlightSwing(improvpink);
+            //get Swing information
+            //clear any swing information to be safe
+            SwingListAcquired.Clear();
+
+            //spawn Swing Piano Roll Keys
+            SpawnSwingKeys();
+
+            //then we roll
+
+            ////then getSwing c/o Chordmanagers
+            //SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
+
+            //show the keys - we dont need this anymore 
+            //HighlightSwing(improvpink);
         }//endif 
         else
         {
@@ -1570,6 +1633,14 @@ public class RollScript : MonoBehaviour
             ClearMelodies();
             ClearImprovs();
             CleanupKeyboard();
+
+            //clear any swing information to be safe
+            SwingListAcquired.Clear();
+
+            //destroy any swing objects as well 
+
+            //clear for a fresh start
+            // WaLSwingCount = 0; 
 
             //clear user press too
             UserPress.Clear();
@@ -1748,11 +1819,11 @@ public class RollScript : MonoBehaviour
     }//end onwait roll keys
 
     //set onwait keylengths
-    public void SetOnWaitKeyLenghts()
+    public void SetOnWaitKeyLenghts(int size, List<List<int>> list)
     {
-        foreach (var item in ChordList)
+        foreach (var item in list)
         {
-            OnWaitKeyLengths.Add(2);
+            OnWaitKeyLengths.Add(size);
             //OnWaitYPlots.Add(120);
         }
 
@@ -1773,17 +1844,17 @@ public class RollScript : MonoBehaviour
         //store this into a string
         //based on timing
 
-        //environment related variables
-        float beatInterval = 0.5f;  // Time interval between beats (in seconds)
-
         //getSwing c/o Chordmanagers
-        SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList("D");
+        SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
 
         //now we know which keys to highlight using a loop
         for (int i = 0; i < SwingListAcquired.Count; i++)
         {
             //highlight piano key based on color and spawntype
             pianoKeys[SwingListAcquired[i]].GetComponent<Image>().color = highlightcolor;
+
+            //add this for returning of on note off
+            improvToHighlight[SwingListAcquired[i]] = true;
 
         }//endforloop highlightf
     }//end HighlightSwing
@@ -1797,9 +1868,127 @@ public class RollScript : MonoBehaviour
             if (pianoKeys[i].GetComponent<Image>().color == yellow)
             {
                 pianoKeys[i].GetComponent<Image>().color = Color.black;
+
+                //clear up error checking as well
+                melodyToHighlight[i] = false;
             }//endcheck
         }//endfor
 
-    }
+    }//end removemelody highlights
+
+    //===== timing related functions for Watch and Learn
+
+
+    //this is for the SwingKey based on the root key 
+    public bool SpawnSwingKeys()
+    {
+        int size = 1; //so its not sticky
+        List<int> templist;
+        // step 01: iterate thru swing list acquired
+        //step 01b: transfer swinglistacquired to swinglist acquired
+        // step 02: make sure there is no offset - default size
+        // step 03: we dont need yplots as well
+        // step 04: trigger roll and highlightling like vizmode 2
+
+        //update latest SwingListAcquired information
+        SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
+        //this only gets half of the swing list so we should add the rest in reverse
+
+        //call append reverse
+        templist = AppendReverseElements(SwingListAcquired);
+
+
+        //then store the appended elements to SwingList
+        SwingList = TransferElements(templist);        //debugged swinglist isnt the problem
+
+        //clear chords
+        LickList.Clear();
+
+        //then copy the same as well for ChordList
+        LickList = TransferElements(templist);
+
+        //set lengths to 1
+        SetOnWaitKeyLenghts(size, SwingList); //debugged onwaitkeylenghts isnt the problem
+
+        //get the yPlots for offsetting of yplots
+        SwingYPlots = ChordManager.GetComponent<ChordMgr>().GenericYPlotter(SwingListAcquired, size);
+
+        for (int ctr = 0; ctr < SwingList.Count; ctr++)
+        {
+            SpawnRoll(SwingList[ctr], improvpink, 2, OnWaitKeyLengths[ctr], SwingYPlots[ctr]);
+        }//endfor 
+
+        //then end all spawns
+        return false;
+
+    }//end spawnKeys
+
+    //some functions to brutaly move list ot list of ints for SOLID's sake
+    public List<List<int>> TransferElements(List<int> SwingListAcquired)
+    {
+        List<List<int>> SwingList = new List<List<int>>();
+
+        foreach (int element in SwingListAcquired)
+        {
+            List<int> sublist = new List<int>();
+            sublist.Add(element);
+            SwingList.Add(sublist);
+        }
+
+        return SwingList;
+    }//this function was written conveniently with the help of gpt 3.5
+
+    //now lets have a generic roll keys
+    //meant specifically for  on wait rollkeys
+    public void GenericRollKeys()
+    {
+        //roll the objects spawns downward
+        for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
+        {
+            //if there are bars spawned keep rolling )
+            if (spawnedBars[i] != null)
+            {
+                Vector3 pos = spawnedBars[i].transform.position;
+                RectTransform SpawnScale = spawnedBars[i].GetComponent<RectTransform>();
+                
+                pos.y -= barSpeed;
+                spawnedBars[i].transform.position = pos;              
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height))) <= green_line.GetComponent<RectTransform>().localPosition.y)
+                {                
+                    //highlightNow = true;
+                    HighlightLicks(LickList[ctr], improvpink, 2);
+                }//endif
+
+                //============= CHECK IF IT REACHES DESTROY POSITION =====/
+                ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time               // /2 here
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y)
+                {
+                    //destroy then highlight 
+                    Destroy(spawnedBars[i]);
+                    CleanupKeyboard();
+                   // ClearImprovs();
+                    ctr++;
+                    //highlightNow = false;
+                    //but we can spawn something new now
+                    //spawnNew = true;
+                    spawnCount--;    
+                }//endif check contact green point
+              
+            }//endif movement
+        }//end loop for to generate all spawns
+
+    }//end onwait roll keys
+
+    //to complete the other half of the swing
+    public List<int> AppendReverseElements(List<int> tempList)
+    {
+        int n = tempList.Count;
+        for (int i = n - 2; i >= 0; i--)
+        {
+            tempList.Add(tempList[i]);
+        }
+        return SwingListAcquired;
+    }//end append reverse elements
+
 
 }//endclass

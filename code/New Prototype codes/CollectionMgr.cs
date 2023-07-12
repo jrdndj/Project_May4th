@@ -170,6 +170,24 @@ public class CollectionMgr : MonoBehaviour
         ("CM9", 2)
     };
 
+    List<(string, int)> SwingMode = new List<(string, int)>
+    {
+        ("C", 1),
+        ("D", 1),
+        ("E", 1),
+        ("F", 1),
+        ("G", 1),
+        ("A", 1),
+        ("B", 1),
+        ("C", 1),
+        ("B", 1),
+        ("A", 1),
+        ("G", 1),
+        ("F", 1),
+        ("E", 1),
+        ("D", 1)
+    };
+
     //we use this to send to ChordMgr 
     public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
     {
