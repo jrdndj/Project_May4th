@@ -11,6 +11,7 @@ repository for Piano 2.0 MVP v1
 
 ### open issues
 - [ ] sync timing with recorded elements
+- [ ] sync timing of highlighting
 
 #### for each lessons, the following modes will be designed and implemented
 Modes and Features
