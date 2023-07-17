@@ -340,7 +340,7 @@ public class ChordMgr : MonoBehaviour
          * repeat until end 
          * **/
 
-
+        //changed to 30 from 60
         int offset = 60; //the first elements will have no offset
         int previousOffset = 0; //there is no existing offset
         int newOffset = 0;
@@ -712,14 +712,14 @@ public class ChordMgr : MonoBehaviour
         //clear onwaitylistplotter to be safe
         OnWaitYListPlotter.Clear();
 
-        int offset = 60; //the first elements will have no offset
+        int offset = 30; //the first elements will have no offset
         int previousOffset = 0; //there is no existing offset
         int newOffset = 0;
 
         //then do the same but for onwait ylist
 
         //start fresh
-        offset = 60; //the first elements will have no offset
+        offset = 30; //the first elements will have no offset
         previousOffset = 0; //there is no existing offset
         newOffset = 0;
         OnWaitYListPlotter.Add(0);
