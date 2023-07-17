@@ -11,7 +11,7 @@ repository for Piano 2.0 MVP v1
 
 ### open issues
 - [ ] sync timing with recorded elements
-- [ ] sync timing of highlighting
+- [x] sync timing of highlighting
 
 #### for each lessons, the following modes will be designed and implemented
 Modes and Features
@@ -21,8 +21,8 @@ Modes and Features
 - [x] Toggles for Content (C) only, Content and Rhythm (CR) only, Content and Rhythm and Harmony (CHR) only and Content and Rhythm and Harmony and Metronome (CHRM) only
 
 New Assets Needed
-* recordings from iRealPro
-* recordings of the different C, R, H, M
+- [x] recordings from iRealPro
+- [ ] recordings of the different C, R, H, M
 
 Newer classes will be implemented to apply these changes
 - [x] ModeMgr - manages the different Modes namely WaL, Try and Test

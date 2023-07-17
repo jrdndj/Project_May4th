@@ -1952,8 +1952,10 @@ public class RollScript : MonoBehaviour
                 RectTransform SpawnScale = spawnedBars[i].GetComponent<RectTransform>();
                 
                 pos.y -= barSpeed;
-                spawnedBars[i].transform.position = pos;              
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height + (SpawnScale.rect.height))) <= green_line.GetComponent<RectTransform>().localPosition.y-90)
+                spawnedBars[i].transform.position = pos;
+
+                //============= IF IT TOUCHES, LIGHT KEYS  =====/
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height / 2)) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {                
                     //highlightNow = true;
                     HighlightLicks(LickList[ctr], improvpink, 2);
@@ -1961,7 +1963,9 @@ public class RollScript : MonoBehaviour
 
                 //============= CHECK IF IT REACHES DESTROY POSITION =====/
                 ////since we are 2D, we use RectTransform and get the localPosition since we are in real-time               // /2 here
-                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y+30)
+                //simplest is, when the top of the bars hit the greenline, destroy
+                //if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height + (SpawnScale.rect.height / 2))) <= destroy_point.GetComponent<RectTransform>().localPosition.y) //removed -30
+                if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y + (SpawnScale.rect.height / 2)) <= green_line.GetComponent<RectTransform>().localPosition.y)
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
