@@ -25,6 +25,10 @@ public class TimeMgr : MonoBehaviour
     //important toggle variables
     public Toggle timebarlistener;
 
+    //some BPM important elements
+    //putting all toggles here
+    public Toggle fulltoggle, halftoggle, quartertoggle, sixteenthtoggle;
+
     // [SerializeField] GameObject RollManager;
 
     //this will be the bar. we need an instantiate in SpawnBar and a prefab clone
@@ -102,27 +106,39 @@ public class TimeMgr : MonoBehaviour
             ToggleValueChanged(timebarlistener);
         });
 
+        //time bpm toggles listener
+        fulltoggle.GetComponent<Toggle>();
+        fulltoggle.onValueChanged.AddListener(delegate
+        {
+            FullToggleValueChanged(fulltoggle);
+        });
 
+        //time bpm toggles listener
+        halftoggle.GetComponent<Toggle>();
+        halftoggle.onValueChanged.AddListener(delegate
+        {
+            HalfToggleValueChanged(halftoggle);
+        });
 
+        //time bpm toggles listener
+        quartertoggle.GetComponent<Toggle>();
+        quartertoggle.onValueChanged.AddListener(delegate
+        {
+            QuarterToggleValueChanged(quartertoggle);
+        });
 
-        //if (timebartoggle == 1)
-        //{
-        //    SpawnBar();
-        //}
+        //time bpm toggles listener
+        sixteenthtoggle.GetComponent<Toggle>();
+        sixteenthtoggle.onValueChanged.AddListener(delegate
+        {
+            SixteenthToggleValueChanged(sixteenthtoggle);
+        });
 
-        //create the bar
-        // SpawnBar();
     }
 
     // we use fixed update on this so it is constant
     void FixedUpdate()
     {
-
-        //if (timebartoggle==1)
-        //{
-        // SpawnBar();
-
-        //}
 
         if (TimeBar[0] != null)
         {
@@ -328,9 +344,62 @@ public class TimeMgr : MonoBehaviour
         }
         else
         {
-           // Debug.Log("off");
+            // Debug.Log("off");
             DestroyBars();
         }
-    }
+    }//end time toggle changed
+
+
+    //some more time related toggles
+    public void FullToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 16;
+        }//end
+        else
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 8; //8 is default
+        }
+    }//end fulltoggle
+
+    //some more time related toggles
+    public void HalfToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 8;
+        }//end
+        else
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 8; //8 is default
+        }
+    }//end half toggle
+
+    //some more time related toggles
+    public void QuarterToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 4;
+        }//end
+        else
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 8; //8 is default
+        }
+    }//end quarter toggle
+
+    //some more time related toggles
+    public void SixteenthToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 2;
+        }//end
+        else
+        {
+            RollManager.GetComponent<RollScript>().BeatsPerMeasure = 8; //8 is default
+        }
+    }//end sixteenth toggle
 
 }//end TimeMgr

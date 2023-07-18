@@ -91,14 +91,16 @@ public class RollScript : MonoBehaviour
 
     private float WaLelapsedTime = 0f;
 
+    int NumOfBeats = 0;
+    int HarmonyCtr = 0;
+    bool ChangeHarmonyNow = true;
+    public int BeatsPerMeasure = 4; // 16, 8, 4, 2, //public for TimeMgr
+
     public string rootKey = "C"; //to make things less sticky
     public int rootKeyIndex; // get the index for easy WaL animations
 
-
-
-    //list needed for the guided press mode
+   //list needed for the guided press mode
     public List<int> guidedPressList = new List<int>();
-
 
     //height of 120 means it runs for 2 seconds.
     //height of 60 means it runs for 1 second
@@ -172,6 +174,7 @@ public class RollScript : MonoBehaviour
         {
             //  Debug.Log("Passing " + item);
             ChordList.Add(item);
+
         }//endchordlist
 
         //assign licklist
@@ -884,7 +887,7 @@ public class RollScript : MonoBehaviour
     // for the higlighting of the licks
     void Update()
     {
-     
+
         //exclusive to vizmode 4 now, merge later 
         if (VizMode == 4)
         {
@@ -1063,14 +1066,42 @@ public class RollScript : MonoBehaviour
         ////have some timing control here for WaL mode - swing
         if (module == 1 && lesson == 1)
         {
+
+            if (ChangeHarmonyNow && accompaniment == 3)
+            {
+                HighlightLicks(ChordList[HarmonyCtr], yellow, 1);
+            }
+
+            if (spawnCount <= 0)
+            {
+                CleanupKeyboard();
+
+                //repeat
+                ctr = 0;
+                HarmonyCtr = 0; //restart harmony too so they sync
+                SpawnSwingKeys();
+            }
+
+
+            //else {
+            //    //cleanup
+            //    HarmonyCtr++;
+            //    //RemoveMelodyHighlights();
+            //  //  CleanupKeyboard();
+            //    //increment the next counter 
+            //   // HarmonyCtr++;
+            //}
+
             //rollswing
-           // GenericRollKeys();
+            // GenericRollKeys();
 
-       
-               // HighlightLicks(LickList[ctr], improvpink, 2);
 
-   
+            // HighlightLicks(LickList[ctr], improvpink, 2);
+
+
         }//end WalMode swing
+
+
 
         //have some timing control here for WaL mode - motifs
 
@@ -1110,6 +1141,7 @@ public class RollScript : MonoBehaviour
         if (module == 1 && lesson == 1)
         {
             GenericRollKeys();
+
 
         }//end WalMode swing
 
@@ -1491,6 +1523,10 @@ public class RollScript : MonoBehaviour
             Debug.Log("Selected Watch and Llisten");
             display_name.text = "Select which lesson 01-04 to watch";
             CleanupKeyboard();
+
+            //UNIVERSAL CONTROL doesnt work
+            //so dont put anything here after you change the values
+
         }//endif 
         else
         {
@@ -1526,10 +1562,11 @@ public class RollScript : MonoBehaviour
             //show swing 
             if (lesson == 1)
             {
-                //spawn piano roll swing keys 
+                //spawn piano roll swing keys
+
 
                 //show the keys
-                HighlightSwing(improvpink);
+                // HighlightSwing(improvpink);
             }//endlesson1
             else if (lesson == 2) //show motifs
             {
@@ -1605,7 +1642,7 @@ public class RollScript : MonoBehaviour
         {
             lesson = 1; // lesson 01 
             Debug.Log("Play Swing thru Modes");
-            display_name.text = "Play Jazz with thru modoes";
+            display_name.text = "Play Jazz with thru modes";
             CleanupKeyboard();
 
             //get Swing information
@@ -1615,10 +1652,10 @@ public class RollScript : MonoBehaviour
             //spawn Swing Piano Roll Keys
             SpawnSwingKeys();
 
-            //then we roll
+            // then we roll
 
-            ////then getSwing c/o Chordmanagers
-            //SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
+            //then getSwing c/o Chordmanagers
+            // SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
 
             //show the keys - we dont need this anymore 
             //HighlightSwing(improvpink);
@@ -1676,7 +1713,9 @@ public class RollScript : MonoBehaviour
             ClearMelodies();
             RemoveMelodyHighlights();
             // ClearImprovs();
-            // CleanupKeyboard();
+
+            //this is important
+            CleanupKeyboard();
 
             //clear user press too
             UserPress.Clear();
@@ -1692,9 +1731,6 @@ public class RollScript : MonoBehaviour
     {
         return bluessequence[order];
     }//end getBlues sequence number
-
-
-
 
     //a function to recolor every key
     public void recolorHighlights()
@@ -1897,7 +1933,6 @@ public class RollScript : MonoBehaviour
         //call append reverse
         templist = AppendReverseElements(SwingListAcquired);
 
-
         //then store the appended elements to SwingList
         SwingList = TransferElements(templist);        //debugged swinglist isnt the problem
 
@@ -1942,6 +1977,7 @@ public class RollScript : MonoBehaviour
     //meant specifically for  on wait rollkeys
     public void GenericRollKeys()
     {
+
         //roll the objects spawns downward
         for (int i = 0; i < spawnedBars.Length; i++) //based on the current #
         {
@@ -1950,13 +1986,13 @@ public class RollScript : MonoBehaviour
             {
                 Vector3 pos = spawnedBars[i].transform.position;
                 RectTransform SpawnScale = spawnedBars[i].GetComponent<RectTransform>();
-                
+
                 pos.y -= barSpeed;
                 spawnedBars[i].transform.position = pos;
 
                 //============= IF IT TOUCHES, LIGHT KEYS  =====/
                 if ((spawnedBars[i].GetComponent<RectTransform>().localPosition.y - (SpawnScale.rect.height / 2)) <= green_line.GetComponent<RectTransform>().localPosition.y)
-                {                
+                {
                     //highlightNow = true;
                     HighlightLicks(LickList[ctr], improvpink, 2);
                 }//endif
@@ -1969,15 +2005,45 @@ public class RollScript : MonoBehaviour
                 {
                     //destroy then highlight 
                     Destroy(spawnedBars[i]);
+
+                    //increment number of beats
+                    NumOfBeats++;
+
+                    //if beats have been 4, then increment HarmonyCtr
+                    if (NumOfBeats % BeatsPerMeasure == 0)
+                    {
+                        //HarmonyCtr++;
+
+                        //manage control of change harmony to loop back
+                        if (HarmonyCtr < ChordList.Count - 1)
+                        {
+                            HarmonyCtr++;
+                        }
+                        //revert back to 0 when over this ensures a loop 
+                        else
+                        {
+                            HarmonyCtr = 0;
+
+                        }
+
+
+                        ChangeHarmonyNow = true;
+
+                    }
+                    //else
+                    //{
+                    //    ChangeHarmonyNow = false;
+                    //}
+
                     CleanupKeyboard();
-                   // ClearImprovs();
+                    // ClearImprovs();
                     ctr++;
                     //highlightNow = false;
                     //but we can spawn something new now
                     //spawnNew = true;
-                    spawnCount--;    
+                    spawnCount--;
                 }//endif check contact green point
-              
+
             }//endif movement
         }//end loop for to generate all spawns
 

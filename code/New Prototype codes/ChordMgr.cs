@@ -19,6 +19,8 @@ public class ChordMgr : MonoBehaviour
     [SerializeField] GameObject InputManager;
     [SerializeField] GameObject ImprovManager;
     [SerializeField] GameObject RollManager;
+    [SerializeField] GameObject BarPrefab; //for the size of the Bar
+
     //[SerializeField] GameObject CollectionManager; //improv controls
 
     int improvmode = 0; //0 if jazz, 1 if blues
@@ -610,20 +612,7 @@ public class ChordMgr : MonoBehaviour
     //    //there is really nothing to update there. 
     //}
 
-    ////======== toggle related functions begin here
 
-    //public void SelectedRollMode(Toggle change)
-    //{
-
-    //    //Debug.Log(change.isOn);
-
-    //    if (change.isOn)
-    //    {
-
-    //        Debug.Log("Selected: Rolling Mode");
-    //    }
-
-    //}
 
     public List<int> GetSwingList(string rootKey)
     {
@@ -666,8 +655,10 @@ public class ChordMgr : MonoBehaviour
                 }
 
             default:
-                { startingnumber = 24;
-                    break; } //assume C scale 
+                {
+                    startingnumber = 24;
+                    break;
+                } //assume C scale 
 
         }
 
@@ -698,17 +689,16 @@ public class ChordMgr : MonoBehaviour
         //    Debug.Log("Swing mode are " + number);
         //}
 
-
-
         return SwingListAcquired;
-
-
 
     }//end getswinglist
 
     //here is a generic yplot plotter
     public List<int> GenericYPlotter(List<int> List3, int size)
     {
+        //important declaration
+        RectTransform BarScale = BarPrefab.GetComponent<RectTransform>();
+
         //clear onwaitylistplotter to be safe
         OnWaitYListPlotter.Clear();
 
@@ -719,7 +709,8 @@ public class ChordMgr : MonoBehaviour
         //then do the same but for onwait ylist
 
         //start fresh
-        offset = 30; //the first elements will have no offset
+        offset = (int)BarScale.rect.height; //now it is more dynamic
+                                            //   30; //the first elements will have no offset
         previousOffset = 0; //there is no existing offset
         newOffset = 0;
         OnWaitYListPlotter.Add(0);
