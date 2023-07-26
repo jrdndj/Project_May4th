@@ -9,7 +9,11 @@ repository for Piano 2.0 MVP v1
 - [ ] Lesson 3: Practice Concepts Through QnA Mode
 - [ ] Lesson 4: Apply Lessons Through Sequencing on Different Notes
 
-### open issues
+### open issues and targets
+- [x] deploy webserver for receiving inputs
+- [x] capture logs into MIDI-able format
+- [ ] use ParseMIDI to convert logs into .mid files
+- [ ] drop .mid files with same ID for server to send to synthesizer
 - [ ] sync timing with recorded elements
 - [x] sync timing of highlighting
 
