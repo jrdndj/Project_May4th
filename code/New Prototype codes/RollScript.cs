@@ -116,6 +116,7 @@ public class RollScript : MonoBehaviour
     public List<int> YPlotsReceived = new List<int>();
     public List<int> KeyLengthsReceived = new List<int>();
     public List<int> OnWaitKeyLengths = new List<int>();
+    public List<int> MotifLengths = new List<int>();
     public List<int> OnWaitYPlots = new List<int>();
 
     float barSpeed = (float)0.5; //0.682 original but 0.5f is 2-4 timesignature
@@ -131,6 +132,9 @@ public class RollScript : MonoBehaviour
     public List<List<int>> SwingList = new List<List<int>>();
     public List<int> SwingYPlots = new List<int>();
 
+    //for motif spawning purpose
+    public List<List<int>> MotifList = new List<List<int>>();
+    public List<int> MotifYPlots = new List<int>();
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -865,6 +869,13 @@ public class RollScript : MonoBehaviour
             Lesson01ToggleValueChanged(lesson01_modeswing);
         });
 
+        //lesson 02 toggle listener
+        lesson02_motiflearning.GetComponent<Toggle>();
+        lesson02_motiflearning.onValueChanged.AddListener(delegate
+        {
+            Lesson02ToggleValueChanged(lesson02_motiflearning);
+        });
+
         //add harmony toggle listener
         harmonytoggle.GetComponent<Toggle>();
         harmonytoggle.onValueChanged.AddListener(delegate
@@ -887,7 +898,6 @@ public class RollScript : MonoBehaviour
     // for the higlighting of the licks
     void Update()
     {
-
         //exclusive to vizmode 4 now, merge later 
         if (VizMode == 4)
         {
@@ -1082,28 +1092,30 @@ public class RollScript : MonoBehaviour
                 SpawnSwingKeys();
             }
 
+         
+        }//end WalMode swing
 
-            //else {
-            //    //cleanup
-            //    HarmonyCtr++;
-            //    //RemoveMelodyHighlights();
-            //  //  CleanupKeyboard();
-            //    //increment the next counter 
-            //   // HarmonyCtr++;
-            //}
+        //have some timing control here for WaL mode - motifs
+        if (module == 1 && lesson == 2)
+        {
 
-            //rollswing
-            // GenericRollKeys();
+            if (ChangeHarmonyNow && accompaniment == 3)
+            {
+                HighlightLicks(ChordList[HarmonyCtr], yellow, 1);
+            }
 
+            if (spawnCount <= 0)
+            {
+                CleanupKeyboard();
 
-            // HighlightLicks(LickList[ctr], improvpink, 2);
+                //repeat
+                ctr = 0;
+                HarmonyCtr = 0; //restart harmony too so they sync
+                SpawnMotifKeys();
+            }
 
 
         }//end WalMode swing
-
-
-
-        //have some timing control here for WaL mode - motifs
 
         //have some timing control here for WaL mode - phrases
 
@@ -1142,6 +1154,12 @@ public class RollScript : MonoBehaviour
         {
             GenericRollKeys();
 
+        }//end WalMode swing
+
+        ////have some timing control here for WaL mode - MOTIFS
+        if (module == 1 && lesson == 2)
+        {
+            GenericRollKeys();
 
         }//end WalMode swing
 
@@ -1687,6 +1705,57 @@ public class RollScript : MonoBehaviour
         }//endelse 
     }//end lesson01toggle
 
+    //Lesson 02
+    public void Lesson02ToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            lesson = 2; // lesson 02 motif learning
+            Debug.Log("Motif Learning Enabled");
+            display_name.text = "Learn different motifs";
+            CleanupKeyboard();
+
+            //get Swing information
+            //clear any swing information to be safe
+            // SwingListAcquired.Clear();
+            //should now get motif list and cleared it
+
+            //spawn Swing Piano Roll Keys
+            //SpawnSwingKeys();
+
+            //spawn motifkeys
+            SpawnMotifKeys();
+
+        }//endif 
+        else
+        {
+            //change to default lesson
+            lesson = 9;
+            Debug.Log("Deselected lesson 02");
+            display_name.text = "select lesson";
+
+            //these 4 always do the same thing
+            DestroySpawns();
+            ClearMelodies(); //this is the next problem 
+            ClearImprovs();
+            CleanupKeyboard();
+
+            //clear any swing information to be safe
+            SwingListAcquired.Clear();
+
+            //destroy any swing objects as well 
+
+            //clear for a fresh start
+            // WaLSwingCount = 0; 
+
+            //clear user press too
+            UserPress.Clear();
+
+            //set ctr to 0 to have a good start
+            ctr = 0;
+        }//endelse 
+    }//end lesson01toggle
+
     //Show Harmony (aka Melody Licks)
     public void HarmonyToggleValueChanged(Toggle change)
     {
@@ -1742,7 +1811,7 @@ public class RollScript : MonoBehaviour
                 pianoKeys[item].GetComponent<Image>().color = Color.white;
             }
         }
-    }//end recolorHighlights
+    }//end get blues sequence
 
     public bool monitorTouch()
     {
@@ -1865,35 +1934,48 @@ public class RollScript : MonoBehaviour
 
     }//end set wait on keylenghts
 
-    //highlight swing mode
-    //lights up a group of keys based on the licks 
-    public void HighlightSwing(Color32 highlightcolor)
+    //generic factory method for key lengths of motifs and qa
+    //set onwait keylengths
+    public void SetOnKeyLengthsGeneric(int size, List<List<int>> list)
     {
-
-        //====general algorithm
-        // this function is inside update and is controlled by timing
-
-        //get the rootkey in the sequence
-        // get all the white keys from the rootkey until the next octave - use contains from blacklist
-        //light each key from first to last +7  indices 
-        //then from last to first
-        //store this into a string
-        //based on timing
-
-        //getSwing c/o Chordmanagers
-        SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
-
-        //now we know which keys to highlight using a loop
-        for (int i = 0; i < SwingListAcquired.Count; i++)
+        foreach (var item in list)
         {
-            //highlight piano key based on color and spawntype
-            pianoKeys[SwingListAcquired[i]].GetComponent<Image>().color = highlightcolor;
+            MotifLengths.Add(size);
+            //OnWaitYPlots.Add(120);
+        }
 
-            //add this for returning of on note off
-            improvToHighlight[SwingListAcquired[i]] = true;
+    }//end set wait on keylenghts
 
-        }//endforloop highlightf
-    }//end HighlightSwing
+    //==== DEPRECATED 
+    ////highlight swing mode
+    ////lights up a group of keys based on the licks 
+    //public void HighlightSwing(Color32 highlightcolor)
+    //{
+
+    //    //====general algorithm
+    //    // this function is inside update and is controlled by timing
+
+    //    //get the rootkey in the sequence
+    //    // get all the white keys from the rootkey until the next octave - use contains from blacklist
+    //    //light each key from first to last +7  indices 
+    //    //then from last to first
+    //    //store this into a string
+    //    //based on timing
+
+    //    //getSwing c/o Chordmanagers
+    //    SwingListAcquired = ChordManager.GetComponent<ChordMgr>().GetSwingList(rootKey);
+
+    //    //now we know which keys to highlight using a loop
+    //    for (int i = 0; i < SwingListAcquired.Count; i++)
+    //    {
+    //        //highlight piano key based on color and spawntype
+    //        pianoKeys[SwingListAcquired[i]].GetComponent<Image>().color = highlightcolor;
+
+    //        //add this for returning of on note off
+    //        improvToHighlight[SwingListAcquired[i]] = true;
+
+    //    }//endforloop highlightf
+    //}//end HighlightSwing
 
     //something to remove melody higlight
     public void RemoveMelodyHighlights()
@@ -1957,6 +2039,61 @@ public class RollScript : MonoBehaviour
         return false;
 
     }//end spawnKeys
+
+    //call this method when Lesson 02 is toggled on  
+    public bool SpawnMotifKeys()
+    {
+        int size = 1; //so its not sticky
+        List<int> SpawnList;
+        // step 01: iterate thru swing list acquired
+        //step 01b: transfer swinglistacquired to swinglist acquired
+        // step 02: make sure there is no offset - default size
+        // step 03: we dont need yplots as well
+        // step 04: trigger roll and highlightling like vizmode 2
+
+        //general algorithm is as follows
+        // get the list of motifs from Chord manager store in spawnlist
+        // chord list should still be the standard chord progress so we dont touch it
+        // store list of motifs in licklist too for the highlighting of keys when they hit
+        // generate spawns from spawnlist
+        // size would now depend on the second number in the motif 
+
+        //get the motif list from ChordMgr thats been in the background
+        SpawnList = ChordManager.GetComponent<ChordMgr>().GetMotifList();
+       // Debug.Log("got spawn list");
+
+        //clear chords
+        LickList.Clear();
+
+        //transfer elements to motifList
+        MotifList = TransferElements(SpawnList);
+
+        //then copy the same as well for LickList
+        LickList = TransferElements(SpawnList);
+        //Debug.Log("copied to licklist");
+
+        //get motifsizes from ChordMgr and send it here as MotifLenghts
+        MotifLengths = ChordManager.GetComponent<ChordMgr>().MotifSizes.ToList();
+       // Debug.Log("got motiflenghts list");
+
+        //set the yplots based on their newly imported motiflengths
+        //but since the sizes are different, we need to import them one by one. 
+        //get the yPlots for offsetting of yplots
+        MotifYPlots = ChordManager.GetComponent<ChordMgr>().MotifYPlotter(SpawnList, MotifLengths);
+        //Debug.Log("assigned several yplots");
+
+        //so now we have all the information we need we can spawen them now
+        for (int ctr = 0; ctr < MotifList.Count; ctr++)
+        {
+            SpawnRoll(MotifList[ctr], improvpink, 2, MotifLengths[ctr], MotifYPlots[ctr]);
+        }//endfor
+
+        //Debug.Log("finished spawning motif keys");
+
+        //then end all spawns
+        return false;
+
+    }//end generic spawn 
 
     //some functions to brutaly move list ot list of ints for SOLID's sake
     public List<List<int>> TransferElements(List<int> SwingListAcquired)

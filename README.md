@@ -5,7 +5,7 @@ repository for Piano 2.0 MVP v1
 
 ### Post Study Release Targets 
 - [x] Lesson 1: Play Swing Through Modes
-- [ ] Lesson 2: Learn Motifs Through Repetition
+- [x] Lesson 2: Learn Motifs Through Repetition
 - [ ] Lesson 3: Practice Concepts Through QnA Mode
 - [ ] Lesson 4: Apply Lessons Through Sequencing on Different Notes
 
@@ -26,7 +26,7 @@ Modes and Features
 
 New Assets Needed
 - [x] recordings from iRealPro
-- [ ] recordings of the different C, R, H, M
+- [x] recordings of the different C, R, H, M
 
 Newer classes will be implemented to apply these changes
 - [x] ModeMgr - manages the different Modes namely WaL, Try and Test

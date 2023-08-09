@@ -84,29 +84,7 @@ public class ParseMIDI : MonoBehaviour
     //https://github.com/melanchall/drywetmidi#getting-started 
 
 
-    //get their XCoords and store them in the array for easy access
-    /*
-     * piano prefab has 69 objects
-     * we have 0 to 68 index
-     * white keys start from 2 (index) to 38 (index)
-     * black keys start from 39 to 63 (index)
-     * other elements 64 to 68
-     */
-    void GetXCoordinates()
-    {
-
-        for (int ctr = 0, ctr2 = 3; ctr < 68 && ctr2 <= 63; ctr++, ctr2++)
-        {
-            //store key value in index of KeyIndex
-            KeyIndex[ctr] = this.gameObject.transform.GetChild(ctr2).name;
-            //store their value in XCords
-            XCoords[ctr] = this.gameObject.transform.GetChild(ctr2).GetChild(1).position.x;
-            /*so in principle
-            KeyIndex[0] = C2
-            XCoords[0] = x position of c2
-            */
-        }//endfor
-    }//endGetXCoordinates
+   
 
     /*
        this method reads the file received from the file browser master
@@ -260,81 +238,13 @@ public class ParseMIDI : MonoBehaviour
     //call the coroutine when the logic is satisfied (at time x)
        
    
-    //spawnskey - can be replaced by HighlightLicks() on Mode 2 
-    public IEnumerator SpawnKey(int Ctr)
-    //private void SpawnKey(string NoteName, long YScale)
-    {
-        GameObject Spawn; 
-        float keyStartTime = currentTime;
-
-        //set spawn point - get the y coord of 69th element which is the green light
-        var YCordSpawnPoint = this.gameObject.transform.GetChild(69).position.y;
-        // Debug.Log("entered spawnkey");
-        //test instantiate by child
-        Spawn = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], YCordSpawnPoint+InputChordLength[Ctr], 0), Quaternion.identity, Spawn_prefab.transform.parent);
-        //Debug.Log("note instantiated");
-        //yield break;// return Note;
-
-        // Debug.Log("note yielded");
-        //Note.transform.SetParent(Note.transform); //set your parent
-        //Note = Instantiate(Spawn_prefab); //instantiate as child
-        Spawn.transform.localScale = new Vector3(40, InputChordLength[Ctr], 1); //set length
-        //changed 20 from 30 to adjust to key size
-        
-        //uncomment these two to go back just in case
-        //Note = GameObject.Instantiate(Spawn_prefab, new Vector3(InputXCoords[Ctr], 130, 0), Quaternion.identity, Spawn_prefab.transform.parent);
-        //Note.transform.localScale = new Vector3(30, InputChordLength[Ctr], 1);
-        Debug.Log(InputNotes[Ctr] + " was spawned ");
    
-        StartCoroutine(MoveKey(Spawn, keyStartTime));
-    //uncomment me afte calibrating the pianos
-       // MoveKey(Spawn, keyStartTime);
-        yield return Spawn;
-        //Destroy(Spawn);
-        //Debug.Log("Object destroyed");
-
-
-    }//endspawnkey
-
-    //only useful on mode1 - piano roll mode
-    private IEnumerator MoveKey(GameObject Note1, float keyStartTime)
-    //private void MoveKey(GameObject Note1, float keyStartTime)
-    {
-
-        //this is the target position vector of the LERP
-        Vector3 Ypos = gameObject.transform.GetChild(68).position;
-        var YCordGreenLine = this.gameObject.transform.GetChild(68).position.y;
-       // float time = 0.01f;
-        float time = 0; 
-
-        //this is the start position of the object 
-        Vector3 startPosition = Note1.transform.position;
-        //the target interpolation is the y position plus half of its size 
-        Vector3 targetPosition = new Vector3(Note1.transform.position.x, Ypos.y - (Note1.transform.localScale.y /2), -1);
-        while (Note1.transform.position.y + (Note1.transform.localScale.y / 2) > YCordGreenLine)
-        //changed rom >= to >. revert if it causes issues
-            {
-            Note1.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
-            // Debug.Log("startposition" + startPosition);
-            //  Debug.Log("target" + targetPosition);
-            time += Time.deltaTime;
-            //original time
-
-           
-            //time = time * time * time * (time * (6f * time - 15f) + 10f);
-            yield return null;            
-        }        
-      
-        Destroy(Note1);
-        Debug.Log("Object destroyed");
-    }
 
 
     // Start is called before the first frame update
     void Start()
     {
-        //STEP 01: get all xcoordinates relative to the piano object for easy loading
-        GetXCoordinates();
+      
 
         //STEP 02: Extract info in chord and store info in data structures
         GetSongInfo(ReadFile());
