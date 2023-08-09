@@ -1,9 +1,16 @@
-﻿using WebSocketSharp; 
+﻿// this was developed using the tutorial from https://www.youtube.com/watch?v=13HnJPstnDM 
+using WebSocketSharp; 
 using UnityEngine;
 
 public class WS_Client : MonoBehaviour
 {
     WebSocket ws;
+
+    //==== general algorithm would be
+    // start collecting keypress for logs on try yourself mode
+    // compile logs and call ParseMgr to generate midi files
+    // mid files are now sent and picked up to the server
+    // server drops them dynamically 
 
     // Start is called before the first frame update
     void Start()

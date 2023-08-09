@@ -16,6 +16,7 @@ using UnityEngine.UI; //for the toggle
 public class ChordMgr : MonoBehaviour
 {
 
+   // [SerializeField] GameObject CollectionMgr;
     [SerializeField] GameObject InputManager;
     [SerializeField] GameObject ImprovManager;
     [SerializeField] GameObject RollManager;
@@ -41,9 +42,16 @@ public class ChordMgr : MonoBehaviour
     List<int> LickListToSend = new List<int>(); //this is for highlight licklist of press mapper
                                                 // we will put all the following lists in a masterlist for easy comparison
     List<int> OnWaitYListPlotter = new List<int>();
+    //List<int> MotifList = new List<int>();
     List<List<int>> ManyLists = new List<List<int>>() { C7, Cm7, CM7, Dm7, G7, Am7, Em7, FM7, F7, A7 };
 
     List<int> tempPressed = new List<int>();
+
+    //=== motif related data structures 
+  //  List<(string, int)> LocalMotif = new List<(string, int)>();
+    public List<int> MotifSizes = new List<int>(); //has to be public so Rm can access it
+    List<int> MotifList = new List<int>(); // contains the key number for proper positioning
+    List<int> MotifYPlots = new List<int>();
 
     //=========== CHORD RELATED VARIABLES ==========/
 
@@ -317,7 +325,6 @@ public class ChordMgr : MonoBehaviour
 
         //we dont need to send time to RollScript because the offset manages the time information of the spawnsb 
 
-
         //our work is done 
     }//end ChordMapper
 
@@ -498,7 +505,7 @@ public class ChordMgr : MonoBehaviour
             // All elements are found
         }
 
-    }
+    }//end checkif correct released 
 
     //chord comparer function
     public void CheckIfAChord(List<int> userinput)
@@ -575,7 +582,7 @@ public class ChordMgr : MonoBehaviour
             RollManager.GetComponent<RollScript>().display_name.text = "Unrecognised chord";
         }
 
-    }//end checkifa chord thank you chat gpt for doing this function
+    }//end checkifa chord thank you chat gpt for helping me build this function
 
     //chord sender function
     public void copyList(List<int> cloneMe, int type)
@@ -587,7 +594,7 @@ public class ChordMgr : MonoBehaviour
                 // LickListToSend.Add(item);
                 RollManager.GetComponent<RollScript>().OnPressLicks.Add(item);
             }
-        }
+        }//end type 1
         if (type == 2)
         {
             foreach (var item in cloneMe)
@@ -595,24 +602,10 @@ public class ChordMgr : MonoBehaviour
                 // LickListToSend.Add(item);
                 RollManager.GetComponent<RollScript>().OnPressBlues.Add(item);
             }
-        }
+        }//end type 2 
 
     }//end copylist
-
-    ////// The main goal is to pass and make vital chord info public or accessible
-    //void Start()
-    //{
-
-
-    //}//end Start
-
-    //// Update is called once per frame
-    //void Update()
-    //{
-    //    //there is really nothing to update there. 
-    //}
-
-
+    
 
     public List<int> GetSwingList(string rootKey)
     {
@@ -693,7 +686,16 @@ public class ChordMgr : MonoBehaviour
 
     }//end getswinglist
 
-    //here is a generic yplot plotter
+    //send the motif list so RollMgr can call it 
+    public List<int> GetMotifList() //removed parameter since its global
+    {
+        //put the jazzmotif in to the motiflist 
+        return MotifList;
+
+    }
+
+
+    //here is a generic yplot plotter - the offset of the Y coordinates 
     public List<int> GenericYPlotter(List<int> List3, int size)
     {
         //important declaration
@@ -731,6 +733,211 @@ public class ChordMgr : MonoBehaviour
         return OnWaitYListPlotter; //pass to RollScript 
 
     }//end GenericYPlotter
+
+    //specific yplotter for motifs since the size is different for each
+    public List<int> MotifYPlotter(List<int> List3, List<int> List4) //par 1 - y plots, par 2 - sizes 
+    {
+        //important declaration
+        RectTransform BarScale = BarPrefab.GetComponent<RectTransform>();
+
+        //clear onwaitylistplotter to be safe
+        MotifYPlots.Clear();
+
+        int offset; //= 30; //the first elements will have no offset
+        int previousOffset = 0; //there is no existing offset
+        int newOffset = 0;
+
+        //then do the same but for onwait ylist
+
+        //start fresh
+        offset = (int)BarScale.rect.height; //now it is more dynamic
+                                            //   30; //the first elements will have no offset
+        previousOffset = 0; //there is no existing offset
+        newOffset = 0;
+        MotifYPlots.Add(0);
+        for (int i = 1; i < List3.Count; i++) //yes begin at 1
+        {
+            //size is replaced by the element of List4 which is the corresponding size
+            // Debug.Log("Offset to multiply" + LengthListToSend[i-1]);
+            newOffset = ((List4[i] * offset) / 2) + ((List4[i] * offset) / 2) + previousOffset;
+            MotifYPlots.Add(newOffset); //should be of the previous one
+
+            //store the previous one for the next round
+            previousOffset = newOffset;
+            
+        }//end for loop yplotter
+
+        return MotifYPlots; //pass to RollScript 
+        
+    }//end MotifYPlotter
+
+    //lets have a MotifController Function here
+    public void SetMotifDetails(List<(string, int)> LocalMotif)
+    {
+        //get the numbers for the sizes
+        MotifSizes = GetSecondElements(LocalMotif).ToList();
+        //now RollMgr should pickup MotifSize
+
+        //get the names for the motiflist and map their piano key index for spawning
+        KeyMapper(LocalMotif);
+
+        //now we need to send their YPlots using the GenericYPlotter 
+
+        //send details to rollscript
+
+    }//end setmotifdetails
+
+    //does the mapping and sends the right lists to responsible functions
+    public void KeyMapper(List<(string, int)> ReceivedList)
+    {
+        // general algorithm
+        // get chordname and assume it from the c4 octave onwards (since they are licks)
+        //then store it in the MotifList
+        //send MotifList for use of RolLScript 
+
+        //iterate through each in the list and then assign or map
+        foreach (var chord in ReceivedList)
+        {
+      
+            string chordname = chord.Item1;
+            //check chord name and add the corresponding improvs as well
+            switch (chordname)
+            {
+                //these should be arranged musically  
+                case "C4": //c4
+                    {
+                        MotifList.Add(24);
+                   
+                        break;
+                    }//end C
+                case "D4": //d4
+                    {
+                        MotifList.Add(26);
+                     
+                        break;
+                    }//end
+                case "E4": //e4
+                    {
+                        MotifList.Add(28);
+          
+                        break;
+                    }//end
+                case "F4": //f4
+                    {
+                        MotifList.Add(29);
+                      
+                        break;
+                    }//end
+                case "G4": //g4
+                    {
+                        MotifList.Add(31);
+                     
+                        break;
+                    }//end
+                case "A4": //a4
+                    {
+                        MotifList.Add(33);
+                 
+                        break;
+                    }//end
+                case "B4": //b4
+                    {
+                        MotifList.Add(35);
+                 
+                        break;
+                    }//end
+                case "C5": //c5
+                    {
+                        MotifList.Add(36);
+            
+                        break;
+                    }//end C
+                default:
+                    {
+                        //TODO: catch "rest" in the piano during spawn
+                        MotifList.Add(24); //assume its a C 
+                        break;
+                    }//end default and rest case
+            }//end switch
+
+            //=== this should get the second elements instead 
+            //then immediate add their length to lengthlist
+           // LengthListToSend.Add(chord.Item2);
+
+        }//end foreach scan of received list
+
+        //work is done since MotifList is a globalvariable
+
+    }//end KeyMapper
+
+    //here is a sample to get the second elements thanks GPT for this
+    // the second elements are the times that will be sent for motif sizes 
+    public List<int> GetSecondElements(List<(string, int)> tupleList)
+    {
+        List<int> secondElements = new List<int>();
+
+        foreach (var tuple in tupleList)
+        {
+            secondElements.Add(tuple.Item2);
+        }
+
+        return secondElements;
+    }//end get second elements 
+
+    //here is a sample to get the FIRST elements thanks GPT for this
+    //the first elements are the keys for key mapping
+    public List<string> GetFirst(List<(string, int)> tupleList)
+    {
+        List<string> firstElements = new List<string>();
+
+        foreach (var tuple in tupleList)
+        {
+            firstElements.Add(tuple.Item1);
+        }
+
+        return firstElements;
+    }// end get first elements
+
+    //an equivalent of chord mapper but for s
+
+    ////here is a motif yplot plotter
+    //public List<int> MotifYPlotter(List<int> List3, int size)
+    //{
+    //    //important declaration
+    //    RectTransform BarScale = BarPrefab.GetComponent<RectTransform>();
+
+    //    //clear onwaitylistplotter to be safe
+    //    OnWaitYListPlotter.Clear();
+
+    //    int offset; //= 30; //the first elements will have no offset
+    //    int previousOffset = 0; //there is no existing offset
+    //    int newOffset = 0;
+
+    //    //then do the same but for onwait ylist
+
+    //    //start fresh
+    //    offset = (int)BarScale.rect.height; //now it is more dynamic
+    //                                        //   30; //the first elements will have no offset
+    //    previousOffset = 0; //there is no existing offset
+    //    newOffset = 0;
+    //    OnWaitYListPlotter.Add(0);
+    //    for (int i = 1; i < List3.Count; i++) //yes begin at 1
+    //    {
+
+    //        // Debug.Log("Offset to multiply" + LengthListToSend[i-1]);
+    //        newOffset = ((size * offset) / 2) + ((size * offset) / 2) + previousOffset;
+    //        OnWaitYListPlotter.Add(newOffset); //should be of the previous one
+
+    //        //store the previous one for the next round
+    //        previousOffset = newOffset;
+    //        //previousOffset = LengthListToSend[i - 1] * offset;
+    //        //
+    //        //Debug.Log("New y coord is " + newOffset);
+    //    }//end for loop yplotter
+
+    //    return OnWaitYListPlotter; //pass to RollScript 
+
+    //}//end GenericYPlotter
 
 
 }//end ChordMgr

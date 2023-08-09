@@ -170,24 +170,24 @@ public class CollectionMgr : MonoBehaviour
         ("CM9", 2)
     };
 
-    //we dont need this since we have a new function to compute this 
-    //List<(string, int)> SwingMode = new List<(string, int)>
-    //{
-    //    ("C", 1),
-    //    ("D", 1),
-    //    ("E", 1),
-    //    ("F", 1),
-    //    ("G", 1),
-    //    ("A", 1),
-    //    ("B", 1),
-    //    ("C", 1),
-    //    ("B", 1),
-    //    ("A", 1),
-    //    ("G", 1),
-    //    ("F", 1),
-    //    ("E", 1),
-    //    ("D", 1)
-    //};
+    //have a list of motifs here
+    List<(string, int)> JazzMotifs01 = new List<(string, int)>
+    {
+        ("D4", 1),
+        ("F4", 1),
+        ("A4", 1),
+        ("C5", 1),
+        ("D4", 1),
+        ("F4", 1),
+        ("G4", 1),
+        ("B4", 1),
+        ("D4", 1),
+        ("E4", 1),
+        ("G4", 1),
+        ("B4", 2) //prolonged
+    }; //end jazzmotif01
+
+    //===== end of all pre defined motifs, chord progressions 
 
     //we use this to send to ChordMgr 
     public List<(string, int)> SendToChordMgr(List<(string, int)> SequenceToSend)
@@ -202,6 +202,11 @@ public class CollectionMgr : MonoBehaviour
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(PracticeJazz01);
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq017);
         ChordManager.GetComponent<ChordMgr>().ChordMapper(CoreJazz01);
+
+        //set motif details so everything is ready in the background
+        ChordManager.GetComponent<ChordMgr>().SetMotifDetails(JazzMotifs01);
+        //send motif and QA information here 
+        //ChordManager.GetComponent<ChordMgr>().GetMotifList(JazzMotifs01);
         //we still need this for the harmony
 
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
