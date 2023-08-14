@@ -852,6 +852,60 @@ public class ChordMgr : MonoBehaviour
             
                         break;
                     }//end C
+                case "D5": //c5
+                    {
+                        MotifList.Add(38);
+
+                        break;
+                    }//end D5
+                case "E5": //c5
+                    {
+                        MotifList.Add(40);
+
+                        break;
+                    }//end E5
+                case "F5": //f5
+                    {
+                        MotifList.Add(41);
+
+                        break;
+                    }//end f
+                case "Fs5": //fs5
+                    {
+                        MotifList.Add(42);
+
+                        break;
+                    }//end fs5
+                case "A5": //a5
+                    {
+                        MotifList.Add(45);
+
+                        break;
+                    }//end A
+                case "B5": //b5
+                    {
+                        MotifList.Add(47);
+
+                        break;
+                    }//end b5
+                case "As5": //as5
+                    {
+                        MotifList.Add(46);
+
+                        break;
+                    }//end as5
+                case "G5": //g5
+                    {
+                        MotifList.Add(43);
+
+                        break;
+                    }//end g5
+                case "Gs5": //c5
+                    {
+                        MotifList.Add(44);
+
+                        break;
+                    }//end gs5
                 default:
                     {
                         //TODO: catch "rest" in the piano during spawn
