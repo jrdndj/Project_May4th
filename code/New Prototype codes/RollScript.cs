@@ -1775,7 +1775,8 @@ public class RollScript : MonoBehaviour
         else
         {
             //change to default lesson
-            lesson = 9;
+            // lesson = 9;
+            accompaniment = 0; //dont change lesson, just accompaniement
             Debug.Log("Removed harmony");
             // display_name.text = "select lesson";
 
@@ -1785,6 +1786,8 @@ public class RollScript : MonoBehaviour
 
             //this is important
             CleanupKeyboard();
+
+            //DestroySpawns();
 
             //clear user press too
             UserPress.Clear();
