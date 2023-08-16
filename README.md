@@ -12,8 +12,9 @@ repository for Piano 2.0 MVP v1
 ### open issues and targets
 - [x] deploy webserver for receiving inputs
 - [x] capture logs into MIDI-able format
+- [x] handled rests
 - [ ] add Show Piano Roll and Play Audio feature toggles OR
-- [ ] integrate DAW for music synthesis live
+- [ ] integrate DAW for music synthesis live OR (all below)
 - [ ] show staff for Play audio feature 
 - [ ] use ParseMIDI to convert logs into .mid files
 - [ ] drop .mid files with same ID for server to send to synthesizer

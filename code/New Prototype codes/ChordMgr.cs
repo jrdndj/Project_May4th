@@ -286,6 +286,10 @@ public class ChordMgr : MonoBehaviour
 
                 //this is for both
                 case "rest":
+                    {
+                        //no need to deal for this version of the code 
+                        break;
+                    }//end rest case
                 default:
                     {
                         //TODO: catch "rest" in the piano during spawn
@@ -803,109 +807,135 @@ public class ChordMgr : MonoBehaviour
             //check chord name and add the corresponding improvs as well
             switch (chordname)
             {
+                //these are the permanent harmony spawns 
                 //these should be arranged musically  
+                case "C3": //c3
+                    {
+                        MotifList.Add(12);
+                        break;
+                    }//end C
+                case "D3": //d3
+                    {
+                        MotifList.Add(14);
+                        break;
+                    }//end d3
+                case "E3": //e3
+                    {
+                        MotifList.Add(16);
+                        break;
+                    }//end e3
+                case "F3": //f3
+                    {
+                        MotifList.Add(17);
+                        break;
+                    }//end f3
+                case "G3": //g3
+                    {
+                        MotifList.Add(19);
+                        break;
+                    }//end g3
+                case "A3": //A3
+                    {
+                        MotifList.Add(21);
+                        break;
+                    }//end A3
+                case "B3": //c3
+                    {
+                        MotifList.Add(23);
+                        break;
+                    }//end b3
+
+                // we begin here the motifs and licks - c4 is both  
                 case "C4": //c4
                     {
-                        MotifList.Add(24);
-                   
+                        MotifList.Add(24);                   
                         break;
                     }//end C
                 case "D4": //d4
                     {
-                        MotifList.Add(26);
-                     
+                        MotifList.Add(26);                     
                         break;
                     }//end
                 case "E4": //e4
                     {
-                        MotifList.Add(28);
-          
+                        MotifList.Add(28);          
                         break;
                     }//end
                 case "F4": //f4
                     {
-                        MotifList.Add(29);
-                      
+                        MotifList.Add(29);                      
                         break;
                     }//end
                 case "G4": //g4
                     {
-                        MotifList.Add(31);
-                     
+                        MotifList.Add(31);                     
                         break;
                     }//end
                 case "A4": //a4
                     {
-                        MotifList.Add(33);
-                 
+                        MotifList.Add(33);                 
                         break;
                     }//end
                 case "B4": //b4
                     {
-                        MotifList.Add(35);
-                 
+                        MotifList.Add(35);                 
                         break;
                     }//end
                 case "C5": //c5
                     {
-                        MotifList.Add(36);
-            
+                        MotifList.Add(36);            
                         break;
                     }//end C
                 case "D5": //c5
                     {
                         MotifList.Add(38);
-
                         break;
                     }//end D5
                 case "E5": //c5
                     {
                         MotifList.Add(40);
-
                         break;
                     }//end E5
                 case "F5": //f5
                     {
                         MotifList.Add(41);
-
                         break;
                     }//end f
                 case "Fs5": //fs5
                     {
                         MotifList.Add(42);
-
                         break;
                     }//end fs5
                 case "A5": //a5
                     {
                         MotifList.Add(45);
-
                         break;
                     }//end A
                 case "B5": //b5
                     {
                         MotifList.Add(47);
-
                         break;
                     }//end b5
                 case "As5": //as5
                     {
                         MotifList.Add(46);
-
                         break;
                     }//end as5
                 case "G5": //g5
                     {
                         MotifList.Add(43);
-
                         break;
                     }//end g5
                 case "Gs5": //c5
                     {
                         MotifList.Add(44);
-
                         break;
                     }//end gs5
+                case "rest":
+                    {
+                        MotifList.Add(0) ; //spawn at zero but make it black
+                        break; 
+                    }//
                 default:
                     {
                         //TODO: catch "rest" in the piano during spawn

@@ -144,6 +144,7 @@ public class RollScript : MonoBehaviour
     Color32 yellow = Color.yellow;
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
     Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
+    Color32 restblack = Color.black; //for the rests 
 
     ////=========== CHORD RELATED VARIABLES ==========/
 
@@ -329,6 +330,12 @@ public class RollScript : MonoBehaviour
                 darkerColor = (Color)spawncolor * 0.75f;
                 spawnedBars[spawnCount].GetComponent<Image>().color = darkerColor;
             }//endisBlackprefabcheck
+
+            //set a black color for rests
+            if (indexList[i]==0)
+            {
+                spawnedBars[spawnCount].GetComponent<Image>().color = restblack; 
+            }
 
             //get the actual size and then get the half of it
             // RectTransform SpawnScale = spawnedBars[spawnCount].GetComponent<RectTransform>();
@@ -709,8 +716,18 @@ public class RollScript : MonoBehaviour
         {
             //HIGHLIGHT PINK WHAT SHOULD BE PINK NOTHING MORE
 
-            //highlight piano key based on color and spawntype
-            pianoKeys[lickset[i]].GetComponent<Image>().color = highlightcolor;
+            //if it is a rest, there is no highlight
+            if (lickset[i] == 0)
+            {
+                pianoKeys[lickset[i]].GetComponent<Image>().color = restblack;
+            }
+            else //everything else is pink
+            {
+
+                //highlight piano key based on color and spawntype
+                pianoKeys[lickset[i]].GetComponent<Image>().color = highlightcolor;
+
+            }
 
 
             //store information for onNoteOff
@@ -1666,6 +1683,9 @@ public class RollScript : MonoBehaviour
             //get Swing information
             //clear any swing information to be safe
             SwingListAcquired.Clear();
+
+            //spawn also Harmony Keys
+
 
             //spawn Swing Piano Roll Keys
             SpawnSwingKeys();
