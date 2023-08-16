@@ -188,6 +188,14 @@ public class CollectionMgr : MonoBehaviour
         ("B4", 2) //prolonged
     }; //end jazzmotif01
 
+    //partner harmony should also be here
+    List<(string, int)> JazzHarmony01 = new List<(string, int)>
+    {
+        ("Dm9", 4),
+        ("G13", 4),
+        ("CM9", 5)
+    }; //end jazzharmony01
+
     // contains lick 1 and 2 only 
     List<(string, int)> JazzMotifs02 = new List<(string, int)>
     {
@@ -207,9 +215,18 @@ public class CollectionMgr : MonoBehaviour
         ("G5", 1) 
     }; //end jazzmotif02
 
+    //partner harmony should also be here
+    List<(string, int)> JazzHarmony02 = new List<(string, int)>
+    {
+        ("Dm9", 4),
+        ("G13", 4),
+        ("CM9", 6)
+    }; //end jazzharmony02
+
     // contains lick 3 only 
     List<(string, int)> JazzMotifs03 = new List<(string, int)>
     {
+        ("rest", 1),
         ("E4", 1),
         ("F4", 1),
         ("A4", 1),
@@ -248,7 +265,9 @@ public class CollectionMgr : MonoBehaviour
     {
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(PracticeJazz01);
         //ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzSeq017);
-        ChordManager.GetComponent<ChordMgr>().ChordMapper(CoreJazz01);
+
+        //so we use this for the harmoney 
+        ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzHarmony01);
 
         //set motif details so everything is ready in the background
         ChordManager.GetComponent<ChordMgr>().SetMotifDetails(JazzMotifs03);
