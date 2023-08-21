@@ -99,7 +99,7 @@ public class RollScript : MonoBehaviour
     public string rootKey = "C"; //to make things less sticky
     public int rootKeyIndex; // get the index for easy WaL animations
 
-   //list needed for the guided press mode
+    //list needed for the guided press mode
     public List<int> guidedPressList = new List<int>();
 
     //height of 120 means it runs for 2 seconds.
@@ -332,9 +332,9 @@ public class RollScript : MonoBehaviour
             }//endisBlackprefabcheck
 
             //set a black color for rests
-            if (indexList[i]==0)
+            if (indexList[i] == 0)
             {
-                spawnedBars[spawnCount].GetComponent<Image>().color = restblack; 
+                spawnedBars[spawnCount].GetComponent<Image>().color = restblack;
             }
 
             //get the actual size and then get the half of it
@@ -1109,7 +1109,7 @@ public class RollScript : MonoBehaviour
                 SpawnSwingKeys();
             }
 
-         
+
         }//end WalMode swing
 
         //have some timing control here for WaL mode - motifs
@@ -2083,7 +2083,7 @@ public class RollScript : MonoBehaviour
 
         //get the motif list from ChordMgr thats been in the background
         SpawnList = ChordManager.GetComponent<ChordMgr>().GetMotifList();
-       // Debug.Log("got spawn list");
+        // Debug.Log("got spawn list");
 
         //clear chords
         LickList.Clear();
@@ -2097,7 +2097,7 @@ public class RollScript : MonoBehaviour
 
         //get motifsizes from ChordMgr and send it here as MotifLenghts
         MotifLengths = ChordManager.GetComponent<ChordMgr>().MotifSizes.ToList();
-       // Debug.Log("got motiflenghts list");
+        // Debug.Log("got motiflenghts list");
 
         //set the yplots based on their newly imported motiflengths
         //but since the sizes are different, we need to import them one by one. 
