@@ -16,7 +16,7 @@ using UnityEngine.UI; //for the toggle
 public class ChordMgr : MonoBehaviour
 {
 
-   // [SerializeField] GameObject CollectionMgr;
+    // [SerializeField] GameObject CollectionMgr;
     [SerializeField] GameObject InputManager;
     [SerializeField] GameObject ImprovManager;
     [SerializeField] GameObject RollManager;
@@ -48,7 +48,7 @@ public class ChordMgr : MonoBehaviour
     List<int> tempPressed = new List<int>();
 
     //=== motif related data structures 
-  //  List<(string, int)> LocalMotif = new List<(string, int)>();
+    //  List<(string, int)> LocalMotif = new List<(string, int)>();
     public List<int> MotifSizes = new List<int>(); //has to be public so Rm can access it
     List<int> MotifList = new List<int>(); // contains the key number for proper positioning
     List<int> MotifYPlots = new List<int>();
@@ -609,7 +609,7 @@ public class ChordMgr : MonoBehaviour
         }//end type 2 
 
     }//end copylist
-    
+
 
     public List<int> GetSwingList(string rootKey)
     {
@@ -768,11 +768,11 @@ public class ChordMgr : MonoBehaviour
 
             //store the previous one for the next round
             previousOffset = newOffset;
-            
+
         }//end for loop yplotter
 
         return MotifYPlots; //pass to RollScript 
-        
+
     }//end MotifYPlotter
 
     //lets have a MotifController Function here
@@ -802,7 +802,7 @@ public class ChordMgr : MonoBehaviour
         //iterate through each in the list and then assign or map
         foreach (var chord in ReceivedList)
         {
-      
+
             string chordname = chord.Item1;
             //check chord name and add the corresponding improvs as well
             switch (chordname)
@@ -848,42 +848,42 @@ public class ChordMgr : MonoBehaviour
                 // we begin here the motifs and licks - c4 is both  
                 case "C4": //c4
                     {
-                        MotifList.Add(24);                   
+                        MotifList.Add(24);
                         break;
                     }//end C
                 case "D4": //d4
                     {
-                        MotifList.Add(26);                     
+                        MotifList.Add(26);
                         break;
                     }//end
                 case "E4": //e4
                     {
-                        MotifList.Add(28);          
+                        MotifList.Add(28);
                         break;
                     }//end
                 case "F4": //f4
                     {
-                        MotifList.Add(29);                      
+                        MotifList.Add(29);
                         break;
                     }//end
                 case "G4": //g4
                     {
-                        MotifList.Add(31);                     
+                        MotifList.Add(31);
                         break;
                     }//end
                 case "A4": //a4
                     {
-                        MotifList.Add(33);                 
+                        MotifList.Add(33);
                         break;
                     }//end
                 case "B4": //b4
                     {
-                        MotifList.Add(35);                 
+                        MotifList.Add(35);
                         break;
                     }//end
                 case "C5": //c5
                     {
-                        MotifList.Add(36);            
+                        MotifList.Add(36);
                         break;
                     }//end C
                 case "D5": //c5
@@ -933,8 +933,8 @@ public class ChordMgr : MonoBehaviour
                     }//end gs5
                 case "rest":
                     {
-                        MotifList.Add(0) ; //spawn at zero but make it black
-                        break; 
+                        MotifList.Add(0); //spawn at zero but make it black
+                        break;
                     }//
                 default:
                     {
@@ -946,7 +946,7 @@ public class ChordMgr : MonoBehaviour
 
             //=== this should get the second elements instead 
             //then immediate add their length to lengthlist
-           // LengthListToSend.Add(chord.Item2);
+            // LengthListToSend.Add(chord.Item2);
 
         }//end foreach scan of received list
 

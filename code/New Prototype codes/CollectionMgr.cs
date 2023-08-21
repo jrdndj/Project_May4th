@@ -212,7 +212,7 @@ public class CollectionMgr : MonoBehaviour
         ("B5", 1),
         ("D5", 1),
         ("C5", 1),
-        ("G5", 1) 
+        ("G5", 1)
     }; //end jazzmotif02
 
     //partner harmony should also be here
