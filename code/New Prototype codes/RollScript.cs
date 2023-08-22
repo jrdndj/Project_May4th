@@ -9,6 +9,8 @@ public class RollScript : MonoBehaviour
 {
     //============ ENVIRONMENT RELATED VARIABLES =============/
 
+    public static RollScript Instance;
+
     [SerializeField] GameObject ChordManager;
 
     //this helps the mapping of keys similar to that midi hardware
@@ -135,6 +137,10 @@ public class RollScript : MonoBehaviour
     //for motif spawning purpose
     public List<List<int>> MotifList = new List<List<int>>();
     public List<int> MotifYPlots = new List<int>();
+
+    //playback related variables
+    public AudioSource MotifToPlay;
+    public bool IsMotifPlaying = false; 
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -816,6 +822,9 @@ public class RollScript : MonoBehaviour
     //start is for initialization 
     void Start()
     {
+        //instance
+        Instance = this; 
+
         movementEnabled = true;
         Debug.Log("initial viz mode is " + VizMode);
         //set greenline pos
@@ -2155,6 +2164,20 @@ public class RollScript : MonoBehaviour
                 {
                     //highlightNow = true;
                     HighlightLicks(LickList[ctr], improvpink, 2);
+
+                    //play accompanying audio if WaL mode 
+                    if (!IsMotifPlaying && module == 1)
+                    {
+
+                        Invoke("PlayDelayedAudio", 0.25f);
+                        //play the lick file
+                       // Instance.MotifToPlay.Play();
+
+                        //change to true now then change to off when finished playing
+                        IsMotifPlaying = true; 
+                    }//check if motifplaying
+
+
                 }//endif
 
                 //============= CHECK IF IT REACHES DESTROY POSITION =====/
@@ -2202,6 +2225,12 @@ public class RollScript : MonoBehaviour
                     //but we can spawn something new now
                     //spawnNew = true;
                     spawnCount--;
+
+                    //if there are no more spawns, motifplaying
+                    if (spawnCount == 0)
+                    {
+                        IsMotifPlaying = false; 
+                    }
                 }//endif check contact green point
 
             }//endif movement
@@ -2219,6 +2248,12 @@ public class RollScript : MonoBehaviour
         }
         return SwingListAcquired;
     }//end append reverse elements
+
+    //playing the audio source with delay
+    private void PlayDelayedAudio()
+    {
+        Instance.MotifToPlay.Play();
+    }
 
 
 }//endclass
