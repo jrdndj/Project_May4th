@@ -185,7 +185,7 @@ public class CollectionMgr : MonoBehaviour
         ("D4", 1),
         ("E4", 1),
         ("G4", 1),
-        ("B4", 2) //prolonged
+        ("B4", 2)
     }; //end jazzmotif01
 
     //partner harmony should also be here
@@ -251,6 +251,61 @@ public class CollectionMgr : MonoBehaviour
         ("E5", 1)
     }; //end jazzmotif03
 
+    List<(string, int)> AllMotifs = new List<(string, int)>
+    {
+        ("D4", 1),
+        ("F4", 1),
+        ("A4", 1),
+        ("C5", 1),
+        ("D4", 1),
+        ("F4", 1),
+        ("G4", 1),
+        ("B4", 1),
+        ("D4", 1),
+        ("E4", 1),
+        ("G4", 1),
+        ("B4", 2), 
+        ("rest", 3), //lick 02 follows
+        ("D4", 1),
+        ("F4", 1),
+        ("A4", 1),
+        ("C5", 1),
+        ("B4", 1),
+        ("A5", 1),
+        ("G5", 1),
+        ("F5", 1),
+        ("E5", 1),
+        ("G5", 1),
+        ("B5", 1),
+        ("D5", 1),
+        ("C5", 1),
+        ("G5", 1), 
+        ("rest", 3), //lick 03 follows
+        ("rest", 1),
+        ("E4", 1),
+        ("F4", 1),
+        ("A4", 1),
+        ("C5", 1),
+        ("E5", 1),
+        ("D5", 1),
+        ("A5", 1),
+        ("As5", 1),
+        ("As5", 1),
+        ("A5", 1),
+        ("G5", 1),
+        ("Fs5", 1),
+        ("F5", 1),
+        ("E5", 1),
+        ("D5", 1),
+        ("B5", 1),
+        ("C5", 1),
+        ("E5", 1),
+        ("G5", 1),
+        ("B5", 1),
+        ("A5", 1),
+        ("E5", 1)
+    }; //end jazzmotif03
+
     //===== end of all pre defined motifs, chord progressions 
 
     //we use this to send to ChordMgr 
@@ -270,7 +325,7 @@ public class CollectionMgr : MonoBehaviour
         ChordManager.GetComponent<ChordMgr>().ChordMapper(JazzHarmony01);
 
         //set motif details so everything is ready in the background
-        ChordManager.GetComponent<ChordMgr>().SetMotifDetails(JazzMotifs03);
+        ChordManager.GetComponent<ChordMgr>().SetMotifDetails(AllMotifs);
         //send motif and QA information here 
         //ChordManager.GetComponent<ChordMgr>().GetMotifList(JazzMotifs01);
         //we still need this for the harmony

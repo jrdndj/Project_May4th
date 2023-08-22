@@ -19,6 +19,8 @@ public class RollScript : MonoBehaviour
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
 
+    [SerializeField] GameObject AudioManager;
+
     //viz modes 1 to 4 should be in this script 
     public Toggle rollmodeListener, onpressmodelistener, guidedlistener, onwaitlistener;
     //jazzlistener, blueslistener, HSlistener, SAlistener, Whitelistener, RedListener;
@@ -139,6 +141,7 @@ public class RollScript : MonoBehaviour
     public List<int> MotifYPlots = new List<int>();
 
     //playback related variables
+    public AudioClip[] clips;
     public AudioSource MotifToPlay;
     public bool IsMotifPlaying = false; 
 
@@ -2169,9 +2172,10 @@ public class RollScript : MonoBehaviour
                     if (!IsMotifPlaying && module == 1)
                     {
 
-                        Invoke("PlayDelayedAudio", 0.25f);
+                        Invoke("PlayDelayedAudio", 0.0f);
+                        // Invoke("PlayDelayedAudio", 0.5f); //for the one that starts with the rest
                         //play the lick file
-                       // Instance.MotifToPlay.Play();
+                        // Instance.MotifToPlay.Play();
 
                         //change to true now then change to off when finished playing
                         IsMotifPlaying = true; 
@@ -2229,7 +2233,10 @@ public class RollScript : MonoBehaviour
                     //if there are no more spawns, motifplaying
                     if (spawnCount == 0)
                     {
-                        IsMotifPlaying = false; 
+                        IsMotifPlaying = false;
+                        //turnoff all highlights
+                        RemoveMelodyHighlights();
+
                     }
                 }//endif check contact green point
 
@@ -2252,7 +2259,10 @@ public class RollScript : MonoBehaviour
     //playing the audio source with delay
     private void PlayDelayedAudio()
     {
-        Instance.MotifToPlay.Play();
+
+        //decentralising to AudioManager game object 
+        AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(4);
+        //Instance.MotifToPlay.Play();
     }
 
 

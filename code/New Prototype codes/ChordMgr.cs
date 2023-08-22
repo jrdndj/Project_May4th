@@ -708,7 +708,7 @@ public class ChordMgr : MonoBehaviour
         //clear onwaitylistplotter to be safe
         OnWaitYListPlotter.Clear();
 
-        int offset = 30; //the first elements will have no offset
+        int offset = 25; //the first elements will have no offset
         int previousOffset = 0; //there is no existing offset
         int newOffset = 0;
 
