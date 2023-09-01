@@ -6,8 +6,9 @@ repository for Piano 2.0 MVP v1
 ### Post Study Release Targets 
 - [x] Lesson 1: Play Swing Through Modes
 - [x] Lesson 2: Learn Motifs Through Repetition
-- [ ] Lesson 3: Practice Concepts Through QnA Mode
-- [ ] Lesson 4: Apply Lessons Through Sequencing on Different Notes
+- [x] Lesson 3: Practice Concepts Through QnA Mode
+- [x] Lesson 4: Apply Lessons Through Sequencing on Different Notes
+- [ ] Lesson 5: Variations
 
 ### open issues and targets
 - [x] deploy webserver for receiving inputs
@@ -20,6 +21,11 @@ repository for Piano 2.0 MVP v1
 - [x] drop .mid files with same ID for server to send to synthesizer
 - [x] sync timing with recorded elements
 - [x] sync timing of highlighting
+- [ ] process sibelius add tempo
+- [ ] syncing of midi and aiff
+- [ ] time x pixelmap
+- [ ] multiple laoding of several audio assets
+      
 
 #### for each lessons, the following modes will be designed and implemented
 Modes and Features
