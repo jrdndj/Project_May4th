@@ -1667,7 +1667,7 @@ public class RollScript : MonoBehaviour
         {
             //change to default module
             module = 9;
-            Debug.Log("Deactivated On press mode.");
+            Debug.Log("Deactivated Test Yourself mode.");
             display_name.text = "select modules";
             DestroySpawns();
             ClearMelodies();
