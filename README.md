@@ -11,6 +11,8 @@ repository for Piano 2.0 MVP v1
 - [x] Lesson 5: Variations
 
 ### open issues and targets
+- [ ] MAJOR cleanup
+- [x] new layout
 - [x] deploy webserver for receiving inputs
 - [x] capture logs into MIDI-able format
 - [x] handled rests
@@ -24,7 +26,7 @@ repository for Piano 2.0 MVP v1
 - [x] process sibelius add tempo
 - [ ] syncing of midi and aiff
 - [ ] time x pixelmap
-- [ ] multiple laoding of several audio assets
+- [x] multiple loading of several audio assets
       
 
 #### for each lessons, the following modes will be designed and implemented

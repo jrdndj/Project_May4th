@@ -13,8 +13,8 @@ public class SongManager : MonoBehaviour
 {
     public static SongManager Instance;
     public AudioSource audioSource;
-    public Lane_Harmony[] harmony_lanes;
-    public Lane_Harmony[] lick_lanes; 
+    ///public Lane_Harmony[] harmony_lanes;
+   // public Lane_Harmony[] lick_lanes; 
     public float songDelayInSeconds;
     public double marginOfError; // in seconds
 
@@ -127,17 +127,20 @@ public class SongManager : MonoBehaviour
         //var numbers = 
         notes.CopyTo(array, 0);
 
+
+        //=== these lines of code are concenred with lane harmony cs which we dont need anymore 
         //foreach (var lane in harmony_lanes)
         //{
         //    lane.SetTimeStamps(array);
         //   // Debug.Log("timestamp: " + lane);
         //}
 
-        foreach (var lane in lick_lanes)
-        {
-            lane.SetTimeStamps(array);
-            // Debug.Log("timestamp: " + lane);
-        }
+        //foreach (var lane in lick_lanes)
+        //{
+        //    lane.SetTimeStamps(array);
+        //    // Debug.Log("timestamp: " + lane);
+        //}
+        //====== end lane harmony needed code
 
         Invoke(nameof(StartSong), songDelayInSeconds);
     }//end gata dara from midi ()
