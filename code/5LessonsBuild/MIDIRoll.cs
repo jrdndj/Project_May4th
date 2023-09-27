@@ -12,6 +12,10 @@ public class MIDIRoll : MonoBehaviour
     public float pixelsPerBeat = 40.0f; // Width of one beat in pixels
     public float beatHeight = 25.0f; // Height of one beat in pixels
 
+    //=== for piano mapping
+    ////this helps the mapping of keys similar to that midi hardware
+         
+
     private void Start()
     {
         GeneratePianoRoll();
@@ -45,5 +49,5 @@ public class MIDIRoll : MonoBehaviour
             noteObject.transform.position = new Vector3(xPosition, yPosition, 0.0f);
             noteObject.transform.localScale = new Vector3(width, beatHeight, 1.0f);
         }
-    }
-}
+    }//end generate piano roll
+}//end midi roll

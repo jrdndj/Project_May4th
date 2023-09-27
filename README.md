@@ -11,7 +11,7 @@ repository for Piano 2.0 MVP v1
 - [x] Lesson 5: Variations
 
 ### open issues and targets
-- [ ] MAJOR cleanup
+- [x] MAJOR cleanup
 - [x] new layout
 - [x] deploy webserver for receiving inputs
 - [x] capture logs into MIDI-able format
