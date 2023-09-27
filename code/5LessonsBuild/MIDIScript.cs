@@ -11,16 +11,16 @@ public class MIDIScript : MonoBehaviour
     // 21: A0
     int keyOffset = 36; //from 21 
 
-    //=== old generation of managers 
-    [SerializeField] GameObject BarManager; //for the improv
-    [SerializeField] GameObject RollManager; //for the pianoroll
+    ////=== old generation of managers 
+    //[SerializeField] GameObject BarManager; //for the improv
+    //[SerializeField] GameObject RollManager; //for the pianoroll
 
-    //=== new generation of Managers
-    [SerializeField] GameObject ImprovManager; //improv controls
-    [SerializeField] GameObject ChordManager; //chord key mappings
-    [SerializeField] GameObject InputManager; //chord time mappings
-    [SerializeField] GameObject TimeManager; //time and bar controls
-    [SerializeField] GameObject VizManager; //everything that is toggled
+    ////=== new generation of Managers
+    //[SerializeField] GameObject ImprovManager; //improv controls
+    //[SerializeField] GameObject ChordManager; //chord key mappings
+    //[SerializeField] GameObject InputManager; //chord time mappings
+    //[SerializeField] GameObject TimeManager; //time and bar controls
+    //[SerializeField] GameObject VizManager; //everything that is toggled
 
 
     // Start is called before the first frame update
@@ -41,7 +41,7 @@ public class MIDIScript : MonoBehaviour
                 //    velocity
                 //) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
                 //noteon is processed by RollManager
-                RollManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
+              //  RollManager.GetComponent<RollScript>().onNoteOn(note.noteNumber - keyOffset, velocity);
 
 
                 //ImprovManager.GetComponent<ImprovMgr>().onNoteOn(note.noteNumber - keyOffset, velocity);
@@ -58,7 +58,7 @@ public class MIDIScript : MonoBehaviour
                 //) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
                 //noteoff is processed by rollmanager
-                RollManager.GetComponent<RollScript>().onNoteOff(note.noteNumber - keyOffset);
+              //  RollManager.GetComponent<RollScript>().onNoteOff(note.noteNumber - keyOffset);
 
                 //ImprovManager.GetComponent<ImprovMgr>().onNoteOff(note.noteNumber - keyOffset);
 
