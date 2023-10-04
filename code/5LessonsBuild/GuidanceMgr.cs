@@ -30,12 +30,27 @@ public class GuidanceMgr : MonoBehaviour
 
         //initialize listener toggles here
 
-        //lesson 01 toggle listener
+        //rhythm toggle listener
         rhythmtoggle.GetComponent<Toggle>();
         rhythmtoggle.onValueChanged.AddListener(delegate
         {
             RhythmToggleValueChanged(rhythmtoggle);
         });
+
+        //harmony toggle listener
+        harmonytoggle.GetComponent<Toggle>();
+        harmonytoggle.onValueChanged.AddListener(delegate
+        {
+            HarmonyToggleValueChanged(harmonytoggle);
+        });
+
+        //metronome toggle listener
+        metronometoggle.GetComponent<Toggle>();
+        metronometoggle.onValueChanged.AddListener(delegate
+        {
+            MetronomeToggleValueChanged(metronometoggle);
+        });
+
 
     }
 
@@ -52,21 +67,29 @@ public class GuidanceMgr : MonoBehaviour
     {
         if (change.isOn)
         {
+            rhythm = true;
             guidancevalue = DetermineAccompaniement();
-            rhythm = true; 
+            
             Debug.Log("Including rhythm");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Added rhythm.";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = guidancevalue;
 
         }//endif 
         else
         {
             //change to default lesson
             // lesson = 9;
+            rhythm = false;
             guidancevalue = 9; //dont change lesson, just accompaniement
-            rhythm = false; 
+            
             Debug.Log("Removing rhythm");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Removed rhythm.";
             // display_name.text = "select lesson";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 9;
 
         }//endelse 
 
@@ -79,20 +102,30 @@ public class GuidanceMgr : MonoBehaviour
     {
         if (change.isOn)
         {
+            harmony = true;
             guidancevalue = DetermineAccompaniement();
-            harmony = true; 
+          
             Debug.Log("Including harmony (aka left hand)");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Added harmony.";
+
+            Debug.Log("guidance value sent to improvmgr is " + guidancevalue );
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = guidancevalue;
 
         }//endif 
         else
         {
             //change to default lesson
             // lesson = 9;
+            harmony = false;
             guidancevalue = 9; //dont change lesson, just accompaniement
-            harmony = false; 
+            
             Debug.Log("Removing harmony ");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Removed harmony.";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 9;
 
         }//endelse 
 
@@ -103,20 +136,28 @@ public class GuidanceMgr : MonoBehaviour
     {
         if (change.isOn)
         {
+            metronome = true;
             guidancevalue = DetermineAccompaniement();
-            metronome = true; 
+            
             Debug.Log("Including metronome");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Added metronome.";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = guidancevalue;
 
         }//endif 
         else
         {
             //change to default lesson
             // lesson = 9;
+            metronome = false;
             guidancevalue = 9; //dont change lesson, just accompaniement
-            metronome = false; 
+            
             Debug.Log("Removing metronome");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Removed metronome";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 9;
         }//endelse 
 
     }//end harmonytoggle
@@ -159,7 +200,7 @@ public class GuidanceMgr : MonoBehaviour
         }
         else
         {
-            return 9; 
+            return 9; //default 
         }
     }//end determine accompaniement
 
