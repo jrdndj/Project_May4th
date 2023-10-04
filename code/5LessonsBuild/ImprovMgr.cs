@@ -55,6 +55,7 @@ public class ImprovMgr : MonoBehaviour
     // when button is clicked, PullContent gets the right content
     public void ManageImprov()
     {
+        Debug.Log("Entered manage improv function");
         /*
          * algo for pull content
          * get mode value
@@ -65,19 +66,25 @@ public class ImprovMgr : MonoBehaviour
          * call RolLScript
          * **/
         //listen and learn mode
+        Debug.Log("mode value we have is " + modeValue);
         if (modeValue==1)
         {
+            Debug.Log("lesson value we have is " + lessonValue);
             //now check which lesson
             if (lessonValue==1)
             {
+
+                Debug.Log("guidance value we have is " + guidanceValue);
                 //nowcheck if guidance is chosen
                 if (guidanceValue == 4) // only harmony
                 {
-                    //select swing-allmodes-allconfig.midi for pianoroll generation
+                                      //select swing-allmodes-allconfig.midi for pianoroll generation
                     RollManager.GetComponent<RollMgr>().Filename = "L0104.mid";
+                    //invoke song manager from rollmgr
+                    RollManager.GetComponent<RollMgr>().InvokeSongManager();
                     //select swing-allmodes-allconfig.aiff for audio
 
-                    //call pianoroll for now
+                    //generate piano roll based on these 
                     RollManager.GetComponent<RollMgr>().GeneratePianoRoll();
                 }//end if check guidance
                 else if (guidanceValue == 2) //only r
