@@ -128,7 +128,7 @@ public class SongMgr : MonoBehaviour
         //print all notes
         foreach (var elements in notes)
         {
-            Debug.Log("notename" + elements.ToString());
+            //Debug.Log("notename" + elements.ToString());
             int newNoteNumber = elements.NoteNumber - 36; //this doesnt realy change the value
            // int newNoteNumber = elements.NoteNumber;
 
