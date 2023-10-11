@@ -20,6 +20,10 @@ public class RollMgr : MonoBehaviour
     [SerializeField] GameObject rollManager;
     [SerializeField] GameObject songManager;
 
+    public GameObject green_line; //formerly 0 -85 0
+    public GameObject spawnpoint; //for the spawnpoint
+
+
     public static RollMgr Instance;
 
     //this helps the mapping of keys similar to that midi hardware
@@ -28,6 +32,9 @@ public class RollMgr : MonoBehaviour
     //this lets us know which keys are black 
     List<int> blacklist = new List<int>() { 1, 3, 6, 8, 10, 13, 15, 18, 20, 22, 25, 27, 30, 32, 34, 37, 39, 42, 44, 46, 49, 51, 54, 56, 58 };
     bool isBlackPrefab = false;
+    bool batchSpawned = false;
+
+    int numOfSpawns = 0; 
 
 
     //==== midi related variables
@@ -36,8 +43,8 @@ public class RollMgr : MonoBehaviour
     //public float pixelsPerBeat = 40.0f; // Width of one beat in pixels
     //public float beatHeight = 25.0f; // Height of one beat in pixels
 
-    public float pixelsPerBeat = 0.1f; // Width of one beat in pixels
-    public float beatHeight = 0.1f; // Height of one beat in pixels
+    public float pixelsPerBeat = 20.0f; // height of one beat in pixels
+    //public float beatHeight = 0.1f; // Height of one beat in pixels
     public string Filename; // this should be manipulated by ImprovManager
 
     public AudioSource audioSource;
@@ -101,7 +108,9 @@ public class RollMgr : MonoBehaviour
         whitePrefab = (GameObject)Resources.Load("Prefab/whitekeyprefab");
         blackPrefab = (GameObject)Resources.Load("Prefab/blackkeyprefab");
 
-        // midi related configs
+
+
+               // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
         Debug.Log("Successfully read " + Filename);
@@ -109,85 +118,29 @@ public class RollMgr : MonoBehaviour
 
         var notes = midi.GetNotes(); // Get all the MIDI notes
 
+
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
             Debug.Log("Spawning...");
 
-
             //configs and declarations first
 
-            //the solution is found in this link
-            // https://www.codeproject.com/Articles/1200014/DryWetMIDI-High-level-processing-of-MIDI-files#tempo
-
-            //call a rescalling algorithm here that considers midi notedata
-
-
             var noteTime = note.TimeAs<MetricTimeSpan>(tempoMap);
-            //var noteYPos = note.TimeAs<BarBeatTicksTimeSpan>(tempoMap).Beats;
-            //Debug.Log("noteYpos values " + note.NoteName.ToString() + " YPos " + noteYPos);
+            // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
 
-
-            /*
-             * this solution might work so we gotta test this
-             *  // Calculate Y position (height) based on note.NoteNumber
-            float yPosition = (noteNumber - 24) * pixelsPerBeat; // Assuming MIDI note C2 is note 24
-
-            // Use note.Length directly to determine the width of the object in beats
-            float widthInBeats = (float)note.Length;
-
-            // Calculate the width of the object based on widthInBeats and pixelsPerBeat
-            float width = widthInBeats * pixelsPerBeat;
-
-            // Create a new instance of the prefab and set its position and size
-            GameObject noteObject = Instantiate(notePrefab);
-            noteObject.transform.position = new Vector3(xPosition, yPosition, 0.0f);
-            noteObject.transform.localScale = new Vector3(width, pixelsPerBeat, 1.0f);
-       
-             * 
-             * **/
-
-            //Debug.Log("noteYPos values " + noteYPos);
-            //var noteDuration = note.LengthAs<MetricTimeSpan>(tempoMap);
-            // use note.LengthAs<Beats>() but divided by 16 
-            var noteDuration = (float) note.Length;
-            Debug.Log("noteDuration " +note.ToString() + "duration : " + noteDuration);
-
-            //check their current height 
-            var noteHeight = note.TimeAs<MetricTimeSpan>(tempoMap).Milliseconds; //this tells us how long a prefab should be
-            Debug.Log("noteHeight " + note.ToString() + " height " + noteHeight);
+            var noteDuration = note.LengthAs<MetricTimeSpan>(tempoMap);
+            // Debug.Log("noteDuration " +note.ToString() + "duration : " + noteDuration);
 
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
-            Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
+                                                   // Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
 
+            //var noteHeight = note.TimeAs<MetricTimeSpan>(tempoMap).Milliseconds; //this tells us how long a prefab should be
+            //  Debug.Log("noteHeight " + note.ToString() + " height " + noteHeight);
+
+            //then instantiate object with these parameters
 
             GameObject noteObject;
-
-            //we need the location of the pianoKeys
-            //Debug.Log("noteNumber is " + noteNumber);
-            Vector3 keypos = pianoKeys[noteNumber].transform.localPosition;
-
-            //==== x position and width doesnt matter regardless of black or white prefab
-
-            // convert duration in divisible multiplers for scale
-
-            // Calculate X position in pixels based on note.Time
-            // float xPosition = (float)noteTime.TotalMicroseconds / 1000.0f * pixelsPerBeat; // Convert microseconds to milliseconds
-            float xPosition = (float)noteTime.TotalMicroseconds / 1000.0f; // Convert microseconds to milliseconds
-
-
-           // Debug.Log("x position here is " + xPosition);
-            // Calculate Y position (height) based on note.NoteNumber
-            //float yPosition = (noteNumber) * beatHeight; // removed -24 here cos offset is already added
-            float yPosition = pianoKeys[noteNumber].transform.position.y; // removed -24 here cos offset is already added
-
-            //Debug.Log("yposition here is " + yPosition);
-
-            // Calculate the width of the object based on note.Duration
-            //  float width = (float)noteDuration.TotalMicroseconds / 1000.0f * pixelsPerBeat; // Convert microseconds to milliseconds
-            //float width = (float)noteDuration.TotalSeconds; //should be seconds but this is a multiplier from the basic prefab size 
-
-           // Debug.Log("width here is " + width);
 
             //===== decide on prefab and color here 
 
@@ -197,7 +150,7 @@ public class RollMgr : MonoBehaviour
             {
                 // Create a new instance of the prefab and set its position and size
                 noteObject = Instantiate(blackPrefab);
-            
+
                 //we need this for the colors
                 isBlackPrefab = true;
 
@@ -217,18 +170,34 @@ public class RollMgr : MonoBehaviour
             //set parent after instantiate for proper positioning
             noteObject.transform.SetParent(rollManager.transform, true);
 
-            //== maybe this should be here first 
-            //get the actual size and then get the half of it for proper positioning
-            RectTransform noteScale = noteObject.GetComponent<RectTransform>();
+            //the assignment of positions should only take place after the setting of parent
+            // Calculate X position in pixels based on note.Time
+            float xPosition = pianoKeys[noteNumber].transform.position.x;
+            // Debug.Log(note.ToString() + " xPosition is: " + xPosition);
 
-            //set the refereference size which is the defaults of the prefab not the piano keys 
-            noteObject.transform.localScale = new Vector3(noteScale.transform.localScale.x, noteDuration, 1.0f); //scale here is the multipler based on duration
+            //calculate their position
+            float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat;
+            // Debug.Log(note.ToString() + " yPosition is: " + yPosition);
 
-                //adjust the size based on the sizedelta
-            noteScale.sizeDelta = new Vector2(noteScale.sizeDelta.x, noteScale.sizeDelta.y ); //removed - barSpeed * 5
+            float zPosition = pianoKeys[noteNumber].transform.position.z;
 
-            //put it in its y position - x is the keynumber aka yposition, y is the height, so thats x position
-            noteObject.transform.localPosition = new Vector3(yPosition, xPosition, keypos.z);
+            Debug.Log(note.ToString() + " XYZ " + xPosition + ", " + yPosition + ", " + zPosition);
+
+
+            //calculate the current height
+            // Calculate the height of the object based on note.Duration
+            float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat; // Convert microseconds to milliseconds
+            //height is too much so consider reducing
+            Debug.Log(note.ToString() + " height is: " + noteHeight);
+
+
+
+            //=== after some routine commands, we now set their position based on these variables
+
+            noteObject.transform.localScale = new Vector3(1, noteHeight, 1); // Set the size          
+            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition, zPosition); // Set the position
+
+
 
             //set color to yellow or pink based on type
             noteObject.GetComponent<Image>().color = improvpink; //pink for now SOLID it later
@@ -242,18 +211,45 @@ public class RollMgr : MonoBehaviour
                 noteObject.GetComponent<Image>().color = darkerColor;
             }//endisBlackprefabcheck
 
+            //now do some computation for the falling
+            // Move the noteObject to the destroy point (final Y position) based on note.Time
+            //float destroyY = yPosition - (float)noteTime.TotalMicroseconds / 1000.0f * pixelsPerBeat;
+            float destroyY = green_line.GetComponent<RectTransform>().position.y;
+            StartCoroutine(MoveNoteObject(noteObject.transform, new Vector3(xPosition, destroyY, zPosition), (float)noteDuration.TotalMicroseconds / 1000.0f));
 
 
+            //done all routine spawn methods
+            numOfSpawns++; 
 
-            // Create a new instance of the prefab and set its position and size
-            // GameObject noteObject = Instantiate(notePrefab);
-            //noteObject.transform.position = new Vector3(keypos.x, yPosition, 0.0f);
-            //noteObject.transform.localScale = new Vector3(width, beatHeight, 1.0f);
         }//end foreach
 
         Debug.Log("Reached end of spawning");
+        batchSpawned = true; // signal for ImprovManager to rollKeys
+        Debug.Log("Total prefabs spawned: " + numOfSpawns);
+
+        //get noteObject count
     }//end generate piano roll
 
     //== press related scripts
+
+    // Coroutine to smoothly move note objects
+    private IEnumerator MoveNoteObject(Transform noteTransform, Vector3 targetPosition, float duration)
+    {
+        float elapsedTime = 0;
+        Vector3 initialPosition = noteTransform.position;
+
+
+
+        while (elapsedTime < duration)
+        {
+            noteTransform.position = Vector3.Lerp(initialPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        noteTransform.position = targetPosition;
+    }
+
+
 
 }//end RollMgr
