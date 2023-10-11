@@ -25,7 +25,7 @@ repository for Piano 2.0 MVP v1
 - [x] sync timing of highlighting
 - [x] process sibelius add tempo
 - [ ] syncing of midi and aiff
-- [ ] time x pixelmap
+- [x] time x pixelmap
 - [x] multiple loading of several audio assets
       
 
