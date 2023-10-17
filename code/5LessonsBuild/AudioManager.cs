@@ -14,14 +14,21 @@ public class AudioManager : MonoBehaviour
     void Start()
     {
 
-        MotifToPlay.clip = clips[0];
+       // MotifToPlay.clip = clips[0]; //this automatically plays the song
          
     }//end start
 
+    /**
+     * index 0 - L0100.aiff
+     * index 1 - L0104.aiff
+     * index 2 - some rhythm
+     * 
+     * 
+     * 
+     * **/
     public void ChangeAudioSelection(int selectedIndex)
     {
-        //=== 0 is swing
-        //=== 1 for lick 01 and so on.. 
+        //== 0 is default
         if (selectedIndex >= 0 && selectedIndex < clips.Length)
         {
             MotifToPlay.clip = clips[selectedIndex];

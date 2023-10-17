@@ -128,17 +128,17 @@ public class SongMgr : MonoBehaviour
         //print all notes
         foreach (var elements in notes)
         {
-            //Debug.Log("notename" + elements.ToString());
+           // //Debug.Log("notename" + elements.ToString());
             int newNoteNumber = elements.NoteNumber - 36; //this doesnt realy change the value
-           // int newNoteNumber = elements.NoteNumber;
+           //// int newNoteNumber = elements.NoteNumber;
 
 
-            ////we need to store these info into a tempo map as TimeSpan 
-            //Debug.Log("notenumber is " + newNoteNumber); //with the offset for the keys
-            //Debug.Log("note timestamp is " + elements.TimeAs<MetricTimeSpan>(tempoMap));
-            //Debug.Log("note length is " + elements.LengthAs<MetricTimeSpan>(tempoMap));
+           // ////we need to store these info into a tempo map as TimeSpan 
+           // //Debug.Log("notenumber is " + newNoteNumber); //with the offset for the keys
+           // //Debug.Log("note timestamp is " + elements.TimeAs<MetricTimeSpan>(tempoMap));
+           // //Debug.Log("note length is " + elements.LengthAs<MetricTimeSpan>(tempoMap));
 
-            //then generate a pixel to time map
+           // //then generate a pixel to time map
         }
 
         //print the contents of tempoMap
@@ -152,10 +152,10 @@ public class SongMgr : MonoBehaviour
         //    Debug.Log($"Time: {time}, Tempo: {tempoMicrosecondsPerBeat} us per beat");
         //}
 
-        var array = new Melanchall.DryWetMidi.Interaction.Note[notes.Count];
+       var array = new Melanchall.DryWetMidi.Interaction.Note[notes.Count];
        // Debug.Log("note count " + notes.Count);
         //var numbers = 
-        notes.CopyTo(array, 0);
+      notes.CopyTo(array, 0);
 
         //foreach(var elements in notes)
         //{
