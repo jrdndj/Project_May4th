@@ -215,7 +215,7 @@ public class ImprovMgr : MonoBehaviour
             }// by default it is ques-ans mode
 
             //=== if there is none then no applicable lesson selected
-            display_text.text = "No applicable lesson selected";
+            display_text.text = " ";
 
         }//end main if for mode 01
         else
