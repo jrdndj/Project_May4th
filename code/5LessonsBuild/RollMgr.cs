@@ -19,10 +19,14 @@ public class RollMgr : MonoBehaviour
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
     [SerializeField] GameObject songManager;
-   // [SerializeField] GameObject AudioManager;
+    // [SerializeField] GameObject AudioManager;
+
+    GameObject noteObject;
 
     public GameObject green_line; //formerly 0 -85 0
     public GameObject spawnpoint; //for the spawnpoint
+                                  // Move the noteObject to the destroy point (final Y position) based on note.Time
+    float destroyY;
 
     public static RollMgr Instance;
 
@@ -35,21 +39,16 @@ public class RollMgr : MonoBehaviour
     bool batchSpawned = false;
 
     int numOfSpawns = 0;
-    int spawnCount = 0; 
+    int spawnCount = 0;
 
-    public float fallSpeed = 100.0f; // Adjust this to control the speed of falling
+    public float fallSpeed = 100.0f; // Adjust this to control the speed of falling - was 100
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
 
     //==== midi related variables
     public static MidiFile midiFile; // MIDI file asset
-    //public GameObject notePrefab; // Prefab for representing MIDI notes
-    //public float pixelsPerBeat = 40.0f; // Width of one beat in pixels
-    //public float beatHeight = 25.0f; // Height of one beat in pixels
-
-    public float pixelsPerBeat = 20.0f; // height of one beat in pixels
-    //public float beatHeight = 0.1f; // Height of one beat in pixels
+    public float pixelsPerBeat = 20.0f; // height of one beat in pixels - shouldnt this be 1? 
     public string Filename; // this should be manipulated by ImprovManager
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
@@ -70,6 +69,9 @@ public class RollMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        destroyY = green_line.GetComponent<RectTransform>().position.y;
+
 
 
     }
@@ -109,6 +111,7 @@ public class RollMgr : MonoBehaviour
     // this generates piano roll from the file read
     public void GeneratePianoRoll(Color32 spawncolor, int spawntype) //1 for melody, 2 for licks 
     {
+        //numOfSpawns = 0; //fresh start
         //piano related configs
         //set prefabs
         GameObject whitePrefab, blackPrefab;
@@ -117,7 +120,7 @@ public class RollMgr : MonoBehaviour
 
 
 
-               // midi related configs
+        // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
         Debug.Log("Successfully read " + Filename);
@@ -125,7 +128,7 @@ public class RollMgr : MonoBehaviour
         //routine getting of files
 
         var notes = midi.GetNotes();
-        var tempoMap = midi.GetTempoMap(); 
+        var tempoMap = midi.GetTempoMap();
 
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
@@ -142,10 +145,10 @@ public class RollMgr : MonoBehaviour
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
                                                    // Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
-        
-            GameObject noteObject;
 
-            spawnCount++; 
+            //GameObject noteObject;
+
+            spawnCount++;
 
             //===== decide on prefab and color here 
 
@@ -170,20 +173,32 @@ public class RollMgr : MonoBehaviour
 
             }//end whitePrefabs
 
+            /**
+             * The algorithm is
+             * 01 get x position for the key
+             * 02 set the y position based on its time when it should appear
+             * 03 set the height based on its duration
+             * 04 change the scale based on its height
+             * 05 adjust to consider the half height of the objects 
+             * **/
+
             //==routine commands for proper game object management
 
             //set parent after instantiate for proper positioning
             noteObject.transform.SetParent(rollManager.transform, true);
 
             //the assignment of positions should only take place after the setting of parent
+
             // Calculate X position in pixels based on note.Time
             float xPosition = pianoKeys[noteNumber].transform.position.x;
-            // Debug.Log(note.ToString() + " xPosition is: " + xPosition);
 
             //calculate their position
-            float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat;
-            // Debug.Log(note.ToString() + " yPosition is: " + yPosition);
+            //  float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat; //latest working
+            //should be somewhere between 1000000 and 2400000
+            float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //testing
+            //but we also need to raise the keys to half of its height so see below 
 
+            //=== i still need this but only for harmony or type 1
             //store here the first y position
             if (spawnCount == 1)
             {
@@ -192,32 +207,30 @@ public class RollMgr : MonoBehaviour
 
             //this firstyposition becomes an offset for melody type spawns
 
-            float zPosition = pianoKeys[noteNumber].transform.position.z;
+            float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
 
-           // Debug.Log(note.ToString() + " XYZ " + xPosition + ", " + yPosition + ", " + zPosition);
-
-
-            //calculate the current height
-            // Calculate the height of the object based on note.Duration
-            float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat; // Convert microseconds to milliseconds
-                                                                                                    //height is too much so consider reducing
-                                                                                                    //   Debug.Log(note.ToString() + " height is: " + noteHeight);
+            // Calculate the height of the object based on note.Duration 
+            float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat;    //height is too much so consider reducing
+            //float noteHeight = (float)noteDuration.TotalMicroseconds / 150000.0f;  //test mode
 
             //get the height of that object
-            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height;
+            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2;
 
-
-            //=== after some routine commands, we now set their position based on these variables
-
-            noteObject.transform.localScale = new Vector3(1, noteHeight, 1); // Set the size
-                                                                   //consider the half of the shape when setting the position
+            //change the size (localscale) of the object based on the computed height
+            noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
+            //consider the half of the shape when setting the position
             //get the half of the object - some computation here
-          //  noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight*2), zPosition); // Set the position
-
+            //  noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight*2), zPosition); // Set the position
 
             //get the half of the object - some computation here
-            noteObject.transform.position = new Vector3(xPosition, yPosition + (objectHeight * 2), zPosition); // Set the position
+            // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight * 2), zPosition); // latest working
+            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight, zPosition); // changes to test
 
+            //== if type 1, adjust it one more time
+            if (spawntype==1)
+            {
+                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + firstYpos +objectHeight, zPosition); // changes to test
+            }//end adjust 
 
             //set color to yellow or pink based on type
             noteObject.GetComponent<Image>().color = spawncolor; //pink for now SOLID it later
@@ -232,20 +245,17 @@ public class RollMgr : MonoBehaviour
             }//endisBlackprefabcheck
 
             //now do some computation for the falling
-            // Move the noteObject to the destroy point (final Y position) based on note.Time
-            float destroyY = green_line.GetComponent<RectTransform>().position.y;
 
-           
 
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
             // Start the coroutine to make the note fall at a constant speed
-          //  StartCoroutine(FallAtEndOfDuration(noteObject.transform, spawnpoint.transform.position.y + yPosition, destroyY-(objectHeight*2)));
-                                                //it should end on the half
+           StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, spawnpoint.transform.position.y + yPosition, destroyY - (objectHeight)));
+            //it should end on the half  
 
 
             //done all routine spawn methods
-            numOfSpawns++; 
+            numOfSpawns++;
 
         }//end foreach
 
@@ -257,12 +267,14 @@ public class RollMgr : MonoBehaviour
     }//end generate piano roll
 
     //== press related scripts
-       
 
-    private IEnumerator FallAtEndOfDuration(Transform noteTransform, float initialY, float destroyY)
+
+    private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     {
         float elapsedTime = 0;
-        float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;
+        float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
+        //float duration = fallSpeed; //testing 
+        Debug.Log("speed is now " + duration);
 
         while (elapsedTime < duration)
         {
@@ -273,6 +285,7 @@ public class RollMgr : MonoBehaviour
         }
 
         noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
+
     }//end fallatendofduration
 
     /**
@@ -286,9 +299,9 @@ public class RollMgr : MonoBehaviour
     {
 
         //decentralising to AudioManager game object 
-      //  AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(1); //change this one 
-                                                                           //Instance.MotifToPlay.Play();
+        //  AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(1); //change this one 
+        //Instance.MotifToPlay.Play();
     }//end PlayDelayed Audio();
 
-
+    //highlight related function
 }//end RollMgr
