@@ -41,7 +41,7 @@ public class RollMgr : MonoBehaviour
     int numOfSpawns = 0;
     int spawnCount = 0;
 
-    public float fallSpeed = 100.0f; // Adjust this to control the speed of falling - was 100
+    public float fallSpeed = 200.0f; // Adjust this to control the speed of falling - was 100
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -229,7 +229,7 @@ public class RollMgr : MonoBehaviour
             //== if type 1, adjust it one more time
             if (spawntype==1)
             {
-                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + firstYpos +objectHeight, zPosition); // changes to test
+                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight, zPosition); // changes to test
             }//end adjust 
 
             //set color to yellow or pink based on type
@@ -250,7 +250,7 @@ public class RollMgr : MonoBehaviour
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
             // Start the coroutine to make the note fall at a constant speed
-           StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, spawnpoint.transform.position.y + yPosition, destroyY - (objectHeight)));
+           StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
             //it should end on the half  
 
 
@@ -272,15 +272,15 @@ public class RollMgr : MonoBehaviour
     private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     {
         float elapsedTime = 0;
-        float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
-        //float duration = fallSpeed; //testing 
+         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
+        //float duration = 200.00f; //testing 
         Debug.Log("speed is now " + duration);
 
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.deltaTime; //what is the value of deltatime ? 
             yield return null;
         }
 
