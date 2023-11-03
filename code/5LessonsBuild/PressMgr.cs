@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public class PressMgr : MonoBehaviour
@@ -27,36 +26,31 @@ public class PressMgr : MonoBehaviour
 
             midiDevice.onWillNoteOn += (note, velocity) =>
             {
-                //Debug.Log(string.Format(
-                //    "Pressed #{0} {1} vel:{2:0.00}  ",
-                //    note.noteNumber,
-                //    note.shortDisplayName,
-                //    velocity
-                //) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
+                //record everything
+                Debug.Log(string.Format(
+                    "Pressed #{0} {1} vel:{2:0.00}  ",
+                    note.noteNumber,
+                    note.shortDisplayName,
+                    velocity
+                ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
                 //noteon is processed by RollManager
-                Instance.onNoteOn(note.noteNumber - keyOffset, velocity);
-
-
-                //ImprovManager.GetComponent<ImprovMgr>().onNoteOn(note.noteNumber - keyOffset, velocity);
-
+                RollMgr.GetComponent<RollMgr>().onNoteOn(note.noteNumber - keyOffset, velocity);                      
 
             }; //important onWillNoteOn function 
 
             midiDevice.onWillNoteOff += (note) =>
             {
-                //Debug.Log(string.Format(
-                //    "Released #{0} {1} ",
-                //    note.noteNumber,
-                //    note.shortDisplayName
-                //) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
+                //record everything
+                Debug.Log(string.Format(
+                    "Released #{0} {1} ",
+                    note.noteNumber,
+                    note.shortDisplayName
+                ) + System.DateTime.UtcNow.ToString(@"mm\:ss\:fff"));
 
                 //noteoff is processed by rollmanager
-                Instance.onNoteOff(note.noteNumber - keyOffset);
+                RollMgr.GetComponent<RollMgr>().onNoteOff(note.noteNumber - keyOffset);
 
-                //ImprovManager.GetComponent<ImprovMgr>().onNoteOff(note.noteNumber - keyOffset);
-
-                //decommissioning BarManager for now
-                //BarManager.GetComponent<BarScript>().onNoteOff(note.noteNumber - keyOffset);
+                
             };
         };
 
@@ -68,27 +62,6 @@ public class PressMgr : MonoBehaviour
 
     }//end update
 
-   // == some press related functions
-    public void onNoteOn(int noteNumber, float velocity)
-    {
 
-        //render object first
-       // Image tempImageRenderer = RollMgr.GetComponent<RollMgr>().pianoKeys[noteNumber].GetComponent<Image>();
-
-        //default behaviour is show white
-
-        //RollMgr.GetComponent<RollMgr>().pianoKeys[noteNumber].GetComponent<Image>().color = Color.red;
-
-
-
-    }//endonNoteOn;
-
-    //when user releases a pressed key as per MIDIScript 
-    public void onNoteOff(int noteNumber)
-    {
-
-       
-
-    }//end OnNoteOff
 
 }//endd PressMgr

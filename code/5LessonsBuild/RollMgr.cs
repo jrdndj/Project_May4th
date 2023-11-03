@@ -41,7 +41,7 @@ public class RollMgr : MonoBehaviour
     int numOfSpawns = 0;
     int spawnCount = 0;
 
-    public float fallSpeed = 200.0f; // Adjust this to control the speed of falling - was 100
+    public float fallSpeed = 100.0f; // Adjust this to control the speed of falling - was 100
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -268,19 +268,43 @@ public class RollMgr : MonoBehaviour
 
     //== press related scripts
 
+    // == some press related functions
+    public void onNoteOn(int noteNumber, float velocity)
+    {
+        //    default behaviour is show white
+        pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+
+     
+
+    }//endonNoteOn;
+
+    //when user releases a pressed key as per MIDIScript 
+    public void onNoteOff(int noteNumber)
+    {
+        //    default behaviour is show black upon release
+        pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
+
+   
+
+
+    }//end OnNoteOff
+
+    //=== logic related scripts
+
 
     private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     {
         float elapsedTime = 0;
          float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
         //float duration = 200.00f; //testing 
-        Debug.Log("speed is now " + duration);
+        //Debug.Log("speed is now " + duration);
 
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime; //what is the value of deltatime ? 
+            elapsedTime += Time.deltaTime; //if fallspeed is high what happens
+           // Debug.Log("elapsed time is " + elapsedTime);
             yield return null;
         }
 
