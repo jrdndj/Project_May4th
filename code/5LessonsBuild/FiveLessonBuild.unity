@@ -1112,12 +1112,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: 
+      - m_Target: {fileID: 1432587893}
+        m_MethodName: LoadButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3894,8 +3894,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 273026818}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 33.415104, y: 171.4138, z: -484.30676}
-  m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1432587888}
   m_RootOrder: 84
@@ -5111,11 +5111,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4507736e42c3243079b0b60bda694b0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RollManager: {fileID: 0}
+  RollManager: {fileID: 1947139807}
   modeValue: 0
   lessonValue: 0
   guidanceValue: 0
+  SelectedIndex: 0
   display_text: {fileID: 780136341}
+  theColor:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
+    m_ColorMultiplier: 0
+    m_FadeDuration: 0
+  theButton: {fileID: 0}
 --- !u!224 &334654184
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14799,10 +14809,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1007282609}
-  - component: {fileID: 1007282610}
   - component: {fileID: 1007282611}
+  - component: {fileID: 1007282610}
   m_Layer: 5
-  m_Name: ContentManager
+  m_Name: SongManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14834,23 +14844,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1007282608}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fee064d0a792043efad8f37e38b7b5de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 273026819}
   songDelayInSeconds: 0
-  marginOfError: 0.1
+  marginOfError: 0
   inputDelayInMilliseconds: 0
-  fileLocation: L0104.mid
-  noteTime: 0
-  noteSpawnY: 0
-  noteTapY: 0
-  spawnpoint: 800
-  destroypoint: -90
-  spawn_top: {fileID: 1150678921}
-  green_line: {fileID: 816541747}
+  fileLocation: 
 --- !u!114 &1007282611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14864,11 +14867,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rollManager: {fileID: 1947139807}
+  songManager: {fileID: 1007282608}
+  green_line: {fileID: 816541747}
+  spawnpoint: {fileID: 1150678921}
   pianoKeys: []
-  notePrefab: {fileID: 0}
+  fallSpeed: 100
   pixelsPerBeat: 40
-  beatHeight: 25
   Filename: 
+  audioSource: {fileID: 273026819}
+  theColor:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
+    m_ColorMultiplier: 0
+    m_FadeDuration: 0
+  theButton: {fileID: 0}
 --- !u!1 &1015305823
 GameObject:
   m_ObjectHideFlags: 0
@@ -16975,7 +16990,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 800}
+  m_AnchoredPosition: {x: 0, y: 340}
   m_SizeDelta: {x: 2000, y: 8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1155404812
@@ -17552,31 +17567,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clips:
+  - {fileID: 8300000, guid: 75da5d12ec400474e98610b85bc2c75c, type: 3}
   - {fileID: 8300000, guid: a71c8f5f690bd4324bc2520032c0e761, type: 3}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 8300000, guid: a71c8f5f690bd4324bc2520032c0e761, type: 3}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
@@ -17602,8 +17597,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1180997806}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 33.415104, y: 171.4138, z: -484.30676}
-  m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1432587888}
   m_RootOrder: 83
@@ -19668,8 +19663,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1325314010}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.064907, y: 104.68925, z: -484.3068}
-  m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1432587888}
   m_RootOrder: 86
@@ -21049,6 +21044,7 @@ GameObject:
   - component: {fileID: 1432587891}
   - component: {fileID: 1432587890}
   - component: {fileID: 1432587889}
+  - component: {fileID: 1432587893}
   m_Layer: 5
   m_Name: piano
   m_TagString: Untagged
@@ -21325,6 +21321,20 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1432587893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1432587887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 194fedb0dcf964e1199f337ed2c92f1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RollManager: {fileID: 1947139807}
+  ImprovManager: {fileID: 334654182}
 --- !u!1 &1433558473
 GameObject:
   m_ObjectHideFlags: 0
@@ -21634,8 +21644,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1451742236}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.064907, y: 104.68925, z: -484.3068}
-  m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1432587888}
   m_RootOrder: 87
@@ -28969,6 +28979,7 @@ GameObject:
   - component: {fileID: 1947139810}
   - component: {fileID: 1947139809}
   - component: {fileID: 1947139808}
+  - component: {fileID: 1947139811}
   m_Layer: 0
   m_Name: RollManager
   m_TagString: Untagged
@@ -28997,6 +29008,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rollManager: {fileID: 1947139807}
+  songManager: {fileID: 1007282608}
+  green_line: {fileID: 1964027204}
+  spawnpoint: {fileID: 1150678921}
   pianoKeys:
   - {fileID: 1831243895}
   - {fileID: 1746304258}
@@ -29059,10 +29073,19 @@ MonoBehaviour:
   - {fileID: 783875861}
   - {fileID: 1263865325}
   - {fileID: 874610878}
-  notePrefab: {fileID: 0}
-  pixelsPerBeat: 40
-  beatHeight: 25
+  fallSpeed: 20
+  pixelsPerBeat: 20
   Filename: 
+  audioSource: {fileID: 273026819}
+  theColor:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
+    m_ColorMultiplier: 0
+    m_FadeDuration: 0
+  theButton: {fileID: 0}
 --- !u!4 &1947139810
 Transform:
   m_ObjectHideFlags: 0
@@ -29077,6 +29100,20 @@ Transform:
   m_Father: {fileID: 1432587888}
   m_RootOrder: 82
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1947139811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947139807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be51b284e89bb479f9167aa2b35f2633, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RollMgr: {fileID: 1947139807}
+  ImprovMgr: {fileID: 334654182}
 --- !u!1 &1950672704
 GameObject:
   m_ObjectHideFlags: 0
@@ -29376,7 +29413,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -90}
+  m_AnchoredPosition: {x: 0, y: -250}
   m_SizeDelta: {x: 2000, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1979080114
@@ -31011,8 +31048,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2105593523}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.064907, y: 104.68925, z: -484.3068}
-  m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1432587888}
   m_RootOrder: 88
