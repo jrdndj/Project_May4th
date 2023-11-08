@@ -41,14 +41,14 @@ public class RollMgr : MonoBehaviour
     int numOfSpawns = 0;
     int spawnCount = 0;
 
-    public float fallSpeed = 100.0f; // Adjust this to control the speed of falling - was 100
+    public float fallSpeed = 0.0f; // Adjust this to control the speed of falling - was 100
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
 
     //==== midi related variables
     public static MidiFile midiFile; // MIDI file asset
-    public float pixelsPerBeat = 20.0f; // height of one beat in pixels - shouldnt this be 1? 
+    public float pixelsPerBeat = 0.0f; // height of one beat in pixels - shouldnt this be 1? 
     public string Filename; // this should be manipulated by ImprovManager
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
@@ -193,9 +193,9 @@ public class RollMgr : MonoBehaviour
             float xPosition = pianoKeys[noteNumber].transform.position.x;
 
             //calculate their position
-            //  float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat; //latest working
+              float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat; //for testing
             //should be somewhere between 1000000 and 2400000
-            float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //testing
+           // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
             //but we also need to raise the keys to half of its height so see below 
 
             //=== i still need this but only for harmony or type 1
@@ -210,11 +210,12 @@ public class RollMgr : MonoBehaviour
             float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
 
             // Calculate the height of the object based on note.Duration 
-            float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat;    //height is too much so consider reducing
-            //float noteHeight = (float)noteDuration.TotalMicroseconds / 150000.0f;  //test mode
+           // float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat;    //last working
+            float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
 
             //get the height of that object
-            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2;
+            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
+          //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
 
             //change the size (localscale) of the object based on the computed height
             noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
@@ -250,11 +251,13 @@ public class RollMgr : MonoBehaviour
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
             // Start the coroutine to make the note fall at a constant speed
-           StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-            //it should end on the half  
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
+            //it should end on the half
+          //  StartCoroutine(FallByTP(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
 
 
-            //done all routine spawn methods
+
+            //done all routine spawn methodss
             numOfSpawns++;
 
         }//end foreach
@@ -290,8 +293,23 @@ public class RollMgr : MonoBehaviour
     }//end OnNoteOff
 
     //=== logic related scripts
+    //transform position falling
+
+    private IEnumerator FallByTP(int noteNumber, Transform noteTransform, float initialY, float destroyY)
+    {
+        Vector3 pos = noteTransform.position;
+       
+        while (noteTransform.position.y > destroyY)
+        {
+            pos.y -= 0.20f;
+            //noteTransform.position = new Vector3(noteTransform.position.x, noteTransform.position.y -=)
+            noteTransform.position = pos;
+            yield return null;
+        }
+    }//end fallbytp
 
 
+    //lerp related falling
     private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     {
         float elapsedTime = 0;
@@ -301,10 +319,11 @@ public class RollMgr : MonoBehaviour
 
         while (elapsedTime < duration)
         {
-            float t = elapsedTime / duration;
+            float t = elapsedTime / duration; // ? 
+          //  float t = duration / elapsedTime;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime; //if fallspeed is high what happens
-           // Debug.Log("elapsed time is " + elapsedTime);
+            elapsedTime += Time.deltaTime; //if fallspeed is high what happens                            // t
+           // Debug.Log("t is " + t);
             yield return null;
         }
 
