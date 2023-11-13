@@ -14861,7 +14861,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1007282608}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: efa689cf062404be582c85b704163440, type: 3}
   m_Name: 
@@ -14874,6 +14874,7 @@ MonoBehaviour:
   fallSpeed: 100
   pixelsPerBeat: 40
   Filename: 
+  IsMotifPlaying: 0
   audioSource: {fileID: 273026819}
   theColor:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -29019,7 +29020,7 @@ MonoBehaviour:
   - {fileID: 1606202681}
   - {fileID: 2080362646}
   - {fileID: 1550120156}
-  - {fileID: 1296101448}
+  - {fileID: 1503367192}
   - {fileID: 1249903852}
   - {fileID: 1624525135}
   - {fileID: 920746858}
@@ -29076,6 +29077,7 @@ MonoBehaviour:
   fallSpeed: 20
   pixelsPerBeat: 20
   Filename: 
+  IsMotifPlaying: 0
   audioSource: {fileID: 273026819}
   theColor:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
