@@ -7,13 +7,53 @@ using UnityEngine.UI;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
+//using RtMidi
+using RtMidi.LowLevel; 
+
 //for songmgr
 using System.IO;
 using UnityEngine.Networking;
 using System;
 
-public class RollMgr : MonoBehaviour
+//we dont need new event directives then xD 
+
+sealed class RollMgr : MonoBehaviour
 {
+    #region Private members;
+    MidiProbe _probe;
+
+    List<MidiOutPort> _ports = new List<MidiOutPort>();
+
+    // Does the port seem real or not?
+    // This is mainly used on Linux (ALSA) to filter automatically generated
+    // virtual ports.
+    bool IsRealPort(string name)
+    {
+        return !name.Contains("Through") && !name.Contains("RtMidi");
+    }
+
+    // Scan and open all the available output ports.
+    void ScanPorts()
+    {
+        for (var i = 0; i < _probe.PortCount; i++)
+        {
+            var name = _probe.GetPortName(i);
+            Debug.Log("MIDI-out port found: " + name);
+            _ports.Add(IsRealPort(name) ? new MidiOutPort(i) : null);
+        }
+    }
+
+    // Close and release all the opened ports.
+    void DisposePorts()
+    {
+        foreach (var p in _ports) p?.Dispose();
+        _ports.Clear();
+    }
+
+    #endregion
+
+    #region MonoBehaviour implementation
+
     //==== environment related variables
 
     //an important element to manage all children of spawns
@@ -51,6 +91,10 @@ public class RollMgr : MonoBehaviour
     public float pixelsPerBeat = 0.0f; // height of one beat in pixels - shouldnt this be 1? 
     public string Filename; // this should be manipulated by ImprovManager
 
+    public bool IsMotifPlaying = false;
+
+  
+
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
 
     public AudioSource audioSource;
@@ -66,13 +110,62 @@ public class RollMgr : MonoBehaviour
     Color32 restblack = Color.black; //for the rests 
 
 
-    // Start is called before the first frame update
-    void Start()
+    //this will now be the one receiving the MIDI events    //TODO Solidify 
+    System.Collections.IEnumerator MIDIMessageReceiver() //this should be programmed to receive MIDI events
+    {   
+       //algorithm
+       // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
+       // by isMotifPlaying variable
+       // 
+
+        //routine methods: scan for midi ports. never modify this code 
+        _probe = new MidiProbe(MidiProbe.Mode.Out);
+
+        yield return new WaitForSeconds(0.1f);
+
+
+        
+    }//end MIDIMessageReceiver
+
+    // this is an interface
+    System.Collections.IEnumerator MIDIMessagInterface() //this should be programmed to receive MIDI events
     {
 
+        //===== these are the template methods for this interface if things get lost 
+        // Send an all-sound-off message.
+        foreach (var port in _ports) port?.SendAllOff(0);
+
+        for (var note = 36; note <= 96; note++) // 
+        {
+            //var note = 40 + (i % 30);
+            //var note = (i % 30) - 36 ;
+            //var note = i;
+
+            //offset of -36 for the layout of the piano in unity
+            Debug.Log("MIDI Out: Note On " + note);
+            pianoKeys[note - 36].GetComponent<Image>().color = Color.white;
+            foreach (var port in _ports) port?.SendNoteOn(0, note, 100);
+
+            yield return new WaitForSeconds(0.1f);
+
+            //note release 
+            Debug.Log("MIDI Out: Note Off " + note);
+            pianoKeys[note - 36].GetComponent<Image>().color = Color.black;
+            foreach (var port in _ports) port?.SendNoteOff(0, note);
+
+            yield return new WaitForSeconds(0.1f);
+
+            //=== end template method 
+        }//end for loop
+
+        yield return new WaitForSeconds(0.1f);
+    }//end interface
+
+        //bringing back the old classic Start method for the sake of it 
+        void Start()
+    {
+        //and this is the only thing we really need
         destroyY = green_line.GetComponent<RectTransform>().position.y;
-
-
 
     }
 
@@ -80,7 +173,23 @@ public class RollMgr : MonoBehaviour
     void Update()
     {
 
+        // Rescan when the number of ports changed.
+        if (_ports.Count != _probe.PortCount)
+        {
+            DisposePorts();
+            ScanPorts();
+        }
+
     }
+
+    //mandatory method for port detection 
+    void OnDestroy()
+    {
+        _probe?.Dispose();
+        DisposePorts();
+    }
+
+    #endregion
 
     //===== function definitions here
 
@@ -106,6 +215,12 @@ public class RollMgr : MonoBehaviour
         return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
     }//end get audio sourcetime
 
+    //method handler to contain midi information to pass for MIDI MessageReceiver
+    private void MIDIEventHandler(IEnumerable<MidiEvent> events)
+    {
+
+        //call midi message receiver here or send it 
+    }//end of MIDEVENT Handler
 
 
     // this generates piano roll from the file read
@@ -124,10 +239,11 @@ public class RollMgr : MonoBehaviour
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
         Debug.Log("Successfully read " + Filename);
-
+            
         //routine getting of files
 
-        var notes = midi.GetNotes();
+        var notes = midi.GetNotes(); // note that this info must be sent to MIDIMessageReceiver
+      //  MIDIEventHandler(midi.ExportEvents(notes));
         var tempoMap = midi.GetTempoMap();
 
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
@@ -277,8 +393,6 @@ public class RollMgr : MonoBehaviour
         //    default behaviour is show white
         pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
 
-     
-
     }//endonNoteOn;
 
     //when user releases a pressed key as per MIDIScript 
@@ -286,9 +400,7 @@ public class RollMgr : MonoBehaviour
     {
         //    default behaviour is show black upon release
         pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-
-   
-
+  
 
     }//end OnNoteOff
 
@@ -314,17 +426,36 @@ public class RollMgr : MonoBehaviour
     {
         float elapsedTime = 0;
          float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
-        //float duration = 200.00f; //testing 
-        //Debug.Log("speed is now " + duration);
+                                                                     //float duration = 200.00f; //testing 
+                                                                     //Debug.Log("speed is now " + duration);
+
+
+        //get the height of that object
+        float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration; // ? 
           //  float t = duration / elapsedTime;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime; //if fallspeed is high what happens                            // t
-           // Debug.Log("t is " + t);
-            yield return null;
+            elapsedTime += Time.deltaTime;                          // t
+
+            //something here that checks time when it falls
+            if ((noteTransform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
+            {
+                Debug.Log("touched");
+                if (!IsMotifPlaying)
+                {
+                 //   Instance.audioSource.Play(); //if this doesnt work then trigger midi out
+
+                    //check to true
+                    IsMotifPlaying = true; 
+                }
+
+            }
+                //            {
+                // Debug.Log("t is " + t);
+                yield return null;
         }
 
         noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
