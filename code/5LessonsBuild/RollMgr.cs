@@ -8,7 +8,7 @@ using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 
 //using RtMidi
-using RtMidi.LowLevel; 
+using RtMidi.LowLevel;
 
 //for songmgr
 using System.IO;
@@ -93,7 +93,8 @@ sealed class RollMgr : MonoBehaviour
 
     public bool IsMotifPlaying = false;
 
-  
+
+    List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
 
@@ -111,21 +112,53 @@ sealed class RollMgr : MonoBehaviour
 
 
     //this will now be the one receiving the MIDI events    //TODO Solidify 
-    System.Collections.IEnumerator MIDIMessageReceiver() //this should be programmed to receive MIDI events
-    {   
-       //algorithm
-       // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
-       // by isMotifPlaying variable
-       // 
+    System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
+    {
+        int swingcount = 0;
+        int velocity = 100; 
+        //algorithm
+        // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
+        // by isMotifPlaying variable
+        // step 02: whne triggered, midimessenger sends to midiout to play sounds.
+        // we need to SOLIDIFY this function so we can receive all types of message
 
         //routine methods: scan for midi ports. never modify this code 
-        _probe = new MidiProbe(MidiProbe.Mode.Out);
+        // _probe = new MidiProbe(MidiProbe.Mode.Out);
 
-        yield return new WaitForSeconds(0.1f);
+        foreach (var noteEvent in note)
+        {
+            //NOTEON
+           // Debug.Log("played key" + noteEvent.NoteNumber);
+            pianoKeys[noteEvent.NoteNumber-36].GetComponent<Image>().color = improvpink;
+            //change velocity
+            swingcount++;
+            if (swingcount % 2 == 0) //change force of press every other press to simulate swing press
+            {
+                velocity = 60;
+            }
+            else velocity = 100;
+            if (swingcount == 5) swingcount = 0;
 
+            foreach (var port in _ports)
+            {
+                port?.SendNoteOn(0, noteEvent.NoteNumber, velocity);
+            }
 
-        
-    }//end MIDIMessageReceiver
+            yield return new WaitForSeconds(noteEvent.Duration);
+
+            //NOTEOFF
+           // Debug.Log("released key" + noteEvent.NoteNumber);
+            pianoKeys[noteEvent.NoteNumber-36].GetComponent<Image>().color = Color.black;
+            foreach (var port in _ports)
+            {
+                port?.SendNoteOff(0, noteEvent.NoteNumber);
+            }
+            yield return new WaitForSeconds(noteEvent.Duration);
+
+        }//end for all
+
+    }//end MIDIMessenger
+  
 
     // this is an interface
     System.Collections.IEnumerator MIDIMessagInterface() //this should be programmed to receive MIDI events
@@ -143,14 +176,14 @@ sealed class RollMgr : MonoBehaviour
 
             //offset of -36 for the layout of the piano in unity
             Debug.Log("MIDI Out: Note On " + note);
-            pianoKeys[note - 36].GetComponent<Image>().color = Color.white;
+            pianoKeys[note - 36].GetComponent<Image>().color = Color.white; //offset is 21 not 36
             foreach (var port in _ports) port?.SendNoteOn(0, note, 100);
 
             yield return new WaitForSeconds(0.1f);
 
             //note release 
             Debug.Log("MIDI Out: Note Off " + note);
-            pianoKeys[note - 36].GetComponent<Image>().color = Color.black;
+            pianoKeys[note - 36].GetComponent<Image>().color = Color.black; //offset is 21 not 36
             foreach (var port in _ports) port?.SendNoteOff(0, note);
 
             yield return new WaitForSeconds(0.1f);
@@ -161,11 +194,15 @@ sealed class RollMgr : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
     }//end interface
 
-        //bringing back the old classic Start method for the sake of it 
-        void Start()
+    //bringing back the old classic Start method for the sake of it 
+    void Start()
     {
+
         //and this is the only thing we really need
         destroyY = green_line.GetComponent<RectTransform>().position.y;
+
+        //routine methods: scan for midi ports. never modify this code 
+        _probe = new MidiProbe(MidiProbe.Mode.Out);
 
     }
 
@@ -215,12 +252,51 @@ sealed class RollMgr : MonoBehaviour
         return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
     }//end get audio sourcetime
 
-    //method handler to contain midi information to pass for MIDI MessageReceiver
-    private void MIDIEventHandler(IEnumerable<MidiEvent> events)
+    //receive info from MIDI notes 
+    private void MIDIEventHandler(List<(long Time, long Duration, int NoteNumber)> notes)
     {
 
-        //call midi message receiver here or send it 
     }//end of MIDEVENT Handler
+
+    //this should generate the MIDIout events
+    public void GenerateMIDIEvents(String improvfilename)
+    {
+
+        MidiFile midi = midiFile;
+       Debug.Log("Successfully read for midi events" + Filename);
+
+        //routine getting of files
+        var notes = midi.GetNotes();  
+        var tempoMap = midi.GetTempoMap();
+
+        //consolate all three then load into noteInfo
+        var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
+
+        //this is the one for data passing
+        foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
+        {
+
+            // float noteTime = (float) note.TimeAs<MetricTimeSpan>(tempoMap);
+            float noteTime = ((float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 100000000.0f);
+            // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
+
+            //   float noteDuration = (float) note.LengthAs<MetricTimeSpan>(tempoMap);
+            float noteDuration = (float)note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 2400000.0f;
+            // Debug.Log("noteDuration " + note.ToString() + "duration : " + noteDuration);
+
+            //check the correct number in the piano key array - OK correct 
+            int noteNumber = note.NoteNumber; //added offset
+                                              //  Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
+
+            //group thhem together
+            var noteSet = (Time: noteTime, Duration: noteDuration, NoteNumber: noteNumber);
+
+            //and add into note collection
+            noteInfo.Add(noteSet);
+      
+
+        }//end for midi passing only
+    }// end generate MIDI Events
 
 
     // this generates piano roll from the file read
@@ -233,22 +309,57 @@ sealed class RollMgr : MonoBehaviour
         whitePrefab = (GameObject)Resources.Load("Prefab/whitekeyprefab");
         blackPrefab = (GameObject)Resources.Load("Prefab/blackkeyprefab");
 
-
-
         // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
         Debug.Log("Successfully read " + Filename);
-            
+
         //routine getting of files
 
         var notes = midi.GetNotes(); // note that this info must be sent to MIDIMessageReceiver
-      //  MIDIEventHandler(midi.ExportEvents(notes));
+
         var tempoMap = midi.GetTempoMap();
 
+        //consolate all three then load into noteInfo
+        var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
+
+        //==== is in its own function now
+        ////this is the one for data passing
+        //foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
+        //{
+
+        //    // float noteTime = (float) note.TimeAs<MetricTimeSpan>(tempoMap);
+        //    float noteTime = ((float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 100000000.0f);
+        //   // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
+
+        //    //   float noteDuration = (float) note.LengthAs<MetricTimeSpan>(tempoMap);
+        //    float noteDuration = (float)note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 2400000.0f;
+        //   // Debug.Log("noteDuration " + note.ToString() + "duration : " + noteDuration);
+
+        //    //check the correct number in the piano key array - OK correct 
+        //    int noteNumber = note.NoteNumber; //added offset
+        //  //  Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
+
+        //    //group thhem together
+        //    var noteSet = (Time: noteTime, Duration: noteDuration, NoteNumber: noteNumber);
+
+        //    //and add into note collection
+        //        //noteCollection.Add(noteSet);
+        //    noteInfo.Add(noteSet);
+        //    //when done we can send to midieventhandleer
+
+        //}//end for midi passing only
+
+       // StartCoroutine(MIDIMessenger(noteCollection));
+
+        //send it to MIDIEventHandler
+        //  MIDIEventHandler(noteCollection);    //this function receives note information and manages them as events
+
+        //this is for spawning and rolling so have another one for data passing
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
-            Debug.Log("Spawning...");
+          //  Debug.Log("Spawning...");
+
 
             //configs and declarations first
 
@@ -261,6 +372,10 @@ sealed class RollMgr : MonoBehaviour
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
                                                    // Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
+
+            //group thhem together
+            // var noteSet = (Time: note.Time, Duration: note.Length, NoteNumber: note.NoteNumber);
+
 
             //GameObject noteObject;
 
@@ -309,10 +424,10 @@ sealed class RollMgr : MonoBehaviour
             float xPosition = pianoKeys[noteNumber].transform.position.x;
 
             //calculate their position
-              float yPosition = ((float)noteTime.TotalMicroseconds / 1000000.0f) * pixelsPerBeat; //for testing
-            //should be somewhere between 1000000 and 2400000
-           // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
-            //but we also need to raise the keys to half of its height so see below 
+            float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
+                                                                                 //1000000.0f                              //should be somewhere between 1000000 and 2400000
+                                                                                 // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
+                                                                                 //but we also need to raise the keys to half of its height so see below 
 
             //=== i still need this but only for harmony or type 1
             //store here the first y position
@@ -326,12 +441,11 @@ sealed class RollMgr : MonoBehaviour
             float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
 
             // Calculate the height of the object based on note.Duration 
-           // float noteHeight = (float)noteDuration.TotalMicroseconds / 10000000.0f * pixelsPerBeat;    //last working
             float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
-
+                                                        //240000.0f
             //get the height of that object
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
-          //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
+                                                                                           //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
 
             //change the size (localscale) of the object based on the computed height
             noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
@@ -344,7 +458,7 @@ sealed class RollMgr : MonoBehaviour
             noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight, zPosition); // changes to test
 
             //== if type 1, adjust it one more time
-            if (spawntype==1)
+            if (spawntype == 1)
             {
                 noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight, zPosition); // changes to test
             }//end adjust 
@@ -369,14 +483,12 @@ sealed class RollMgr : MonoBehaviour
             // Start the coroutine to make the note fall at a constant speed
             StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
             //it should end on the half
-          //  StartCoroutine(FallByTP(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-
-
 
             //done all routine spawn methodss
             numOfSpawns++;
 
         }//end foreach
+
 
         Debug.Log("Reached end of spawning");
         batchSpawned = true; // signal for ImprovManager to rollKeys
@@ -384,6 +496,8 @@ sealed class RollMgr : MonoBehaviour
 
         //get noteObject count
     }//end generate piano roll
+
+
 
     //== press related scripts
 
@@ -400,34 +514,33 @@ sealed class RollMgr : MonoBehaviour
     {
         //    default behaviour is show black upon release
         pianoKeys[noteNumber].GetComponent<Image>().color = Color.black;
-  
 
     }//end OnNoteOff
 
     //=== logic related scripts
     //transform position falling
+    //decommissioned 
+    //private IEnumerator FallByTP(int noteNumber, Transform noteTransform, float initialY, float destroyY)
+    //{
+    //    Vector3 pos = noteTransform.position;
 
-    private IEnumerator FallByTP(int noteNumber, Transform noteTransform, float initialY, float destroyY)
-    {
-        Vector3 pos = noteTransform.position;
-       
-        while (noteTransform.position.y > destroyY)
-        {
-            pos.y -= 0.20f;
-            //noteTransform.position = new Vector3(noteTransform.position.x, noteTransform.position.y -=)
-            noteTransform.position = pos;
-            yield return null;
-        }
-    }//end fallbytp
+    //    while (noteTransform.position.y > destroyY)
+    //    {
+    //        pos.y -= 0.20f;
+    //        //noteTransform.position = new Vector3(noteTransform.position.x, noteTransform.position.y -=)
+    //        noteTransform.position = pos;
+    //        yield return null;
+    //    }
+    //}//end fallbytp
 
 
     //lerp related falling
     private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     {
         float elapsedTime = 0;
-         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
-                                                                     //float duration = 200.00f; //testing 
-                                                                     //Debug.Log("speed is now " + duration);
+        float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
+                                                                    //float duration = 200.00f; //testing 
+                                                                    //Debug.Log("speed is now " + duration);
 
 
         //get the height of that object
@@ -436,26 +549,34 @@ sealed class RollMgr : MonoBehaviour
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration; // ? 
-          //  float t = duration / elapsedTime;
+                                              //  float t = duration / elapsedTime;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
             elapsedTime += Time.deltaTime;                          // t
 
             //something here that checks time when it falls
             if ((noteTransform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
             {
-                Debug.Log("touched");
+                //i think we should destroy the object ???
+             //   noteObject.SetActive(!noteObject.activeSelf); //tbh idk what this does niyahaha
+
+           //     StartCoroutine(MIDIMessenger(noteInfo));
+            //   Debug.Log("playing");
                 if (!IsMotifPlaying)
                 {
-                 //   Instance.audioSource.Play(); //if this doesnt work then trigger midi out
 
+
+                    //have the coroutine here
+                    StartCoroutine(MIDIMessenger(noteInfo));
+                    // StartCoroutine(MIDIMessenger(noteInfo));
+                    Debug.Log("playing tunes");
                     //check to true
-                    IsMotifPlaying = true; 
+                    IsMotifPlaying = true;
                 }
 
             }
-                //            {
-                // Debug.Log("t is " + t);
-                yield return null;
+            //            {
+            // Debug.Log("t is " + t);
+            yield return null;
         }
 
         noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
