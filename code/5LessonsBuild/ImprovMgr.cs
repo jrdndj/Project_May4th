@@ -101,17 +101,22 @@ public class ImprovMgr : MonoBehaviour
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
+                    //generate MIDIevents  - here we only get the events of the licks
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100.mid");
+
                     //generate roll
                     RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);
 
                     //=== we need the y position of the first improv licks since we will base the harmony there 
 
                     //=======then load rhythm guidance
-                    //lick
+                    //harmony
                     RollManager.GetComponent<RollMgr>().Filename = "L01LH.mid"; //harmony
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //no need to generate midievents for harmony
 
                     //generate roll
                     RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1);
@@ -178,7 +183,8 @@ public class ImprovMgr : MonoBehaviour
                 //invoke song manager from rollmgr
                 RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
-
+                //generate MIDIevents  - here we only get the events of the licks
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100.mid");
                 //generate piano roll based on these
                 SelectedIndex = 0;
                 RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);

@@ -29074,8 +29074,8 @@ MonoBehaviour:
   - {fileID: 783875861}
   - {fileID: 1263865325}
   - {fileID: 874610878}
-  fallSpeed: 20
-  pixelsPerBeat: 20
+  fallSpeed: 17
+  pixelsPerBeat: 24
   Filename: 
   IsMotifPlaying: 0
   audioSource: {fileID: 273026819}
