@@ -81,24 +81,29 @@ sealed class RollMgr : MonoBehaviour
     int numOfSpawns = 0;
     int spawnCount = 0;
 
-    public float fallSpeed = 0.0f; // Adjust this to control the speed of falling - was 100
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
 
     //==== midi related variables
     public static MidiFile midiFile; // MIDI file asset
+    public float fallSpeed = 0.0f; // Adjust this to control the speed of falling - was 100
     public float pixelsPerBeat = 0.0f; // height of one beat in pixels - shouldnt this be 1? 
     public string Filename; // this should be manipulated by ImprovManager
 
     public bool IsMotifPlaying = false;
-
 
     List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
 
     public AudioSource audioSource;
+
+    //=== midi out related variables 
+    public int swingcount = 0;
+    public int swingfrequency = 2;
+    public int velocity = 80;
+
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -114,8 +119,8 @@ sealed class RollMgr : MonoBehaviour
     //this will now be the one receiving the MIDI events    //TODO Solidify 
     System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
     {
-        int swingcount = 0;
-        int velocity = 100; 
+        
+        
         //algorithm
         // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
         // by isMotifPlaying variable
@@ -128,15 +133,14 @@ sealed class RollMgr : MonoBehaviour
         foreach (var noteEvent in note)
         {
             //NOTEON
-           // Debug.Log("played key" + noteEvent.NoteNumber);
             pianoKeys[noteEvent.NoteNumber-36].GetComponent<Image>().color = improvpink;
             //change velocity
             swingcount++;
-            if (swingcount % 2 == 0) //change force of press every other press to simulate swing press
+            if (swingcount % swingfrequency == 0) //change force of press every other press to simulate swing press
             {
                 velocity = 60;
             }
-            else velocity = 100;
+            else velocity = 80;
             if (swingcount == 5) swingcount = 0;
 
             foreach (var port in _ports)
@@ -497,10 +501,6 @@ sealed class RollMgr : MonoBehaviour
         //get noteObject count
     }//end generate piano roll
 
-
-
-    //== press related scripts
-
     // == some press related functions
     public void onNoteOn(int noteNumber, float velocity)
     {
@@ -517,22 +517,7 @@ sealed class RollMgr : MonoBehaviour
 
     }//end OnNoteOff
 
-    //=== logic related scripts
-    //transform position falling
-    //decommissioned 
-    //private IEnumerator FallByTP(int noteNumber, Transform noteTransform, float initialY, float destroyY)
-    //{
-    //    Vector3 pos = noteTransform.position;
-
-    //    while (noteTransform.position.y > destroyY)
-    //    {
-    //        pos.y -= 0.20f;
-    //        //noteTransform.position = new Vector3(noteTransform.position.x, noteTransform.position.y -=)
-    //        noteTransform.position = pos;
-    //        yield return null;
-    //    }
-    //}//end fallbytp
-
+    //==== Roll related scripts
 
     //lerp related falling
     private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
@@ -542,7 +527,6 @@ sealed class RollMgr : MonoBehaviour
                                                                     //float duration = 200.00f; //testing 
                                                                     //Debug.Log("speed is now " + duration);
 
-
         //get the height of that object
         float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
@@ -551,52 +535,51 @@ sealed class RollMgr : MonoBehaviour
             float t = elapsedTime / duration; // ? 
                                               //  float t = duration / elapsedTime;
             noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime;                          // t
+            elapsedTime += Time.deltaTime;
 
             //something here that checks time when it falls
             if ((noteTransform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
             {
-                //i think we should destroy the object ???
-             //   noteObject.SetActive(!noteObject.activeSelf); //tbh idk what this does niyahaha
+                //this.gameObject.SetActive(false);
 
-           //     StartCoroutine(MIDIMessenger(noteInfo));
-            //   Debug.Log("playing");
                 if (!IsMotifPlaying)
                 {
 
-
-                    //have the coroutine here
+                   //have the coroutine here
                     StartCoroutine(MIDIMessenger(noteInfo));
                     // StartCoroutine(MIDIMessenger(noteInfo));
                     Debug.Log("playing tunes");
                     //check to true
                     IsMotifPlaying = true;
-                }
+                }//end is motifyplaying
 
-            }
-            //            {
-            // Debug.Log("t is " + t);
-            yield return null;
+                ////shrink objects when they touch
+                //elapsedTime = 0f;
+                //Vector3 initialScale = noteObject.GetComponent<RectTransform>().localScale;
+                //Vector3 targetScale = new Vector3(finalScale, finalScale, finalScale);
+
+                //while (elapsedTime < shrinkDuration)
+                //{
+                //    noteObject.GetComponent<RectTransform>().localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / shrinkDuration);
+                //    elapsedTime += Time.deltaTime;
+                //    yield return null;
+                //}
+
+                //// Ensure the object reaches the exact final scale
+                //noteObject.GetComponent<RectTransform>().localScale = targetScale;
+
+                ////==end of shrink code                      
+
+            }//end check if touch
+
+         //   yield return this.gameObject.SetActive(false);
+          yield return null;
         }
 
         noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
+       
 
     }//end fallatendofduration
-
-    /**
-     * somewhere inside rollkeys when they touch the green line for the first time, 
-     * we call   //Invoke("PlayDelayedAudio", 0.0f);
-        //                    // Invoke("PlayDelayedAudio", 0.5f); //for the one that starts with the rest
-    * which calls this function
-    *
-     * **/
-    private void PlayDelayedAudio()
-    {
-
-        //decentralising to AudioManager game object 
-        //  AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(1); //change this one 
-        //Instance.MotifToPlay.Play();
-    }//end PlayDelayed Audio();
 
     //highlight related function
 }//end RollMgr
