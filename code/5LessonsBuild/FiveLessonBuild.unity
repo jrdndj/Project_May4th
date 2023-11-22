@@ -14876,6 +14876,9 @@ MonoBehaviour:
   Filename: 
   IsMotifPlaying: 0
   audioSource: {fileID: 273026819}
+  swingcount: 0
+  swingfrequency: 4
+  velocity: 100
   theColor:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
     m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
@@ -29074,11 +29077,14 @@ MonoBehaviour:
   - {fileID: 783875861}
   - {fileID: 1263865325}
   - {fileID: 874610878}
-  fallSpeed: 17
-  pixelsPerBeat: 24
+  fallSpeed: 0
+  pixelsPerBeat: 0
   Filename: 
   IsMotifPlaying: 0
   audioSource: {fileID: 273026819}
+  swingcount: 0
+  swingfrequency: 4
+  velocity: 0
   theColor:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
     m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
