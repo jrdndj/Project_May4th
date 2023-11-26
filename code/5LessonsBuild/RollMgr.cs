@@ -119,8 +119,8 @@ sealed class RollMgr : MonoBehaviour
     //this will now be the one receiving the MIDI events    //TODO Solidify 
     System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
     {
-        
-        
+
+
         //algorithm
         // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
         // by isMotifPlaying variable
@@ -133,7 +133,7 @@ sealed class RollMgr : MonoBehaviour
         foreach (var noteEvent in note)
         {
             //NOTEON
-            pianoKeys[noteEvent.NoteNumber-36].GetComponent<Image>().color = improvpink;
+            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = improvpink;
             //change velocity
             swingcount++;
             if (swingcount % swingfrequency == 0) //change force of press every other press to simulate swing press
@@ -151,8 +151,8 @@ sealed class RollMgr : MonoBehaviour
             yield return new WaitForSeconds(noteEvent.Duration);
 
             //NOTEOFF
-           // Debug.Log("released key" + noteEvent.NoteNumber);
-            pianoKeys[noteEvent.NoteNumber-36].GetComponent<Image>().color = Color.black;
+            // Debug.Log("released key" + noteEvent.NoteNumber);
+            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = Color.black;
             foreach (var port in _ports)
             {
                 port?.SendNoteOff(0, noteEvent.NoteNumber);
@@ -162,7 +162,7 @@ sealed class RollMgr : MonoBehaviour
         }//end for all
 
     }//end MIDIMessenger
-  
+
 
     // this is an interface
     System.Collections.IEnumerator MIDIMessagInterface() //this should be programmed to receive MIDI events
@@ -267,10 +267,10 @@ sealed class RollMgr : MonoBehaviour
     {
 
         MidiFile midi = midiFile;
-       Debug.Log("Successfully read for midi events" + Filename);
+        Debug.Log("Successfully read for midi events" + Filename);
 
         //routine getting of files
-        var notes = midi.GetNotes();  
+        var notes = midi.GetNotes();
         var tempoMap = midi.GetTempoMap();
 
         //consolate all three then load into noteInfo
@@ -297,7 +297,7 @@ sealed class RollMgr : MonoBehaviour
 
             //and add into note collection
             noteInfo.Add(noteSet);
-      
+
 
         }//end for midi passing only
     }// end generate MIDI Events
@@ -354,7 +354,7 @@ sealed class RollMgr : MonoBehaviour
 
         //}//end for midi passing only
 
-       // StartCoroutine(MIDIMessenger(noteCollection));
+        // StartCoroutine(MIDIMessenger(noteCollection));
 
         //send it to MIDIEventHandler
         //  MIDIEventHandler(noteCollection);    //this function receives note information and manages them as events
@@ -362,7 +362,7 @@ sealed class RollMgr : MonoBehaviour
         //this is for spawning and rolling so have another one for data passing
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
-          //  Debug.Log("Spawning...");
+            //  Debug.Log("Spawning...");
 
 
             //configs and declarations first
@@ -429,9 +429,9 @@ sealed class RollMgr : MonoBehaviour
 
             //calculate their position
             float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
-                                                                                 //1000000.0f                              //should be somewhere between 1000000 and 2400000
-                                                                                 // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
-                                                                                 //but we also need to raise the keys to half of its height so see below 
+                                                                                                //1000000.0f                              //should be somewhere between 1000000 and 2400000
+                                                                                                // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
+                                                                                                //but we also need to raise the keys to half of its height so see below 
 
             //=== i still need this but only for harmony or type 1
             //store here the first y position
@@ -446,8 +446,8 @@ sealed class RollMgr : MonoBehaviour
 
             // Calculate the height of the object based on note.Duration 
             float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
-                                                        //240000.0f
-            //get the height of that object
+                                                                                   //240000.0f
+                                                                                   //get the height of that object
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
                                                                                            //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
 
@@ -485,7 +485,9 @@ sealed class RollMgr : MonoBehaviour
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
             // Start the coroutine to make the note fall at a constant speed
-            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
+            //  StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight)));
+
             //it should end on the half
 
             //done all routine spawn methodss
@@ -500,6 +502,12 @@ sealed class RollMgr : MonoBehaviour
 
         //get noteObject count
     }//end generate piano roll
+
+    //===
+    public void DestroyObject(GameObject rollingobject)
+    {
+        Destroy(rollingobject);
+    }//end destroy object
 
     // == some press related functions
     public void onNoteOn(int noteNumber, float velocity)
@@ -520,7 +528,8 @@ sealed class RollMgr : MonoBehaviour
     //==== Roll related scripts
 
     //lerp related falling
-    private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
+    //private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
+    private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY)
     {
         float elapsedTime = 0;
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
@@ -534,50 +543,45 @@ sealed class RollMgr : MonoBehaviour
         {
             float t = elapsedTime / duration; // ? 
                                               //  float t = duration / elapsedTime;
-            noteTransform.position = new Vector3(noteTransform.position.x, Mathf.Lerp(initialY, destroyY, t), noteTransform.position.z);
-            elapsedTime += Time.deltaTime;
-
-            //something here that checks time when it falls
-            if ((noteTransform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
+                                              //something here that checks time when it falls
+            try
             {
-                //this.gameObject.SetActive(false);
-
-                if (!IsMotifPlaying)
+                if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
                 {
 
-                   //have the coroutine here
-                    StartCoroutine(MIDIMessenger(noteInfo));
-                    // StartCoroutine(MIDIMessenger(noteInfo));
-                    Debug.Log("playing tunes");
-                    //check to true
-                    IsMotifPlaying = true;
-                }//end is motifyplaying
+                    if (!IsMotifPlaying)
+                    {
 
-                ////shrink objects when they touch
-                //elapsedTime = 0f;
-                //Vector3 initialScale = noteObject.GetComponent<RectTransform>().localScale;
-                //Vector3 targetScale = new Vector3(finalScale, finalScale, finalScale);
+                        //have the coroutine here
+                        StartCoroutine(MIDIMessenger(noteInfo));
+                        // StartCoroutine(MIDIMessenger(noteInfo));
+                        Debug.Log("playing tunes");
+                        //check to true
+                        IsMotifPlaying = true;
+                    }//end is motifyplaying
 
-                //while (elapsedTime < shrinkDuration)
-                //{
-                //    noteObject.GetComponent<RectTransform>().localScale = Vector3.Lerp(initialScale, targetScale, elapsedTime / shrinkDuration);
-                //    elapsedTime += Time.deltaTime;
-                //    yield return null;
-                //}
+                    //destroy here            
+                    DestroyObject(rollingObject);
 
-                //// Ensure the object reaches the exact final scale
-                //noteObject.GetComponent<RectTransform>().localScale = targetScale;
+                }//end check if touch
+                else //keep moving
+                {
+                    rollingObject.transform.position = new Vector3(rollingObject.transform.position.x, Mathf.Lerp(initialY, destroyY, t), rollingObject.transform.position.z);
+                    elapsedTime += Time.deltaTime;
+                }//else
 
-                ////==end of shrink code                      
+            }//endtry
+            catch (System.Exception nre) //ignore this
+            {
+               // Debug.Log("previous object destroyed so all is good" + nre.Message);
+                yield break;
+            }//end catch
+          
+            yield return null;
+        }//end while duration lerp function
 
-            }//end check if touch
-
-         //   yield return this.gameObject.SetActive(false);
-          yield return null;
-        }
-
-        noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
-       
+        //comment this just to see revert if fck up 
+        // noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
 
     }//end fallatendofduration
 
