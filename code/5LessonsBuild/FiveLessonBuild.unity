@@ -526,7 +526,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5.380188, y: 40.34933}
+  m_AnchoredPosition: {x: 5.380188, y: 37.5}
   m_SizeDelta: {x: 100, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &16432892
@@ -3120,7 +3120,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &210068936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3682,7 +3682,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 269699599}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -369.7138, y: 37.15454, z: -0.000030791398}
+  m_LocalPosition: {x: -369.7138, y: 27.15454, z: -0.000030791398}
   m_LocalScale: {x: 4.0358896, y: 4.0358896, z: 4.0358896}
   m_Children:
   - {fileID: 1362900412}
@@ -5115,7 +5115,6 @@ MonoBehaviour:
   modeValue: 0
   lessonValue: 0
   guidanceValue: 0
-  SelectedIndex: 0
   display_text: {fileID: 780136341}
   theColor:
     m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
@@ -9474,7 +9473,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 626704861}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -95.096306, y: 165.7643, z: -0.000030791398}
+  m_LocalPosition: {x: -95.096306, y: 155.7643, z: -0.000030791398}
   m_LocalScale: {x: 4.03589, y: 4.03589, z: 4.03589}
   m_Children:
   - {fileID: 1271266353}
@@ -20875,9 +20874,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Listen and repeat
-
-'
+  m_Text: Watch and listen
 --- !u!222 &1414736935
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -31076,6 +31073,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ImprovMgr: {fileID: 334654182}
   listentoggle: {fileID: 3102564}
+  trytoggle: {fileID: 210068936}
   testtoggle: {fileID: 15050348}
 --- !u!1 &2131849348
 GameObject:

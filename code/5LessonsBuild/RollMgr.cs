@@ -76,14 +76,16 @@ sealed class RollMgr : MonoBehaviour
     //this lets us know which keys are black 
     List<int> blacklist = new List<int>() { 1, 3, 6, 8, 10, 13, 15, 18, 20, 22, 25, 27, 30, 32, 34, 37, 39, 42, 44, 46, 49, 51, 54, 56, 58 };
     bool isBlackPrefab = false;
-    bool batchSpawned = false;
+    // bool batchSpawned = false;
 
     int numOfSpawns = 0;
     int spawnCount = 0;
 
-
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
+
+    //==== lesson related variables
+    // int userMode = 9; // default is 9, 1 is waL, 2 is test 3 is try
 
     //==== midi related variables
     public static MidiFile midiFile; // MIDI file asset
@@ -104,7 +106,6 @@ sealed class RollMgr : MonoBehaviour
     public int swingfrequency = 2;
     public int velocity = 80;
 
-
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
     public ColorBlock theColor;
@@ -114,7 +115,6 @@ sealed class RollMgr : MonoBehaviour
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
     Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
     Color32 restblack = Color.black; //for the rests 
-
 
     //this will now be the one receiving the MIDI events    //TODO Solidify 
     System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
@@ -160,9 +160,26 @@ sealed class RollMgr : MonoBehaviour
             yield return new WaitForSeconds(noteEvent.Duration);
 
         }//end for all
-
     }//end MIDIMessenger
 
+    //this is a copy of MIDIMessenger but with no midi out
+    System.Collections.IEnumerator MIDIMessengerTryYourself(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
+    {              
+
+        foreach (var noteEvent in note)
+        {
+            //LIGHT KEYS - NO SOUND
+            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = improvpink;     
+
+            yield return new WaitForSeconds(noteEvent.Duration);
+
+            //REMOVE KEY LIGHT - STILL NO SOUND
+            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = Color.black;
+           
+            yield return new WaitForSeconds(noteEvent.Duration);
+
+        }//end for all
+    }//end MIDIMessenger try yourself
 
     // this is an interface
     System.Collections.IEnumerator MIDIMessagInterface() //this should be programmed to receive MIDI events
@@ -304,7 +321,7 @@ sealed class RollMgr : MonoBehaviour
 
 
     // this generates piano roll from the file read
-    public void GeneratePianoRoll(Color32 spawncolor, int spawntype) //1 for melody, 2 for licks 
+    public void GeneratePianoRoll(Color32 spawncolor, int spawntype, int userMode) //1 for melody, 2 for licks 
     {
         //numOfSpawns = 0; //fresh start
         //piano related configs
@@ -327,44 +344,9 @@ sealed class RollMgr : MonoBehaviour
         //consolate all three then load into noteInfo
         var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
 
-        //==== is in its own function now
-        ////this is the one for data passing
-        //foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
-        //{
-
-        //    // float noteTime = (float) note.TimeAs<MetricTimeSpan>(tempoMap);
-        //    float noteTime = ((float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 100000000.0f);
-        //   // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
-
-        //    //   float noteDuration = (float) note.LengthAs<MetricTimeSpan>(tempoMap);
-        //    float noteDuration = (float)note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 2400000.0f;
-        //   // Debug.Log("noteDuration " + note.ToString() + "duration : " + noteDuration);
-
-        //    //check the correct number in the piano key array - OK correct 
-        //    int noteNumber = note.NoteNumber; //added offset
-        //  //  Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
-
-        //    //group thhem together
-        //    var noteSet = (Time: noteTime, Duration: noteDuration, NoteNumber: noteNumber);
-
-        //    //and add into note collection
-        //        //noteCollection.Add(noteSet);
-        //    noteInfo.Add(noteSet);
-        //    //when done we can send to midieventhandleer
-
-        //}//end for midi passing only
-
-        // StartCoroutine(MIDIMessenger(noteCollection));
-
-        //send it to MIDIEventHandler
-        //  MIDIEventHandler(noteCollection);    //this function receives note information and manages them as events
-
         //this is for spawning and rolling so have another one for data passing
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
-            //  Debug.Log("Spawning...");
-
-
             //configs and declarations first
 
             var noteTime = note.TimeAs<MetricTimeSpan>(tempoMap);
@@ -375,13 +357,6 @@ sealed class RollMgr : MonoBehaviour
 
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
-                                                   // Debug.Log("noteNumber " + note.ToString() + " note number " + noteNumber);
-
-            //group thhem together
-            // var noteSet = (Time: note.Time, Duration: note.Length, NoteNumber: note.NoteNumber);
-
-
-            //GameObject noteObject;
 
             spawnCount++;
 
@@ -486,7 +461,7 @@ sealed class RollMgr : MonoBehaviour
 
             // Start the coroutine to make the note fall at a constant speed
             //  StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight)));
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight), userMode));
 
             //it should end on the half
 
@@ -496,9 +471,9 @@ sealed class RollMgr : MonoBehaviour
         }//end foreach
 
 
-        Debug.Log("Reached end of spawning");
-        batchSpawned = true; // signal for ImprovManager to rollKeys
-        Debug.Log("Total prefabs spawned: " + numOfSpawns);
+        //  Debug.Log("Reached end of spawning");
+        //   batchSpawned = true; // signal for ImprovManager to rollKeys
+        //  Debug.Log("Total prefabs spawned: " + numOfSpawns);
 
         //get noteObject count
     }//end generate piano roll
@@ -529,7 +504,7 @@ sealed class RollMgr : MonoBehaviour
 
     //lerp related falling
     //private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
-    private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY)
+    private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY, int userMode)
     {
         float elapsedTime = 0;
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
@@ -549,7 +524,7 @@ sealed class RollMgr : MonoBehaviour
                 if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
                 {
 
-                    if (!IsMotifPlaying)
+                    if (!IsMotifPlaying && userMode == 1) //if waL play tunes 
                     {
 
                         //have the coroutine here
@@ -559,6 +534,15 @@ sealed class RollMgr : MonoBehaviour
                         //check to true
                         IsMotifPlaying = true;
                     }//end is motifyplaying
+                    else if (!IsMotifPlaying && userMode == 3)//its just test yourself mode
+                    {
+                        //have the coroutine here
+                        StartCoroutine(MIDIMessengerTryYourself(noteInfo));
+                        // StartCoroutine(MIDIMessenger(noteInfo));
+                        Debug.Log("playing tunes");
+                        //check to true
+                        IsMotifPlaying = true;
+                    }//end else if user mode 3
 
                     //destroy here            
                     DestroyObject(rollingObject);
@@ -573,10 +557,10 @@ sealed class RollMgr : MonoBehaviour
             }//endtry
             catch (System.Exception nre) //ignore this
             {
-               // Debug.Log("previous object destroyed so all is good" + nre.Message);
+                // Debug.Log("previous object destroyed so all is good" + nre.Message);
                 yield break;
             }//end catch
-          
+
             yield return null;
         }//end while duration lerp function
 
