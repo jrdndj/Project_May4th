@@ -17,12 +17,13 @@ public class ModeMgr : MonoBehaviour
     [SerializeField] GameObject ImprovMgr;
 
     //=== declare toggle listeners here
-    public Toggle listentoggle, testtoggle;
+    public Toggle listentoggle, trytoggle, testtoggle;
 
     //declare variable to send to ImprovMgr
-    int module = 9; //default set it to zero
+    //  int module = 9; //default set it to zero
     // 1 if listen
-    // 2 if test 
+    // 2 if test yourself
+    // 3 if try yourself
 
     // Start is called before the first frame update
     void Start()
@@ -36,6 +37,13 @@ public class ModeMgr : MonoBehaviour
             ListenToggleValueChanged(listentoggle);
         });
 
+        //try mode
+        trytoggle.GetComponent<Toggle>();
+        trytoggle.onValueChanged.AddListener(delegate
+        {
+            TryToggleValueChanged(trytoggle);
+        });
+
         //test mode
         testtoggle.GetComponent<Toggle>();
         testtoggle.onValueChanged.AddListener(delegate
@@ -45,13 +53,6 @@ public class ModeMgr : MonoBehaviour
 
     }
 
-    //==== we dont need update for now since these are value listeners
-    //// Update is called once per frame
-    //void Update()
-    //{
-        
-    //}
-
     //=== some functions here that manage the values that will all be sent to the improv manager
 
     //watch toggle value changed
@@ -59,18 +60,18 @@ public class ModeMgr : MonoBehaviour
     {
         if (change.isOn)
         {
-            module = 1; //watch and listen mode
+            //  module = 1; //watch and listen mode
             Debug.Log("Selected Listen and Learn mode");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Listen and Learn mode, now select a lesson";
 
             //now send the value to ImprovMgr
-            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 1; 
-  
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 1;
+
         }//endif 
         else
         {
             //change to default module
-            module = 9;
+            //   module = 9;
             Debug.Log("Unselected Listen and Learn mode");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Select a mode to begin with.";
 
@@ -80,12 +81,39 @@ public class ModeMgr : MonoBehaviour
         }//endelse 
     }//end listentoggle
 
+    //watch toggle value changed
+    public void TryToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            //  module = 3; //try yourself
+            Debug.Log("Selected Try Yourself mode");
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Try Yourself mode, now select a lesson";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 3;
+
+        }//endif 
+        else
+        {
+            //change to default module
+            // module = 9;
+            Debug.Log("Unselected Try Yourself mode");
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Select a mode to begin with.";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 9;
+
+        }//endelse 
+    }//end listentoggle
+
+
     //test toggle
     public void TestToggleValueChanged(Toggle change)
     {
         if (change.isOn)
         {
-            module = 2; //test mode
+            //   module = 2; //test mode
             Debug.Log("Selected Test Yourself mode");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Test Yourself mode, now select a lesson";
 
@@ -96,12 +124,12 @@ public class ModeMgr : MonoBehaviour
         else
         {
             //change to default module
-            module = 9;
+            //   module = 9;
             Debug.Log("Unselected Listen and Learn mode.");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Select a mode to begin with.";
 
             //now send the value to ImprovMgr
-            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 2;
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 9;
 
         }//endelse 
     }//end testtoggle

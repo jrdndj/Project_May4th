@@ -9,7 +9,7 @@ public class MIDIScript : MonoBehaviour
 {
     // midi note number of lowest key in your midi device
     // 21: A0
-    int keyOffset = 36; //from 21 
+   // int keyOffset = 36; //from 21 
 
     ////=== old generation of managers 
     //[SerializeField] GameObject BarManager; //for the improv

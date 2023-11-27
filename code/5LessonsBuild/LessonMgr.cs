@@ -24,7 +24,6 @@ public class LessonMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         //initialize listener toggles here
 
         //lesson 01 toggle listener
@@ -62,14 +61,8 @@ public class LessonMgr : MonoBehaviour
             Lesson05ToggleValueChanged(lesson05_quesans);
         });
 
-    }
+    }//end start
 
-    //we dont need you yet
-    //// Update is called once per frame
-    //void Update()
-    //{
-
-    //}//end update
 
     //=====declare toggle listener functions here
     //Lesson 01
@@ -77,7 +70,7 @@ public class LessonMgr : MonoBehaviour
     {
         if (change.isOn)
         {
-            lesson = 1; 
+            lesson = 1;
             Debug.Log("Selected Lesson 01: All Swing Modes");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 01. Choose guidance or you may Press Load";
 
@@ -201,6 +194,5 @@ public class LessonMgr : MonoBehaviour
 
         }//endelse 
     }//end lesson05toggle
-
 
 }//end lessonmgr

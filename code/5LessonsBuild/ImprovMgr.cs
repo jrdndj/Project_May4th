@@ -24,15 +24,12 @@ public class ImprovMgr : MonoBehaviour
 {
     //== declare Improv to be static so other classes can access it withouts
     [SerializeField] GameObject RollManager;
-   // [SerializeField] GameObject AudioManager;
-
-    //public static ImprovMgr ImprovMgrInstance;
 
     //== some variables that ImprovMgr will manage
 
     public int modeValue = 9, lessonValue = 9, guidanceValue = 9; //mode, lesson and guidance mgrs need these
-    public int SelectedIndex = 0; // 0 by default
-    int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
+                                                                  // int SelectedIndex = 0; // 0 by default
+    public int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
 
     //==== UI related variables
 
@@ -45,9 +42,8 @@ public class ImprovMgr : MonoBehaviour
     Color32 improvpink = new Color32(255, 150, 234, 255);
     Color32 yellow = Color.yellow;
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
-    Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
-    Color32 restblack = Color.black; //for the rests 
-
+                                                       //  Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
+                                                       // Color32 restblack = Color.black; //for the rests 
 
     // Start is called before the first frame update
     void Start()
@@ -55,20 +51,20 @@ public class ImprovMgr : MonoBehaviour
         //set display text
         display_text.text = "Select mode, lesson and guidance to begin.";
 
-    }
+    }//endstart
 
     // Update is called once per frame
     void Update()
     {
 
-    }
+    }//end update()
 
     //=== function definitions
 
     // when button is clicked, PullContent gets the right content
     public void ManageImprov()
     {
-        Debug.Log("Entered manage improv function");
+        //  Debug.Log("Entered manage improv function");
         /*
          * algo for pull content
          * get mode value
@@ -80,7 +76,7 @@ public class ImprovMgr : MonoBehaviour
          * **/
         //listen and learn mode
         Debug.Log("mode value we have is " + modeValue);
-        if (modeValue == 1)
+        if (modeValue == 1 || modeValue == 3) //mode 1 or 3 doesnt matter, only the coroutine changes
         {
             Debug.Log("lesson value we have is " + lessonValue);
             //now check which lesson
@@ -89,8 +85,8 @@ public class ImprovMgr : MonoBehaviour
 
                 //swing specific values for sync
                 RollManager.GetComponent<RollMgr>().swingfrequency = 2;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 17;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
+                RollManager.GetComponent<RollMgr>().fallSpeed = 17; 
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24; 
 
 
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -99,9 +95,9 @@ public class ImprovMgr : MonoBehaviour
                 {
                     //=====load improv lick first, then load guidance licks applicable
 
-                    //lick
+                    //read file to generate lick highlights 
                     RollManager.GetComponent<RollMgr>().Filename = "L0100g.mid"; //improv lick
-                   // Debug.Log("filename is transferred " + RollManager.GetComponent<RollMgr>().Filename);
+                                                                                 // Debug.Log("filename is transferred " + RollManager.GetComponent<RollMgr>().Filename);
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
@@ -109,12 +105,14 @@ public class ImprovMgr : MonoBehaviour
                     //generate MIDIevents  - here we only get the events of the licks
                     RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100g.mid");
 
-                    //generate roll
-                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);
+                    //generate piano roll from the file read
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
 
                     //=== we need the y position of the first improv licks since we will base the harmony there 
 
                     //=======then load rhythm guidance
+
                     //harmony
                     RollManager.GetComponent<RollMgr>().Filename = "L01LH.mid"; //harmony
 
@@ -124,16 +122,10 @@ public class ImprovMgr : MonoBehaviour
                     //no need to generate midievents for harmony
 
                     //generate roll
-                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1);
+                    spawntype = 1;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, spawntype, modeValue);
 
-                    //=== then play roll all spawns and play songs
 
-                    //song to be invoked is only one file which is
-                    // L0104.aiff
-                    //update index for AudioManager
-
-                    SelectedIndex = 0;
-                    //  AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(SelectedIndex);
 
                     //select swing-allmodes-allconfig.aiff for audio
 
@@ -146,7 +138,6 @@ public class ImprovMgr : MonoBehaviour
 
                     ////generate piano roll based on these 
                     //RollManager.GetComponent<RollMgr>().GeneratePianoRoll();
-
 
                 }//end if check guidance
                 else if (guidanceValue == 2) //only r
@@ -176,8 +167,6 @@ public class ImprovMgr : MonoBehaviour
                 else if (guidanceValue == 14) // all modes
                 {
 
-
-
                 }//end - no guidance value - so just update by default BELOW
                 else         //by default there is no guidance so we go to the standard value
                 {
@@ -190,8 +179,9 @@ public class ImprovMgr : MonoBehaviour
                     //generate MIDIevents  - here we only get the events of the licks
                     RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100g.mid");
                     //generate piano roll based on these
-                    SelectedIndex = 0;
-                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);
+
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
 
                 }//end else default mode
 
@@ -202,8 +192,7 @@ public class ImprovMgr : MonoBehaviour
                 //sequence specific values for sync
                 RollManager.GetComponent<RollMgr>().swingfrequency = 3;
                 RollManager.GetComponent<RollMgr>().fallSpeed = 16;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 22;
-
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 22.5f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -221,7 +210,6 @@ public class ImprovMgr : MonoBehaviour
 
                     //lick
                     RollManager.GetComponent<RollMgr>().Filename = "L0200.mid"; //improv lick
-                                                                                // Debug.Log("filename is transferred " + RollManager.GetComponent<RollMgr>().Filename);
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
@@ -230,7 +218,8 @@ public class ImprovMgr : MonoBehaviour
                     RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200.mid");
 
                     //generate roll
-                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
 
                     //=== we need the y position of the first improv licks since we will base the harmony there 
 
@@ -244,7 +233,7 @@ public class ImprovMgr : MonoBehaviour
                     //no need to generate midievents for harmony
 
                     //generate roll
-                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1);
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
 
                 }//end if check guidance
 
@@ -279,7 +268,6 @@ public class ImprovMgr : MonoBehaviour
 
                 }//end - no guidance value - so just update by default BELOW
 
-
                 //by default there is no guidance so we go to the standard value
 
                 //select swing-allmodes-allconfig.midi for pianoroll generation
@@ -291,9 +279,8 @@ public class ImprovMgr : MonoBehaviour
                 //generate MIDIevents  - here we only get the events of the licks
                 RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200.mid");
                 //generate piano roll based on these
-                SelectedIndex = 0;
-                RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, 2);
-
+                spawntype = 2;
+                RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
 
             }//end listen and learn mode ifs
 
@@ -306,27 +293,29 @@ public class ImprovMgr : MonoBehaviour
             else if (lessonValue == 4) //variations mode
             {
 
-
-
-
             }//end variations mode
             else if (lessonValue == 5) //ques-Ans mode 
             {
-
 
             }// by default it is ques-ans mode
 
             //=== if there is none then no applicable lesson selected
             display_text.text = " ";
 
-        }//end main if for mode 01
-        else
+        }//end main if for mode 01 or mode 03        
+        else if (modeValue == 2) // test yourself mode
         {
-            //assume test yourself mode 
+            //do something here 
 
         }//end of test yourself mode
     }//end manage improv method
 
     //========some other methods would be defined here
+
+    //one catch all function to reset lessons, modes, guidances and destroys all objects and stops all coroutines
+    public void ResetAllValues()
+    {
+
+    }
 
 }//end class
