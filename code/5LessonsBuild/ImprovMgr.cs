@@ -23,7 +23,7 @@ using UnityEngine.UI; //added for colors
 public class ImprovMgr : MonoBehaviour
 {
     //== declare Improv to be static so other classes can access it withouts
-    [SerializeField] GameObject RollManager;
+    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager;
 
     //== some variables that ImprovMgr will manage
 
@@ -84,9 +84,13 @@ public class ImprovMgr : MonoBehaviour
             {
 
                 //swing specific values for sync
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 2;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 17; 
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
+
                 RollManager.GetComponent<RollMgr>().swingfrequency = 2;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 17; 
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24; 
+                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
 
 
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -190,9 +194,12 @@ public class ImprovMgr : MonoBehaviour
             {
 
                 //sequence specific values for sync
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 16;
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 22.5f;
                 RollManager.GetComponent<RollMgr>().swingfrequency = 3;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 16;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 22.5f;
+                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -312,10 +319,76 @@ public class ImprovMgr : MonoBehaviour
 
     //========some other methods would be defined here
 
+    //this method destroys all objects whose parent is RollManager (thereby clears all falling piano notes)
+    //thanks gpt for this
+    void RemoveObjectsWithParent(string parentName)
+    {
+        // Find all objects of type GameObject in the scene
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        // Iterate through each object
+        foreach (GameObject obj in allObjects)
+        {
+            // Check if the parent of the object is named "RollManager"
+            if (obj.transform.parent != null && obj.transform.parent.name == parentName)
+            {
+                // Destroy the object
+                Destroy(obj);
+            }//end if check parent name
+        }//end foreach
+        Debug.Log("Piano roll objects have been cleared");
+    }//end removeobjects 
+
     //one catch all function to reset lessons, modes, guidances and destroys all objects and stops all coroutines
     public void ResetAllValues()
     {
+        //== algorithm
+        // 01 destroy all objects - ok 
+        // 02 end all coroutines - ok -within meta 
+        // 03 clear all modes, guidances, modes, toggles - ok 
+        // 04 start from the scratch - ok!
+        // 05 clear the keyboard of any highlights just to be safe - ok
+        // 06 reset isMotifplaying so it can be resumed again
+        // 07 clear the contents of the midi co routine so it is fresh
 
-    }
+        //destroy objects
+        RemoveObjectsWithParent("RollManager");
+
+        //stop all coroutines
+        RollManager.GetComponent<RollMgr>().StopAllCoroutines(); //added this to be sure
+        RollManager.GetComponent<RollMgr>().IsMotifPlaying = false;
+
+        //clear counter too
+        RollManager.GetComponent<RollMgr>().ctr = 0; 
+
+        //clear all MIDIevents un played
+        RollManager.GetComponent<RollMgr>().noteInfo.Clear(); 
+
+        //clear hihglights in the keyboard to be safe
+        RollManager.GetComponent<RollMgr>().CleanupKeyboard();
+
+        //clearing of all inner values
+        modeValue = 9;
+        lessonValue = 9;
+        guidanceValue = 9;
+          
+
+        //clear guidance toggles 
+        GuidanceManager.GetComponent<GuidanceMgr>().rhythmtoggle.isOn = false;
+        GuidanceManager.GetComponent<GuidanceMgr>().harmonytoggle.isOn = false;
+        GuidanceManager.GetComponent<GuidanceMgr>().metronometoggle.isOn = false;
+
+        //clear lesson toggles 
+        LessonManager.GetComponent<LessonMgr>().lesson01_modeswing.isOn = false;
+        LessonManager.GetComponent<LessonMgr>().lesson02_sequencing.isOn = false;
+        LessonManager.GetComponent<LessonMgr>().lesson03_motifs.isOn = false;
+        LessonManager.GetComponent<LessonMgr>().lesson04_variations.isOn = false;
+        LessonManager.GetComponent<LessonMgr>().lesson05_quesans.isOn = false;
+
+        //clear mode toggles
+        ModeManager.GetComponent<ModeMgr>().listentoggle.isOn = false;
+        ModeManager.GetComponent<ModeMgr>().trytoggle.isOn = false;
+        ModeManager.GetComponent<ModeMgr>().testtoggle.isOn = false;
+    }//end reset all values 
 
 }//end class
