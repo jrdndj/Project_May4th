@@ -3,6 +3,8 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
+### All features working as of 30.11.2023 Just pending Lesson 3-5 from Sandi
+
 ### Post Study Release Targets 
 - [x] Lesson 1: Play Swing Through Modes
 - [x] Lesson 2: Learn Motifs Through Repetition

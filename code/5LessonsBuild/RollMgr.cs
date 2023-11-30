@@ -80,6 +80,7 @@ sealed class RollMgr : MonoBehaviour
 
     int numOfSpawns = 0;
     int spawnCount = 0;
+    int numOfEvents = 0; 
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -95,7 +96,7 @@ sealed class RollMgr : MonoBehaviour
 
     public bool IsMotifPlaying = false;
 
-    List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
+    public List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
 
@@ -105,6 +106,8 @@ sealed class RollMgr : MonoBehaviour
     public int swingcount = 0;
     public int swingfrequency = 2;
     public int velocity = 80;
+    int keysCount = 61;
+    public int ctr = 0;
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -119,7 +122,6 @@ sealed class RollMgr : MonoBehaviour
     //this will now be the one receiving the MIDI events    //TODO Solidify 
     System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
     {
-
 
         //algorithm
         // step 01: receive MIDI event as a parameter. thiis is triggered by the touching or
@@ -162,20 +164,71 @@ sealed class RollMgr : MonoBehaviour
         }//end for all
     }//end MIDIMessenger
 
+    //putting here a more reusable version 
+    System.Collections.IEnumerator playNote(int index, float Duration)
+    {
+        pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        swingcount++;
+        if (swingcount % swingfrequency == 0) //change force of press every other press to simulate swing press
+        {
+            velocity = 60;
+        }
+        else velocity = 80;
+        if (swingcount == 5) swingcount = 0;
+
+        foreach (var port in _ports)
+        {
+            port?.SendNoteOn(0, index, velocity);
+        }//endforeach for ports midi out
+
+        //next
+        ctr++;
+
+        yield return new WaitForSeconds(Duration);
+
+        //=== then key off
+        pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
+        foreach (var port in _ports)
+        {
+            port?.SendNoteOff(0, index);
+        }
+        yield return new WaitForSeconds(Duration);
+
+    }//end playNote
+
+    //putting here a more reusable version 
+    System.Collections.IEnumerator playNoteTryYourself(int index, float Duration)
+    {
+        pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+      
+
+        //next
+        ctr++;
+
+        yield return new WaitForSeconds(Duration);
+
+        //=== then key off
+        pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
+        yield return new WaitForSeconds(Duration);
+
+    }//end playNote
+
+
+
     //this is a copy of MIDIMessenger but with no midi out
     System.Collections.IEnumerator MIDIMessengerTryYourself(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
-    {              
+    {
 
         foreach (var noteEvent in note)
         {
             //LIGHT KEYS - NO SOUND
-            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = improvpink;     
+            pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = improvpink;
 
             yield return new WaitForSeconds(noteEvent.Duration);
 
             //REMOVE KEY LIGHT - STILL NO SOUND
             pianoKeys[noteEvent.NoteNumber - 36].GetComponent<Image>().color = Color.black;
-           
+
             yield return new WaitForSeconds(noteEvent.Duration);
 
         }//end for all
@@ -224,8 +277,8 @@ sealed class RollMgr : MonoBehaviour
 
         //routine methods: scan for midi ports. never modify this code 
         _probe = new MidiProbe(MidiProbe.Mode.Out);
-
-    }
+      
+    }//endstart
 
     // Update is called once per frame
     void Update()
@@ -236,9 +289,9 @@ sealed class RollMgr : MonoBehaviour
         {
             DisposePorts();
             ScanPorts();
-        }
+        }//end port count
 
-    }
+    }//end update
 
     //mandatory method for port detection 
     void OnDestroy()
@@ -248,6 +301,9 @@ sealed class RollMgr : MonoBehaviour
     }
 
     #endregion
+
+    //== startup
+
 
     //===== function definitions here
 
@@ -273,11 +329,6 @@ sealed class RollMgr : MonoBehaviour
         return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
     }//end get audio sourcetime
 
-    //receive info from MIDI notes 
-    private void MIDIEventHandler(List<(long Time, long Duration, int NoteNumber)> notes)
-    {
-
-    }//end of MIDEVENT Handler
 
     //this should generate the MIDIout events
     public void GenerateMIDIEvents(String improvfilename)
@@ -315,8 +366,10 @@ sealed class RollMgr : MonoBehaviour
             //and add into note collection
             noteInfo.Add(noteSet);
 
-
         }//end for midi passing only
+
+        numOfEvents = notes.Count;
+        Debug.Log("There are " + numOfEvents + "midi out events");
     }// end generate MIDI Events
 
 
@@ -500,6 +553,18 @@ sealed class RollMgr : MonoBehaviour
 
     }//end OnNoteOff
 
+    //need a cleanup function
+    public void CleanupKeyboard()
+    {
+        //show all 4 as a for loops
+        for (int i = 0; i < keysCount; i++)
+        {
+            pianoKeys[i].GetComponent<Image>().color = Color.black;
+        }//endfor
+
+    }//endremovelicks
+
+
     //==== Roll related scripts
 
     //lerp related falling
@@ -510,7 +575,7 @@ sealed class RollMgr : MonoBehaviour
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
                                                                     //float duration = 200.00f; //testing 
                                                                     //Debug.Log("speed is now " + duration);
-
+     
         //get the height of that object
         float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
@@ -519,29 +584,33 @@ sealed class RollMgr : MonoBehaviour
             float t = elapsedTime / duration; // ? 
                                               //  float t = duration / elapsedTime;
                                               //something here that checks time when it falls
+         
             try
             {
                 if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
                 {
 
-                    if (!IsMotifPlaying && userMode == 1) //if waL play tunes 
+                    if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
 
+                        StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
                         //have the coroutine here
-                        StartCoroutine(MIDIMessenger(noteInfo));
+                      //  StartCoroutine(MIDIMessenger(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
-                        Debug.Log("playing tunes");
+                     //   Debug.Log("playing tunes");
                         //check to true
-                        IsMotifPlaying = true;
+                      //  ctr++;
+                        //   IsMotifPlaying = true;
                     }//end is motifyplaying
                     else if (!IsMotifPlaying && userMode == 3)//its just test yourself mode
                     {
+                        StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
                         //have the coroutine here
-                        StartCoroutine(MIDIMessengerTryYourself(noteInfo));
+                     //   StartCoroutine(MIDIMessengerTryYourself(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
-                        Debug.Log("playing tunes");
+                    //    Debug.Log("hi tunes");
                         //check to true
-                        IsMotifPlaying = true;
+                     //   IsMotifPlaying = true;
                     }//end else if user mode 3
 
                     //destroy here            
@@ -549,7 +618,7 @@ sealed class RollMgr : MonoBehaviour
 
                 }//end check if touch
                 else //keep moving
-                {
+                {                   
                     rollingObject.transform.position = new Vector3(rollingObject.transform.position.x, Mathf.Lerp(initialY, destroyY, t), rollingObject.transform.position.z);
                     elapsedTime += Time.deltaTime;
                 }//else
@@ -570,4 +639,26 @@ sealed class RollMgr : MonoBehaviour
     }//end fallatendofduration
 
     //highlight related function
+    System.Collections.IEnumerator StartUp(int index)
+    {
+        pianoKeys[index].GetComponent<Image>().color = improvpink;
+        foreach (var port in _ports)
+        {
+            port?.SendNoteOn(0, index, 60);
+        }//endforeach for ports midi out
+
+        //next
+        ctr++;
+
+        yield return new WaitForSeconds(0.1f);
+
+        //=== then key off
+        pianoKeys[index].GetComponent<Image>().color = Color.black;
+        foreach (var port in _ports)
+        {
+            port?.SendNoteOff(0, index);
+        }
+        yield return new WaitForSeconds(0.1f);
+
+    }//end startup
 }//end RollMgr
