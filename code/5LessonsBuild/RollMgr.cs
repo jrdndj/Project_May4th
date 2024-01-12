@@ -577,7 +577,7 @@ sealed class RollMgr : MonoBehaviour
                                                                     //Debug.Log("speed is now " + duration);
      
         //get the height of that object
-        float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
+        float objectHeight = (noteObject.GetComponent<RectTransform>().rect.height*2); //latest working *2
 
         while (elapsedTime < duration)
         {
