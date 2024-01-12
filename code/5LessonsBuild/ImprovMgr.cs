@@ -74,6 +74,11 @@ public class ImprovMgr : MonoBehaviour
          * call ContentMgr
          * call RolLScript
          * **/
+
+        //call determine accompaniement to finalize the value of guidancevalue
+        GuidanceManager.GetComponent<GuidanceMgr>().DetermineAccompaniement();
+       // guidanceValue = GuidanceManager.GetComponent<GuidanceMgr>().guidancevalue;
+
         //listen and learn mode
         Debug.Log("mode value we have is " + modeValue);
         if (modeValue == 1 || modeValue == 3) //mode 1 or 3 doesnt matter, only the coroutine changes

@@ -3,14 +3,21 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
+### All lessons received from Sandi. Newer tasks as of 12.01.2024
+- [x] Change guidances toggles to checkboxes
+- [ ] Add guidance features: metronome and rhythm
+- [ ] fix LH configuration
+- [ ] Music sheets as display and condition 2
+- [ ] Bars (?) 
+
 ### All features working as of 30.11.2023 Just pending Lesson 3-5 from Sandi
 
 ### Post Study Release Targets 
 - [x] Lesson 1: Play Swing Through Modes
-- [x] Lesson 2: Learn Motifs Through Repetition
-- [x] Lesson 3: Practice Concepts Through QnA Mode
-- [x] Lesson 4: Apply Lessons Through Sequencing on Different Notes
-- [x] Lesson 5: Variations
+- [x] Lesson 2: Learn Sequences Through Repetition
+- [x] Lesson 3: Learn Motifs Through Phrasing
+- [x] Lesson 4: Learn Variations
+- [x] Lesson 5: Ques-Ans
 
 ### open issues and targets
 - [x] MAJOR cleanup
