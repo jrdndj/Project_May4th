@@ -31,6 +31,8 @@ public class ImprovMgr : MonoBehaviour
                                                                   // int SelectedIndex = 0; // 0 by default
     public int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
 
+    bool loaded = false; 
+
     //==== UI related variables
 
     [SerializeField] public Text display_text; //connect to display_text
@@ -56,6 +58,11 @@ public class ImprovMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (loaded && RollManager.GetComponent<RollMgr>().numOfEvents == RollManager.GetComponent<RollMgr>().ctr)
+        {
+            display_text.text = "Lesson finished. Select another lesson to continue";
+            loaded = false;
+        }  //end if loaded check
 
     }//end update()
 
@@ -77,7 +84,10 @@ public class ImprovMgr : MonoBehaviour
 
         //call determine accompaniement to finalize the value of guidancevalue
         GuidanceManager.GetComponent<GuidanceMgr>().DetermineAccompaniement();
-       // guidanceValue = GuidanceManager.GetComponent<GuidanceMgr>().guidancevalue;
+        // guidanceValue = GuidanceManager.GetComponent<GuidanceMgr>().guidancevalue;
+
+        loaded = true;
+        display_text.text = "Lesson ongoing...";
 
         //listen and learn mode
         Debug.Log("mode value we have is " + modeValue);
@@ -299,11 +309,197 @@ public class ImprovMgr : MonoBehaviour
             else if (lessonValue == 3) // motif mode
             {
 
+                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+
+                //default value for lesson 02
+                Debug.Log("guidance value we have is " + guidanceValue);
+
+                //change swing frequency to 2
+                RollManager.GetComponent<RollMgr>().swingfrequency = 4;
+
+                //change velocity
+                RollManager.GetComponent<RollMgr>().velocity = 60;
+
+                //nowcheck if guidance is chosen
+                if (guidanceValue == 4) // only harmony
+                {
+                    //=====load improv lick first, then load guidance licks applicable
+
+                    //lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0300.mid"; //improv lick
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //generate MIDIevents  - here we only get the events of the licks
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300.mid");
+
+                    //generate roll
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
+                    //=== we need the y position of the first improv licks since we will base the harmony there 
+
+                    //=======then load rhythm guidance
+                    //harmony
+                   // RollManager.GetComponent<RollMgr>().Filename = "L03LH.mid"; //harmony
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                  //  RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //no need to generate midievents for harmony
+
+                    //generate roll
+                  //  RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
+
+                }//end if check guidance
+
+                else if (guidanceValue == 2) //only r
+                {
+
+                }//else guidanceValue rhythm only 
+                else if (guidanceValue == 8) //only m
+                {
+
+                }
+                else if (guidanceValue == 4) // only h 
+                {
+
+                }
+                else if (guidanceValue == 6) //only r + h
+                {
+
+                }
+                else if (guidanceValue == 10) //only r + m
+                {
+
+                }
+                else if (guidanceValue == 12) // only h + m
+                {
+
+                }
+                else if (guidanceValue == 14) // all modes
+                {
+
+
+
+                }//end - no guidance value - so just update by default BELOW
+
+                //by default there is no guidance so we go to the standard value
+
+                //select motif-allmodes-allconfig.midi for pianoroll generation
+                RollManager.GetComponent<RollMgr>().Filename = "L0300.mid"; //must be 00
+
+                //invoke song manager from rollmgr
+                RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                //generate MIDIevents  - here we only get the events of the licks
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300.mid");
+                //generate piano roll based on these
+                spawntype = 2;
+                RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
 
             }//end motif mode
 
             else if (lessonValue == 4) //variations mode
             {
+
+                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+
+                //default value for lesson 02
+                Debug.Log("guidance value we have is " + guidanceValue);
+
+                //change swing frequency to 2
+                RollManager.GetComponent<RollMgr>().swingfrequency = 4;
+
+                //change velocity
+                RollManager.GetComponent<RollMgr>().velocity = 60;
+
+                //nowcheck if guidance is chosen
+                if (guidanceValue == 4) // only harmony
+                {
+                    //=====load improv lick first, then load guidance licks applicable
+
+                    //lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0400.mid"; //improv lick
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //generate MIDIevents  - here we only get the events of the licks
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400.mid");
+
+                    //generate roll
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
+                    //=== we need the y position of the first improv licks since we will base the harmony there 
+
+                    //=======then load rhythm guidance
+                    //harmony
+                    // RollManager.GetComponent<RollMgr>().Filename = "L03LH.mid"; //harmony
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    //  RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //no need to generate midievents for harmony
+
+                    //generate roll
+                    //  RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
+
+                }//end if check guidance
+
+                else if (guidanceValue == 2) //only r
+                {
+
+                }//else guidanceValue rhythm only 
+                else if (guidanceValue == 8) //only m
+                {
+
+                }
+                else if (guidanceValue == 4) // only h 
+                {
+
+                }
+                else if (guidanceValue == 6) //only r + h
+                {
+
+                }
+                else if (guidanceValue == 10) //only r + m
+                {
+
+                }
+                else if (guidanceValue == 12) // only h + m
+                {
+
+                }
+                else if (guidanceValue == 14) // all modes
+                {
+
+
+
+                }//end - no guidance value - so just update by default BELOW
+
+                //by default there is no guidance so we go to the standard value
+
+                //select motif-allmodes-allconfig.midi for pianoroll generation
+                RollManager.GetComponent<RollMgr>().Filename = "L0400.mid"; //must be 00
+
+                //invoke song manager from rollmgr
+                RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                //generate MIDIevents  - here we only get the events of the licks
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400.mid");
+                //generate piano roll based on these
+                spawntype = 2;
+                RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
+
 
             }//end variations mode
             else if (lessonValue == 5) //ques-Ans mode 

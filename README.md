@@ -10,7 +10,7 @@ repository for Piano 2.0 MVP v1
 - [ ] Music sheets as display and condition 2
 - [ ] Bars (?) 
 
-### All features working as of 30.11.2023 Just pending Lesson 3-5 from Sandi
+### All features working as of 30.11.2023 ~~Just pending Lesson 3-5 from Sandi~~ ALREADY ADDED THEM! 
 
 ### Post Study Release Targets 
 - [x] Lesson 1: Play Swing Through Modes
