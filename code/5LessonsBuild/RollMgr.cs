@@ -80,7 +80,7 @@ sealed class RollMgr : MonoBehaviour
 
     int numOfSpawns = 0;
     int spawnCount = 0;
-    int numOfEvents = 0; 
+    public int numOfEvents = 0; 
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -455,12 +455,14 @@ sealed class RollMgr : MonoBehaviour
             // Calculate X position in pixels based on note.Time
             float xPosition = pianoKeys[noteNumber].transform.position.x;
 
+      
+
             //calculate their position
             float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
                                                                                                 //1000000.0f                              //should be somewhere between 1000000 and 2400000
                                                                                                 // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
-                                                                                                //but we also need to raise the keys to half of its height so see below 
 
+    
             //=== i still need this but only for harmony or type 1
             //store here the first y position
             if (spawnCount == 1)
@@ -476,9 +478,12 @@ sealed class RollMgr : MonoBehaviour
             float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
                                                                                    //240000.0f
                                                                                    //get the height of that object
+
+  
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
                                                                                            //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
 
+           // float blacknoteHeight = objectHeight / 2; 
             //change the size (localscale) of the object based on the computed height
             noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
             //consider the half of the shape when setting the position
@@ -505,6 +510,9 @@ sealed class RollMgr : MonoBehaviour
                 Color darkerColor = new Color();
                 darkerColor = (Color)improvpink * 0.75f;
                 noteObject.GetComponent<Image>().color = darkerColor;
+                //add more height for black prefabs to offset for their height
+               // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight + blacknoteHeight, zPosition); // changes to test
+
             }//endisBlackprefabcheck
 
             //now do some computation for the falling
