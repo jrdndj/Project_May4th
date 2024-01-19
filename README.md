@@ -7,6 +7,7 @@ repository for Piano 2.0 MVP v1
 - [x] Change guidances toggles to checkboxes
 - [ ] Add guidance features: metronome and rhythm
 - [ ] fix LH configuration
+- [x] music sheets work! 
 - [ ] Music sheets as display and condition 2
 - [ ] Bars (?) 
 
