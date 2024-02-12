@@ -25,6 +25,8 @@ public class ImprovMgr : MonoBehaviour
     //== declare Improv to be static so other classes can access it withouts
     [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager;
 
+    public static ImprovMgr Instance;
+
     //== some variables that ImprovMgr will manage
 
     public int modeValue = 9, lessonValue = 9, guidanceValue = 9; //mode, lesson and guidance mgrs need these
@@ -46,6 +48,13 @@ public class ImprovMgr : MonoBehaviour
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
                                                        //  Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
                                                        // Color32 restblack = Color.black; //for the rests 
+
+
+    //playback related objects and variables
+    [SerializeField] GameObject AudioManager;
+    public AudioClip[] clips;
+    public AudioSource audioSource;
+    public bool IsRhythmPlaying = false;
 
     // Start is called before the first frame update
     void Start()
@@ -89,11 +98,22 @@ public class ImprovMgr : MonoBehaviour
         loaded = true;
         display_text.text = "Lesson ongoing...";
 
+
         //listen and learn mode
         Debug.Log("mode value we have is " + modeValue);
         if (modeValue == 1 || modeValue == 3) //mode 1 or 3 doesnt matter, only the coroutine changes
         {
             Debug.Log("lesson value we have is " + lessonValue);
+
+            //begin rhythm if true
+            if (GuidanceManager.GetComponent<GuidanceMgr>().rhythm && !IsRhythmPlaying)
+            {
+                Invoke("PlayDelayedAudio", 4.0f);
+             //   Instance.audioSource.Play();
+                // RollManager.GetComponent<RollMgr>().audioSource.Play();
+                IsRhythmPlaying = true;
+            }
+
             //now check which lesson
             if (lessonValue == 1)
             {
@@ -115,14 +135,14 @@ public class ImprovMgr : MonoBehaviour
                     //=====load improv lick first, then load guidance licks applicable
 
                     //read file to generate lick highlights 
-                    RollManager.GetComponent<RollMgr>().Filename = "L0100g.mid"; //improv lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0100F.mid"; //improv lick
                                                                                  // Debug.Log("filename is transferred " + RollManager.GetComponent<RollMgr>().Filename);
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //generate MIDIevents  - here we only get the events of the licks
-                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100g.mid");
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100F.mid");
 
                     //generate piano roll from the file read
                     spawntype = 2;
@@ -161,6 +181,40 @@ public class ImprovMgr : MonoBehaviour
                 }//end if check guidance
                 else if (guidanceValue == 2) //only r
                 {
+                    //=====load improv lick first, then load guidance licks applicable
+
+                    //read file to generate lick highlights 
+                    RollManager.GetComponent<RollMgr>().Filename = "L0100F.mid"; //improv lick
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //generate MIDIevents  - here we only get the events of the licks
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100F.mid");
+
+                    //generate piano roll from the file read
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
+
+                    //=======then load RHYTHM!!! guidance
+
+               
+
+
+
+                    //select swing-allmodes-allconfig.aiff for audio
+
+                    //==== template stuff 
+                    ////select swing-allmodes-allconfig.midi for pianoroll generation
+                    //RollManager.GetComponent<RollMgr>().Filename = "L0104.mid";
+
+                    ////invoke song manager from rollmgr
+                    //RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    ////generate piano roll based on these 
+                    //RollManager.GetComponent<RollMgr>().GeneratePianoRoll();
+
 
                 }//else guidanceValue rhythm only 
                 else if (guidanceValue == 8) //only m
@@ -190,13 +244,13 @@ public class ImprovMgr : MonoBehaviour
                 else         //by default there is no guidance so we go to the standard value
                 {
                     //select swing-allmodes-allconfig.midi for pianoroll generation
-                    RollManager.GetComponent<RollMgr>().Filename = "L0100g.mid"; //must be 00
+                    RollManager.GetComponent<RollMgr>().Filename = "L0100F.mid"; //must be 00
 
                     //invoke song manager from rollmgr
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //generate MIDIevents  - here we only get the events of the licks
-                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100g.mid");
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0100F.mid");
                     //generate piano roll based on these
 
                     spawntype = 2;
@@ -231,13 +285,13 @@ public class ImprovMgr : MonoBehaviour
                     //=====load improv lick first, then load guidance licks applicable
 
                     //lick
-                    RollManager.GetComponent<RollMgr>().Filename = "L0200.mid"; //improv lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0200F.mid"; //improv lick
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //generate MIDIevents  - here we only get the events of the licks
-                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200.mid");
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200F.mid");
 
                     //generate roll
                     spawntype = 2;
@@ -293,13 +347,13 @@ public class ImprovMgr : MonoBehaviour
                 //by default there is no guidance so we go to the standard value
 
                 //select swing-allmodes-allconfig.midi for pianoroll generation
-                RollManager.GetComponent<RollMgr>().Filename = "L0200.mid"; //must be 00
+                RollManager.GetComponent<RollMgr>().Filename = "L0200F.mid"; //must be 00
 
                 //invoke song manager from rollmgr
                 RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                 //generate MIDIevents  - here we only get the events of the licks
-                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200.mid");
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0200F.mid");
                 //generate piano roll based on these
                 spawntype = 2;
                 RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
@@ -328,13 +382,13 @@ public class ImprovMgr : MonoBehaviour
                     //=====load improv lick first, then load guidance licks applicable
 
                     //lick
-                    RollManager.GetComponent<RollMgr>().Filename = "L0300.mid"; //improv lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0300F.mid"; //improv lick
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //generate MIDIevents  - here we only get the events of the licks
-                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300.mid");
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300F.mid");
 
                     //generate roll
                     spawntype = 2;
@@ -390,13 +444,13 @@ public class ImprovMgr : MonoBehaviour
                 //by default there is no guidance so we go to the standard value
 
                 //select motif-allmodes-allconfig.midi for pianoroll generation
-                RollManager.GetComponent<RollMgr>().Filename = "L0300.mid"; //must be 00
+                RollManager.GetComponent<RollMgr>().Filename = "L0300F.mid"; //must be 00
 
                 //invoke song manager from rollmgr
                 RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                 //generate MIDIevents  - here we only get the events of the licks
-                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300.mid");
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0300F.mid");
                 //generate piano roll based on these
                 spawntype = 2;
                 RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
@@ -426,13 +480,13 @@ public class ImprovMgr : MonoBehaviour
                     //=====load improv lick first, then load guidance licks applicable
 
                     //lick
-                    RollManager.GetComponent<RollMgr>().Filename = "L0400.mid"; //improv lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0400F.mid"; //improv lick
 
                     //InvokeSongManager to access methods to generate PianoRoll
                     RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //generate MIDIevents  - here we only get the events of the licks
-                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400.mid");
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400F.mid");
 
                     //generate roll
                     spawntype = 2;
@@ -488,13 +542,13 @@ public class ImprovMgr : MonoBehaviour
                 //by default there is no guidance so we go to the standard value
 
                 //select motif-allmodes-allconfig.midi for pianoroll generation
-                RollManager.GetComponent<RollMgr>().Filename = "L0400.mid"; //must be 00
+                RollManager.GetComponent<RollMgr>().Filename = "L0400F.mid"; //must be 00
 
                 //invoke song manager from rollmgr
                 RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                 //generate MIDIevents  - here we only get the events of the licks
-                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400.mid");
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0400F.mid");
                 //generate piano roll based on these
                 spawntype = 2;
                 RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
@@ -504,6 +558,99 @@ public class ImprovMgr : MonoBehaviour
             }//end variations mode
             else if (lessonValue == 5) //ques-Ans mode 
             {
+
+                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+
+                //default value for lesson 02
+                Debug.Log("guidance value we have is " + guidanceValue);
+
+                //change swing frequency to 2
+                RollManager.GetComponent<RollMgr>().swingfrequency = 4;
+
+                //change velocity
+                RollManager.GetComponent<RollMgr>().velocity = 60;
+
+                //nowcheck if guidance is chosen
+                if (guidanceValue == 4) // only harmony
+                {
+                    //=====load improv lick first, then load guidance licks applicable
+
+                    //lick
+                    RollManager.GetComponent<RollMgr>().Filename = "L0500F.mid"; //improv lick
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //generate MIDIevents  - here we only get the events of the licks
+                    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0500F.mid");
+
+                    //generate roll
+                    spawntype = 2;
+                    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
+                    //=== we need the y position of the first improv licks since we will base the harmony there 
+
+                    //=======then load rhythm guidance
+                    //harmony
+                    // RollManager.GetComponent<RollMgr>().Filename = "L03LH.mid"; //harmony
+
+                    //InvokeSongManager to access methods to generate PianoRoll
+                    //  RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                    //no need to generate midievents for harmony
+
+                    //generate roll
+                    //  RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
+
+                }//end if check guidance
+
+                else if (guidanceValue == 2) //only r
+                {
+
+                }//else guidanceValue rhythm only 
+                else if (guidanceValue == 8) //only m
+                {
+
+                }
+                else if (guidanceValue == 4) // only h 
+                {
+
+                }
+                else if (guidanceValue == 6) //only r + h
+                {
+
+                }
+                else if (guidanceValue == 10) //only r + m
+                {
+
+                }
+                else if (guidanceValue == 12) // only h + m
+                {
+
+                }
+                else if (guidanceValue == 14) // all modes
+                {
+
+
+
+                }//end - no guidance value - so just update by default BELOW
+
+                //by default there is no guidance so we go to the standard value
+
+                //select motif-allmodes-allconfig.midi for pianoroll generation
+                RollManager.GetComponent<RollMgr>().Filename = "L0500F.mid"; //must be 00
+
+                //invoke song manager from rollmgr
+                RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+                //generate MIDIevents  - here we only get the events of the licks
+                RollManager.GetComponent<RollMgr>().GenerateMIDIEvents("L0500F.mid");
+                //generate piano roll based on these
+                spawntype = 2;
+                RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+
 
             }// by default it is ques-ans mode
 
@@ -519,6 +666,18 @@ public class ImprovMgr : MonoBehaviour
     }//end manage improv method
 
     //========some other methods would be defined here
+
+
+    //rhythm related scripts
+    //selecting audio for audiosource
+    //playing the audio source with delay
+    public void PlayDelayedAudio()
+    {
+        //decentralising to AudioManager game object 
+        AudioManager.GetComponent<AudioManager>().RhythmAudioSelection(2); //change this one
+       //Instance.audioSource.Play();
+        //Instance.MotifToPlay.Play();
+    }
 
     //this method destroys all objects whose parent is RollManager (thereby clears all falling piano notes)
     //thanks gpt for this
@@ -552,14 +711,19 @@ public class ImprovMgr : MonoBehaviour
         // 06 reset isMotifplaying so it can be resumed again
         // 07 clear the contents of the midi co routine so it is fresh
 
+
         //destroy objects
         RemoveObjectsWithParent("RollManager");
 
         //stop all coroutines
         RollManager.GetComponent<RollMgr>().StopAllCoroutines(); //added this to be sure
         RollManager.GetComponent<RollMgr>().IsMotifPlaying = false;
+        RollManager.GetComponent<RollMgr>().IsRhythmPlaying = false;
 
-        //clear counter too
+        //stop audio
+        AudioManager.GetComponent<AudioManager>().StopRhythm(); 
+
+            //clear counter too
         RollManager.GetComponent<RollMgr>().ctr = 0; 
 
         //clear all MIDIevents un played
@@ -572,7 +736,8 @@ public class ImprovMgr : MonoBehaviour
         modeValue = 9;
         lessonValue = 9;
         guidanceValue = 9;
-          
+        IsRhythmPlaying = false; 
+ 
 
         //clear guidance toggles 
         GuidanceManager.GetComponent<GuidanceMgr>().rhythmtoggle.isOn = false;

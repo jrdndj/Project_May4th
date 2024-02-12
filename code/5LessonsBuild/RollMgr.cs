@@ -100,7 +100,11 @@ sealed class RollMgr : MonoBehaviour
 
     //public int SelectedSong; //which will be sent to PlayDelayedAudio for Audiomanager
 
+    //playback related objects and variables
+    [SerializeField] GameObject AudioManager;
+    public AudioClip[] clips; 
     public AudioSource audioSource;
+    public bool IsRhythmPlaying = false; 
 
     //=== midi out related variables 
     public int swingcount = 0;
@@ -335,7 +339,7 @@ sealed class RollMgr : MonoBehaviour
     {
 
         MidiFile midi = midiFile;
-        Debug.Log("Successfully read for midi events" + Filename);
+     //   Debug.Log("Successfully read for midi events" + Filename);
 
         //routine getting of files
         var notes = midi.GetNotes();
@@ -369,7 +373,7 @@ sealed class RollMgr : MonoBehaviour
         }//end for midi passing only
 
         numOfEvents = notes.Count;
-        Debug.Log("There are " + numOfEvents + "midi out events");
+     //   Debug.Log("There are " + numOfEvents + "midi out events");
     }// end generate MIDI Events
 
 
@@ -380,13 +384,13 @@ sealed class RollMgr : MonoBehaviour
         //piano related configs
         //set prefabs
         GameObject whitePrefab, blackPrefab;
-        whitePrefab = (GameObject)Resources.Load("Prefab/whitekeyprefab");
-        blackPrefab = (GameObject)Resources.Load("Prefab/blackkeyprefab");
+        whitePrefab = (GameObject)Resources.Load("Prefab/new_whiteprefab");
+        blackPrefab = (GameObject)Resources.Load("Prefab/new_blackprefab");
 
         // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
-        Debug.Log("Successfully read " + Filename);
+     //   Debug.Log("Successfully read " + Filename);
 
         //routine getting of files
 
@@ -457,18 +461,18 @@ sealed class RollMgr : MonoBehaviour
 
       
 
-            //calculate their position
+            //calculate their position -
             float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
                                                                                                 //1000000.0f                              //should be somewhere between 1000000 and 2400000
                                                                                                 // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
 
     
-            //=== i still need this but only for harmony or type 1
-            //store here the first y position
-            if (spawnCount == 1)
-            {
-                firstYpos = yPosition;
-            }
+            ////=== i still need this but only for harmony or type 1
+            ////store here the first y position
+            //if (spawnCount == 1)
+            //{
+            //    firstYpos = yPosition;
+            //}
 
             //this firstyposition becomes an offset for melody type spawns
 
@@ -482,8 +486,7 @@ sealed class RollMgr : MonoBehaviour
   
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
                                                                                            //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
-
-           // float blacknoteHeight = objectHeight / 2; 
+            // float blacknoteHeight = objectHeight / 2; 
             //change the size (localscale) of the object based on the computed height
             noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
             //consider the half of the shape when setting the position
@@ -492,13 +495,15 @@ sealed class RollMgr : MonoBehaviour
 
             //get the half of the object - some computation here
             // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight * 2), zPosition); // latest working
-            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight, zPosition); // changes to test
-
+            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2, zPosition); // changes to test
+                                                                                                            // or NoteHeight/2
+          
             //== if type 1, adjust it one more time
             if (spawntype == 1)
             {
-                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight, zPosition); // changes to test
-            }//end adjust 
+                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + yPosition + objectHeight*2, zPosition); // changes to test
+            }//end adjust
+
 
             //set color to yellow or pink based on type
             noteObject.GetComponent<Image>().color = spawncolor; //pink for now SOLID it later
@@ -587,6 +592,7 @@ sealed class RollMgr : MonoBehaviour
         //get the height of that object
         float objectHeight = (noteObject.GetComponent<RectTransform>().rect.height*2); //latest working *2
 
+
         while (elapsedTime < duration)
         {
             float t = elapsedTime / duration; // ? 
@@ -595,8 +601,9 @@ sealed class RollMgr : MonoBehaviour
          
             try
             {
+                //this is where we check if the rolls touch the greenline
                 if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
-                {
+                {                                //  
 
                     if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
@@ -669,4 +676,15 @@ sealed class RollMgr : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
     }//end startup
+
+    //rhythm related scripts
+    //selecting audio for audiosource
+    //playing the audio source with delay
+    //public void PlayDelayedAudio()
+    //{
+    //    //decentralising to AudioManager game object 
+    //    AudioManager.GetComponent<AudioManager>().ChangeAudioSelection(0); //change this one
+    //    Instance.audioSource.Play(); 
+    //    //Instance.MotifToPlay.Play();
+    //}
 }//end RollMgr

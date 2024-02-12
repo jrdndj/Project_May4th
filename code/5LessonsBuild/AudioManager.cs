@@ -6,7 +6,8 @@ public class AudioManager : MonoBehaviour
 {
     //playback related variables
     public AudioClip[] clips;
-    public AudioSource MotifToPlay;
+   // public AudioSource MotifToPlay;
+    public AudioSource RhythmToPlay; 
 
     public int selectedIndex = 0; //default is the 0th clip
 
@@ -28,18 +29,56 @@ public class AudioManager : MonoBehaviour
      * **/
     public void ChangeAudioSelection(int selectedIndex)
     {
-        //== 0 is default
-        if (selectedIndex >= 0 && selectedIndex < clips.Length)
+        ////== 0 is default
+        //if (selectedIndex >= 0 && selectedIndex < clips.Length)
+        //{
+        //    MotifToPlay.clip = clips[selectedIndex];
+        //    MotifToPlay.Play();
+        //}//end selecting of chosen index
+        //else
+        //{
+        //    Debug.Log("Invalid clip selection");
+        //}//end else
+
+    }//end changeAudio Selection
+
+    /**
+    * index 0 - L01R0.aiff
+    * index 1 - L01R1.aiff
+    * index 2 - some rhythm
+    * 
+    * 
+    * 
+    * **/
+    public void RhythmAudioSelection(int selectedIndex)
+    {
+        if (selectedIndex==0)
         {
-            MotifToPlay.clip = clips[selectedIndex];
-            MotifToPlay.Play();
+            RhythmToPlay.clip = clips[0];
+            RhythmToPlay.Play();
         }//end selecting of chosen index
+        else if(selectedIndex==1)
+        {
+            RhythmToPlay.clip = clips[1];
+            RhythmToPlay.Play();
+           
+        }//end else if
+        else if (selectedIndex == 2)
+        {
+            RhythmToPlay.clip = clips[2];
+            RhythmToPlay.Play();
+
+        }//end else if
         else
         {
             Debug.Log("Invalid clip selection");
         }//end else
+    }//end RhythmAudioSelection
 
-    }//end changeAudio Selection
+    public void StopRhythm()
+    {
+        RhythmToPlay.Stop();
+    }//end stoprhythm
 
     // Update is called once per frame
     void Update()
