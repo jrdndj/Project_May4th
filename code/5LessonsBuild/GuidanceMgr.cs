@@ -167,49 +167,49 @@ public class GuidanceMgr : MonoBehaviour
         // r= 2, h=4, m=8, all is 2+4+8 = 14
         if (rhythm && harmony && metronome)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+        ///    Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 14;
             // return 14;  // r + h + m
         }//endif
         else if (rhythm && harmony && !metronome)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+         //   Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 6 ;
             // return 6; // r + h
         }
         else if(rhythm && metronome && !harmony)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+        //    Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 10; 
             //return 10; // r + m
         }
         else if(harmony && metronome && !rhythm)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+        //    Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 12; 
             //return 12; // h + m
         }
         else if(rhythm && !harmony && !metronome)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+         //   Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 2; 
             //return 2; // r
         }
         else if(harmony && !rhythm && !metronome)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+          //  Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 4;
             // return 4; // h 
         }
         else if (metronome && !harmony && !rhythm)
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+          //  Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 8;
             //return 8; // m
         }
         else
         {
-            Debug.Log("RHM" + rhythm + harmony + metronome);
+           // Debug.Log("RHM" + rhythm + harmony + metronome);
             ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 9; 
             //return 9; //default 
         }
