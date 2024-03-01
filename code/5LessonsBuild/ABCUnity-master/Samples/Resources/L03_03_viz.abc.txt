@@ -1,0 +1,7 @@
+X:1
+T: Motif 3
+L:1/4
+M:4/4
+V:1
+K:C
+[V:1] e c A F | E3/2 D/ D2 | d B G E | D3/2 ^C/ C2 :|

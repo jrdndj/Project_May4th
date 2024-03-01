@@ -6,10 +6,8 @@ repository for Piano 2.0 MVP v1
 ### All lessons received from Sandi. Newer tasks as of 12.01.2024
 - [x] Change guidances toggles to checkboxes
 - [x] Add guidance features: metronome and rhythm
-- [ ] fix LH configuration
 - [x] music sheets work! 
-- [ ] Music sheets as display and condition 2
-- [ ] Bars (?) 
+- [x] Music sheets as display and condition 2
 
 ### All features working as of 30.11.2023 ~~Just pending Lesson 3-5 from Sandi~~ ALREADY ADDED THEM! 
 
