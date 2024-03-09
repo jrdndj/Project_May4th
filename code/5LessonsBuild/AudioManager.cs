@@ -7,7 +7,8 @@ public class AudioManager : MonoBehaviour
     //playback related variables
     public AudioClip[] clips;
    // public AudioSource MotifToPlay;
-    public AudioSource RhythmToPlay; 
+    public AudioSource RhythmToPlay;
+   // public AudioSource MetronomeToPlay; 
 
     public int selectedIndex = 0; //default is the 0th clip
 
@@ -52,33 +53,52 @@ public class AudioManager : MonoBehaviour
     * **/
     public void RhythmAudioSelection(int selectedIndex)
     {
-        if (selectedIndex==0)
-        {
-            RhythmToPlay.clip = clips[0];
-            RhythmToPlay.Play();
-        }//end selecting of chosen index
-        else if(selectedIndex==1)
-        {
-            RhythmToPlay.clip = clips[1];
-            RhythmToPlay.Play();
+        RhythmToPlay.clip = clips[selectedIndex];
+        RhythmToPlay.Play();
+        //if (selectedIndex==0)
+        //{
+        //    RhythmToPlay.clip = clips[0];
+        //    RhythmToPlay.Play();
+        //}//end selecting of chosen index
+        //else if(selectedIndex==1)
+        //{
+        //    RhythmToPlay.clip = clips[1];
+        //    RhythmToPlay.Play();
            
-        }//end else if
-        else if (selectedIndex == 2)
-        {
-            RhythmToPlay.clip = clips[2];
-            RhythmToPlay.Play();
+        //}//end else if
+        //else if (selectedIndex == 2)
+        //{
+        //    RhythmToPlay.clip = clips[2];
+        //    RhythmToPlay.Play();
 
-        }//end else if
-        else
-        {
-            Debug.Log("Invalid clip selection");
-        }//end else
+        //}//end else if
+        //else
+        //{
+        //    Debug.Log("Invalid clip selection");
+        //}//end else
     }//end RhythmAudioSelection
+
+    public void MetronomeSelection()
+    {
+        RhythmToPlay.clip = clips[7];
+        RhythmToPlay.Play();
+    }
+
+    public void HarmonySelection(int selectedIndex)
+    {
+        RhythmToPlay.clip = clips[selectedIndex];
+        RhythmToPlay.Play();
+    }
 
     public void StopRhythm()
     {
         RhythmToPlay.Stop();
     }//end stoprhythm
+
+    public void StopMetronome()
+    {
+        RhythmToPlay.Stop();
+    }
 
     // Update is called once per frame
     void Update()

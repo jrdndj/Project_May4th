@@ -58,7 +58,7 @@ sealed class RollMgr : MonoBehaviour
 
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager;
-    [SerializeField] GameObject songManager;
+    [SerializeField] GameObject songManager, ImprovManager;
     // [SerializeField] GameObject AudioManager;
 
     GameObject noteObject;
@@ -69,6 +69,7 @@ sealed class RollMgr : MonoBehaviour
     float destroyY;
 
     public static RollMgr Instance;
+    public bool reload = true; 
 
     //this helps the mapping of keys similar to that midi hardware
     [SerializeField] List<GameObject> pianoKeys = new List<GameObject>();
@@ -80,7 +81,9 @@ sealed class RollMgr : MonoBehaviour
 
     int numOfSpawns = 0;
     int spawnCount = 0;
-    public int numOfEvents = 0; 
+    public int numOfEvents = 0;
+
+    public float latestY = 0; 
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -95,6 +98,7 @@ sealed class RollMgr : MonoBehaviour
     public string Filename; // this should be manipulated by ImprovManager
 
     public bool IsMotifPlaying = false;
+    public bool isTouched = false; 
 
     public List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
 
@@ -121,7 +125,7 @@ sealed class RollMgr : MonoBehaviour
     Color32 yellow = Color.yellow;
     Color32 belowpink = new Color32(75, 0, 130, 255);  //this is indigo akshully
     Color32 blues = new Color32(65, 105, 225, 255); // this is for the blues blue
-    Color32 restblack = Color.black; //for the rests 
+    Color32 restblack = Color.black; //for the rests
 
     //this will now be the one receiving the MIDI events    //TODO Solidify 
     System.Collections.IEnumerator MIDIMessenger(List<(float Time, float Duration, int NoteNumber)> note) //this should be programmed to receive MIDI events
@@ -380,13 +384,15 @@ sealed class RollMgr : MonoBehaviour
     // this generates piano roll from the file read
     public void GeneratePianoRoll(Color32 spawncolor, int spawntype, int userMode) //1 for melody, 2 for licks 
     {
+
+        int sequencecount = 0; 
+        reload = false; 
         //numOfSpawns = 0; //fresh start
         //piano related configs
         //set prefabs
         GameObject whitePrefab, blackPrefab;
         whitePrefab = (GameObject)Resources.Load("Prefab/new_whiteprefab");
         blackPrefab = (GameObject)Resources.Load("Prefab/new_blackprefab");
-
         // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
@@ -480,11 +486,12 @@ sealed class RollMgr : MonoBehaviour
 
             // Calculate the height of the object based on note.Duration 
             float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
-                                                                                   //240000.0f
+                                                                                   //240000.0f the correct version
                                                                                    //get the height of that object
 
   
-            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
+           // float objectHeight = GetComponent<Renderer>().bounds.size.y;
+          float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
                                                                                            //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
             // float blacknoteHeight = objectHeight / 2; 
             //change the size (localscale) of the object based on the computed height
@@ -495,7 +502,7 @@ sealed class RollMgr : MonoBehaviour
 
             //get the half of the object - some computation here
             // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight * 2), zPosition); // latest working
-            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2, zPosition); // changes to test
+            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2f, zPosition); // changes to test
                                                                                                             // or NoteHeight/2
           
             //== if type 1, adjust it one more time
@@ -522,6 +529,8 @@ sealed class RollMgr : MonoBehaviour
 
             //now do some computation for the falling
 
+            //remember latestY
+           // latestY = noteObject.transform.position.y;
 
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
@@ -535,6 +544,18 @@ sealed class RollMgr : MonoBehaviour
             numOfSpawns++;
 
         }//end foreach
+
+       // latestY = 
+        //add sequence count
+        sequencecount++;
+
+        //get the latest position
+        //by this point we're done
+        if (sequencecount<=4)
+        {
+            //ImprovManager.GetComponent<ImprovMgr>().LoadSequence(ImprovManager.GetComponent<ImprovMgr>().modeValue, ImprovManager.GetComponent<ImprovMgr>().lessonValue, ImprovManager.GetComponent<ImprovMgr>().guidanceValue, sequencecount);
+        }
+        //improvmanager load sequence
 
 
         //  Debug.Log("Reached end of spawning");
@@ -588,7 +609,7 @@ sealed class RollMgr : MonoBehaviour
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
                                                                     //float duration = 200.00f; //testing 
                                                                     //Debug.Log("speed is now " + duration);
-     
+       // Debug.Log("fallspeed is " + fallSpeed);
         //get the height of that object
         float objectHeight = (noteObject.GetComponent<RectTransform>().rect.height*2); //latest working *2
 
@@ -604,17 +625,19 @@ sealed class RollMgr : MonoBehaviour
                 //this is where we check if the rolls touch the greenline
                 if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
                 {                                //  
+                    isTouched = true; 
 
                     if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
 
                         StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
+                      
                         //have the coroutine here
-                      //  StartCoroutine(MIDIMessenger(noteInfo));
+                        //  StartCoroutine(MIDIMessenger(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
-                     //   Debug.Log("playing tunes");
+                        //   Debug.Log("playing tunes");
                         //check to true
-                      //  ctr++;
+                        //  ctr++;
                         //   IsMotifPlaying = true;
                     }//end is motifyplaying
                     else if (!IsMotifPlaying && userMode == 3)//its just test yourself mode
@@ -644,9 +667,10 @@ sealed class RollMgr : MonoBehaviour
                 // Debug.Log("previous object destroyed so all is good" + nre.Message);
                 yield break;
             }//end catch
-
+            
             yield return null;
         }//end while duration lerp function
+        reload = true;
 
         //comment this just to see revert if fck up 
         // noteTransform.position = new Vector3(noteTransform.position.x, destroyY, noteTransform.position.z);
