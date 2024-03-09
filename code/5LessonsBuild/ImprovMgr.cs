@@ -23,7 +23,8 @@ using UnityEngine.UI; //added for colors
 public class ImprovMgr : MonoBehaviour
 {
     //== declare Improv to be static so other classes can access it withouts
-    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager;
+    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager, Metronome, MusicSheetMgr;
+
 
     public static ImprovMgr Instance;
 
@@ -33,11 +34,16 @@ public class ImprovMgr : MonoBehaviour
                                                                   // int SelectedIndex = 0; // 0 by default
     public int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
 
-    bool loaded = false; 
+    bool loaded = false;
+
+    public int seqctr = 4;
+    public int display_lesson_ctr = 0; //always init to 1 and refresh to 1
+    public int display_lesson_max = 8; //set 7 if lessonvalue = 1
 
     //==== UI related variables
 
     [SerializeField] public Text display_text; //connect to display_text
+    [SerializeField] public Text display_lesson; //for displaying lessons
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -59,6 +65,7 @@ public class ImprovMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         //set display text
         display_text.text = "Select mode, lesson and guidance to begin.";
 
@@ -71,11 +78,266 @@ public class ImprovMgr : MonoBehaviour
         {
             display_text.text = "Lesson finished. Select another lesson to continue";
             loaded = false;
+            AudioManager.GetComponent<AudioManager>().StopRhythm(); //finish rhythm too
+
         }  //end if loaded check
 
     }//end update()
 
     //=== function definitions
+
+    //introducing ManageSequence so I dont destroy ManageImpprov
+    public void ManageSequence()
+    {
+        
+        //metronome is always on but to be SOLID we need to determine accompaniement
+        GuidanceManager.GetComponent<GuidanceMgr>().DetermineAccompaniement();
+
+        RollManager.GetComponent<RollMgr>().reload = true;
+        display_text.text = "Lesson ongoing...";
+
+        //since its constant, set it here
+        RollManager.GetComponent<RollMgr>().swingfrequency = 2; //16-24 works best with swing
+        RollManager.GetComponent<RollMgr>().fallSpeed = 16; //formerly 18
+        RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24; //formerly 24
+
+
+        LoadSequence(modeValue, lessonValue, guidanceValue, 0); //should always be zero
+
+    }//end ManageSequence
+
+    //assign sequence for viz filenames on load
+    public List<string> AssignSequence(int modeValue, int lessonValue, int guidanceValue, int count)
+    {
+        //some local variables to streamline data transfer
+        List<string> vizfilenames = new List<string>(8);
+        int vizindex = count;
+
+        //the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
+        //dynamically assign the lessons from LessonMgr - this is the viz and the set of 
+        if (LessonManager.GetComponent<LessonMgr>().lessonlist.Count > 0)
+        {
+            List<string> lessonSublessons = LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue - 1]; // -1 index 
+            for (int i = 0; i < 8 && i < lessonSublessons.Count; i++)
+            {
+                vizfilenames.Add(lessonSublessons[i]); // Add first 8 sublessons to eightElementList
+            }
+        }//end transfer
+
+        return vizfilenames;
+
+    }//end AssignSequence
+
+    //assign filenames for music sheets on load
+    public List<string> AssignSheetFileNames(int modeValue, int lessonValue, int guidanceValue, int count)
+    {
+        //some local variables to streamline data transfer
+        List<string> sheetfilenames = new List<string>(8);
+       // int sheetindex = count;
+
+        //the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
+        //dynamically assign the lessons from LessonMgr - this is the viz and the set of 
+        if (LessonManager.GetComponent<LessonMgr>().sheetlist.Count > 0)
+        {
+            List<string> sheetSublessons = LessonManager.GetComponent<LessonMgr>().sheetlist[lessonValue - 1]; // -1 index 
+            for (int i = 0; i < 8 && i < sheetSublessons.Count; i++)
+            {
+                sheetfilenames.Add(sheetSublessons[i]); // Add first 8 sublessons to eightElementList
+            }
+        }//end transfer
+
+        return sheetfilenames;
+    }//end AssignSequence
+
+    public void LoadSequence(int modeValue, int lessonValue, int guidanceValue, int count)
+    {
+
+        //assign filenames that we will pass
+        List<string> vizfilenames = AssignSequence(modeValue, lessonValue, guidanceValue, count);
+        List<string> sheetfilenames = AssignSheetFileNames(modeValue, lessonValue, guidanceValue, count);
+        int vizindex = count;
+        string lesson_title; 
+
+        //now show the sheetfilename - by calling MusicSheetManager to update notation handler
+        MusicSheetMgr.GetComponent<MusicSheetManager>().SetSheetFilename(sheetfilenames[vizindex]); //no minus 1 here
+        Debug.Log("sheet index loaded is " + vizindex);
+
+        //update display lesson regardless of mode comes in two parts
+        //part 1 set lesson title
+        switch (lessonValue)
+        {
+            case 1: lesson_title = "Swing"; break;
+            case 2: lesson_title = "Sequences"; break;
+            case 3: lesson_title = "Motifs"; break;
+            case 4: lesson_title = "Variations"; break;
+            case 5: lesson_title = "Ques-Ans"; break;
+            default: lesson_title = ""; break; 
+        }//end switch
+
+        //part 2 set max upper bound 
+        if (lessonValue == 1)
+        {
+            display_lesson_max = 7;
+            lesson_title = "Swing";
+        }//end
+        else
+        {
+            display_lesson_max = 8; 
+        }//end else
+
+        //now update lesson title whenever LoadSequences are called
+        display_lesson_ctr = count+1; // should be count now
+        display_lesson.text = display_lesson_ctr + "/" + display_lesson_max + "\n " + lesson_title;
+
+        Debug.Log("midi file to load is " + vizindex);
+        //now manage everything base on the mode!
+        //== dont get confused 1 = w&L, 2 = TEST, 3 = TRY
+        if (modeValue == 1) // watch and learn
+        {
+           
+            RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+            RollManager.GetComponent<RollMgr>().InvokeSongManager();
+            RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
+            spawntype = 2;
+            RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+            Metronome.GetComponent<Metronome>().StartMetronome(); 
+
+        }//end modeValue 1
+        else if (modeValue == 3) //try yourself
+        {
+            //code is the same just that in Rollmanager it stops the midi events 
+            RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+            RollManager.GetComponent<RollMgr>().InvokeSongManager();
+            RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
+            spawntype = 2;
+            RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+            //if harmony is enabled then no need to play metronome
+            if ((guidanceValue == 4 || guidanceValue == 12))
+            {
+                AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);             
+            }//end checkharmony
+            else
+            {
+                Metronome.GetComponent<Metronome>().StartMetronome();
+
+            }//end else
+
+            
+        }//end else modevalue 3
+        else if (modeValue == 2)//testyourself
+        {
+            display_text.text = "Your turn, compose on the fly!";
+            //if harmony is enabled then no need to play metronome
+            if (guidanceValue == 4 || guidanceValue == 12)
+            {
+                AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
+            }//end checkharmony
+            else if (guidanceValue == 8 || guidanceValue == 10)
+            {
+                Metronome.GetComponent<Metronome>().StartMetronome();
+            }
+   
+            //play rhythm!
+            else if ((guidanceValue == 2 || guidanceValue == 10 || guidanceValue == 6 || guidanceValue == 14))
+            {
+                PlayRhythm();
+            }
+            else
+            {
+                Metronome.GetComponent<Metronome>().StartMetronome();
+
+            }//end else
+             // RollManager.GetComponent<RollMgr>().audioSource.Play();
+        }//end else 
+        ////the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
+        ////dynamically assign the lessons from LessonMgr - this is the viz and the set of 
+        //if (LessonManager.GetComponent<LessonMgr>().lessonlist.Count > 0)
+        //{
+        //    List<string> lessonSublessons = LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue - 1]; // -1 index 
+        //    for (int i = 0; i < 8 && i < lessonSublessons.Count; i++)
+        //    {
+        //        vizfilenames.Add(lessonSublessons[i]); // Add first 8 sublessons to eightElementList
+        //    }
+        //}//end transfer
+
+        //have some invokedelay function that sends the filenames per lesson and task
+        // call task 1 
+
+
+
+        ////set 1
+        ////get song information 
+        //RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+        //RollManager.GetComponent<RollMgr>().InvokeSongManager();
+        //RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
+        //spawntype = 2;
+        //RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+        //Debug.Log("generated piano roll");
+      //  Metronome.GetComponent<Metronome>().StartMetronome();
+        //   IsRhythmPlaying = true;
+
+    
+
+
+
+
+
+        //=== recover start if fck up
+        //  //have a loop to load the entire thing
+        //  while (vizindex < vizfilenames.Count && RollManager.GetComponent<RollMgr>().reload) {
+        ////  while (vizindex < vizfilenames.Count)
+        ////  {
+
+        //      //set the pattern from list of midis
+
+        //      //get song information 
+        //      RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex]; 
+        //      RollManager.GetComponent<RollMgr>().InvokeSongManager();
+
+        //  //note we need this to make sure the key presses get lit. if we wanna change the sound
+        //  //its in the co routine in rollmgr
+        //      RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
+
+        //      //generate viz 
+        //      spawntype = 2;
+        //      RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+        //      Debug.Log("generated piano roll");
+
+        //      //since metronome is always part, call metronome here 
+        //      Metronome.GetComponent<Metronome>().StartMetronome();
+
+        //      // seqctr--;
+
+        //      //play metronome
+        //      //  Invoke("PlayMetronome", 8.0f);
+        //      //   Instance.audioSource.Play();
+        //      // RollManager.GetComponent<RollMgr>().audioSource.Play();
+        //      IsRhythmPlaying = true;
+
+        //      vizindex++;
+        //  }//end foreach
+
+        //==== recover end if fkcup
+
+        //stop metronome here
+        //  Metronome.GetComponent<Metronome>().StopMetronome();
+
+
+        //set the lessons to generate viz
+
+        //get midievents if WaL mode
+
+        //generate PianoRoll
+
+        //generic pattern below
+
+
+
+
+    }//end loadsequence 
+
+
+    //==== this is the old way we did things without the ff, bw and pause buttons ====/ 
 
     // when button is clicked, PullContent gets the right content
     public void ManageImprov()
@@ -98,6 +360,11 @@ public class ImprovMgr : MonoBehaviour
         loaded = true;
         display_text.text = "Lesson ongoing...";
 
+        //since its constant, set it here
+        RollManager.GetComponent<RollMgr>().swingfrequency = 2; //16-24 works best with swing
+        RollManager.GetComponent<RollMgr>().fallSpeed = 16; //formerly 18
+        RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24; //formerly 24
+
 
         //listen and learn mode
         Debug.Log("mode value we have is " + modeValue);
@@ -108,8 +375,8 @@ public class ImprovMgr : MonoBehaviour
             //begin rhythm if true
             if (GuidanceManager.GetComponent<GuidanceMgr>().rhythm && !IsRhythmPlaying)
             {
-                Invoke("PlayDelayedAudio", 4.0f);
-             //   Instance.audioSource.Play();
+                //   Invoke("PlayMetronome", 4.0f);
+                //   Instance.audioSource.Play();
                 // RollManager.GetComponent<RollMgr>().audioSource.Play();
                 IsRhythmPlaying = true;
             }
@@ -123,9 +390,9 @@ public class ImprovMgr : MonoBehaviour
                 //RollManager.GetComponent<RollMgr>().fallSpeed = 17; 
                 //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
 
-                RollManager.GetComponent<RollMgr>().swingfrequency = 2;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 2;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 16; //formerly 18
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24;
 
 
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -199,7 +466,7 @@ public class ImprovMgr : MonoBehaviour
 
                     //=======then load RHYTHM!!! guidance
 
-               
+
 
 
 
@@ -266,9 +533,9 @@ public class ImprovMgr : MonoBehaviour
                 //RollManager.GetComponent<RollMgr>().swingfrequency = 3;
                 //RollManager.GetComponent<RollMgr>().fallSpeed = 16;
                 //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 22.5f;
-                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+                // RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -363,9 +630,9 @@ public class ImprovMgr : MonoBehaviour
             else if (lessonValue == 3) // motif mode
             {
 
-                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -398,15 +665,15 @@ public class ImprovMgr : MonoBehaviour
 
                     //=======then load rhythm guidance
                     //harmony
-                   // RollManager.GetComponent<RollMgr>().Filename = "L03LH.mid"; //harmony
+                    // RollManager.GetComponent<RollMgr>().Filename = "L03LH.mid"; //harmony
 
                     //InvokeSongManager to access methods to generate PianoRoll
-                  //  RollManager.GetComponent<RollMgr>().InvokeSongManager();
+                    //  RollManager.GetComponent<RollMgr>().InvokeSongManager();
 
                     //no need to generate midievents for harmony
 
                     //generate roll
-                  //  RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
+                    //  RollManager.GetComponent<RollMgr>().GeneratePianoRoll(yellow, 1, modeValue);
 
                 }//end if check guidance
 
@@ -461,9 +728,9 @@ public class ImprovMgr : MonoBehaviour
             else if (lessonValue == 4) //variations mode
             {
 
-                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -559,9 +826,9 @@ public class ImprovMgr : MonoBehaviour
             else if (lessonValue == 5) //ques-Ans mode 
             {
 
-                RollManager.GetComponent<RollMgr>().swingfrequency = 3;
-                RollManager.GetComponent<RollMgr>().fallSpeed = 18;
-                RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
+                //RollManager.GetComponent<RollMgr>().swingfrequency = 3;
+                //RollManager.GetComponent<RollMgr>().fallSpeed = 18;
+                //RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24f;
 
                 //default value for lesson 02
                 Debug.Log("guidance value we have is " + guidanceValue);
@@ -671,13 +938,20 @@ public class ImprovMgr : MonoBehaviour
     //rhythm related scripts
     //selecting audio for audiosource
     //playing the audio source with delay
-    public void PlayDelayedAudio()
+    // 0 - 100bpm, 1-100bpm, 2-idk, 3-120bpm, 4-120bpm
+    public void PlayRhythm()
     {
         //decentralising to AudioManager game object 
-        AudioManager.GetComponent<AudioManager>().RhythmAudioSelection(2); //change this one
-       //Instance.audioSource.Play();
-        //Instance.MotifToPlay.Play();
-    }
+        AudioManager.GetComponent<AudioManager>().RhythmAudioSelection(0); //change this one 
+                                                                           //Instance.audioSource.Play();
+                                                                           //Instance.MotifToPlay.Play();
+    }//endplaydelayedaudio
+
+    public void PlayMetronome()
+    {
+        //decentralising to AudioManager game object 
+        AudioManager.GetComponent<AudioManager>().MetronomeSelection();
+    }//end play metronome
 
     //this method destroys all objects whose parent is RollManager (thereby clears all falling piano notes)
     //thanks gpt for this
@@ -711,7 +985,6 @@ public class ImprovMgr : MonoBehaviour
         // 06 reset isMotifplaying so it can be resumed again
         // 07 clear the contents of the midi co routine so it is fresh
 
-
         //destroy objects
         RemoveObjectsWithParent("RollManager");
 
@@ -721,13 +994,23 @@ public class ImprovMgr : MonoBehaviour
         RollManager.GetComponent<RollMgr>().IsRhythmPlaying = false;
 
         //stop audio
-        AudioManager.GetComponent<AudioManager>().StopRhythm(); 
+        AudioManager.GetComponent<AudioManager>().StopRhythm();
 
-            //clear counter too
-        RollManager.GetComponent<RollMgr>().ctr = 0; 
+        //remove sheets
+        MusicSheetMgr.GetComponent<MusicSheetManager>().ClearSheets();
+
+        //stop metronome
+        Metronome.GetComponent<Metronome>().StopMetronome();
+
+        //clear counter too
+        RollManager.GetComponent<RollMgr>().ctr = 0;
+        display_lesson_ctr = 0;
+        display_lesson_max = 0;
+        display_lesson.text = ">"; 
+
 
         //clear all MIDIevents un played
-        RollManager.GetComponent<RollMgr>().noteInfo.Clear(); 
+        RollManager.GetComponent<RollMgr>().noteInfo.Clear();
 
         //clear hihglights in the keyboard to be safe
         RollManager.GetComponent<RollMgr>().CleanupKeyboard();
@@ -736,8 +1019,8 @@ public class ImprovMgr : MonoBehaviour
         modeValue = 9;
         lessonValue = 9;
         guidanceValue = 9;
-        IsRhythmPlaying = false; 
- 
+        IsRhythmPlaying = false;
+
 
         //clear guidance toggles 
         GuidanceManager.GetComponent<GuidanceMgr>().rhythmtoggle.isOn = false;
@@ -755,6 +1038,38 @@ public class ImprovMgr : MonoBehaviour
         ModeManager.GetComponent<ModeMgr>().listentoggle.isOn = false;
         ModeManager.GetComponent<ModeMgr>().trytoggle.isOn = false;
         ModeManager.GetComponent<ModeMgr>().testtoggle.isOn = false;
-    }//end reset all values 
+    }//end reset all values
+
+    //this is some change sequence function for the buttons
+    public void ClearSpawns()
+    {
+        //=== this is kinda like ResetAllValues but without clearing the selection and
+        //we are just moving to the next or previous lessons
+        //destroy objects
+        RemoveObjectsWithParent("RollManager");
+
+        //stop all coroutines
+        RollManager.GetComponent<RollMgr>().StopAllCoroutines(); //added this to be sure
+        RollManager.GetComponent<RollMgr>().IsMotifPlaying = false;
+        RollManager.GetComponent<RollMgr>().IsRhythmPlaying = false;
+
+        //stop audio
+        AudioManager.GetComponent<AudioManager>().StopRhythm();
+
+        //remove sheets
+        MusicSheetMgr.GetComponent<MusicSheetManager>().ClearSheets();
+
+        //stop metronome
+        Metronome.GetComponent<Metronome>().StopMetronome();
+
+        //clear counter too
+        RollManager.GetComponent<RollMgr>().ctr = 0;
+
+        //clear all MIDIevents un played
+        RollManager.GetComponent<RollMgr>().noteInfo.Clear();
+
+        //clear hihglights in the keyboard to be safe
+        RollManager.GetComponent<RollMgr>().CleanupKeyboard();
+    }
 
 }//end class

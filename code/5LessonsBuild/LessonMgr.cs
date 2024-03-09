@@ -13,6 +13,10 @@ public class LessonMgr : MonoBehaviour
     //declare listener toggles here
     public Toggle lesson01_modeswing, lesson02_sequencing, lesson03_motifs, lesson04_variations, lesson05_quesans;
 
+    //we need to declare the lessons here so we just pass them around
+    public List<List<string>> lessonlist = new List<List<string>>();
+    public List<List<string>> sheetlist = new List<List<string>>();
+
     //some variables for tracking
     public int lesson = 9; //default is 9
     // 1 modeswing
@@ -61,6 +65,12 @@ public class LessonMgr : MonoBehaviour
             Lesson05ToggleValueChanged(lesson05_quesans);
         });
 
+        //print it to check
+        SetLessons();
+        SetSheetFilenames();
+        //it works! commenting it now
+        //PrintAllLessons(lessonlist);
+
     }//end start
 
 
@@ -72,10 +82,11 @@ public class LessonMgr : MonoBehaviour
         {
             lesson = 1;
             Debug.Log("Selected Lesson 01: All Swing Modes");
-            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 01. Choose guidance or you may Press Load";
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 01. Press Load to begin.";
 
-            //now send the value to ImprovMgr
+            //now send the value to ImprovMgr and MusicSheetManager
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 1;
+          //  MusicSheetMgr.GetComponent<MusicSheetManager>().lesson01 = true; 
 
         }//endif 
         else
@@ -87,6 +98,7 @@ public class LessonMgr : MonoBehaviour
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 9;
+          //  MusicSheetMgr.GetComponent<MusicSheetManager>().lesson01 = false;
 
         }//endelse 
     }//end lesson01toggle
@@ -98,10 +110,11 @@ public class LessonMgr : MonoBehaviour
         {
             lesson = 2;
             Debug.Log("Selected Lesson 02: Sequencing");
-            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 02. Choose guidance or you may Press Load";
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 02. Press Load to begin.";
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 2;
+         //   MusicSheetMgr.GetComponent<MusicSheetManager>().lesson02 = true;
 
         }//endif 
         else
@@ -113,6 +126,7 @@ public class LessonMgr : MonoBehaviour
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 9;
+         //   MusicSheetMgr.GetComponent<MusicSheetManager>().lesson02 = false;
 
         }//endelse 
     }//end lesson02toggle
@@ -124,10 +138,11 @@ public class LessonMgr : MonoBehaviour
         {
             lesson = 3;
             Debug.Log("Selected Lesson 03: Motif Learning");
-            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 03. Choose guidance or you may Press Load";
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 03. Press Load to begin.";
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 3;
+         //   MusicSheetMgr.GetComponent<MusicSheetManager>().lesson03 = true;
 
         }//endif 
         else
@@ -139,6 +154,7 @@ public class LessonMgr : MonoBehaviour
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 9;
+          //  MusicSheetMgr.GetComponent<MusicSheetManager>().lesson03 = false;
 
         }//endelse 
     }//end lesson03toggle
@@ -150,10 +166,11 @@ public class LessonMgr : MonoBehaviour
         {
             lesson = 4;
             Debug.Log("Selected Lesson 04: Variations");
-            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 04. Choose guidance or you may Press Load";
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 04. Press Load to begin.";
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 4;
+         //   MusicSheetMgr.GetComponent<MusicSheetManager>().lesson04 = true;
 
         }//endif 
         else
@@ -165,6 +182,7 @@ public class LessonMgr : MonoBehaviour
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 9;
+        //    MusicSheetMgr.GetComponent<MusicSheetManager>().lesson04 = false;
 
         }//endelse 
     }//end lesson04toggle
@@ -176,10 +194,11 @@ public class LessonMgr : MonoBehaviour
         {
             lesson = 5;
             Debug.Log("Selected Lesson 05: Questions Answers");
-            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 05. Choose guidance or you may Press Load";
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 05. Press Load to begin.";
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 5;
+        //    MusicSheetMgr.GetComponent<MusicSheetManager>().lesson05 = true;
 
         }//endif 
         else
@@ -191,8 +210,115 @@ public class LessonMgr : MonoBehaviour
 
             //now send the value to ImprovMgr
             ImprovMgr.GetComponent<ImprovMgr>().lessonValue = 9;
+         //   MusicSheetMgr.GetComponent<MusicSheetManager>().lesson05 = false;
 
         }//endelse 
-    }//end lesson05toggle
+    }//end
+     //
+
+    //when updating the files, just update these lessons. 
+    public void SetLessons()
+    {
+        //lesson 01 is more specific
+        List<string> lesson1 = new List<string>(){
+            "L01_01C_viz.mid",
+            "L01_02D_viz.mid",
+            "L01_03E_viz.mid",
+            "L01_04F_viz.mid",
+            "L01_05G_viz.mid",
+            "L01_06A_viz.mid",
+            "L01_07B_viz.mid"
+        };
+
+        lessonlist.Add(lesson1);
+
+        //so is lesson 02 
+        List<string> lesson2 = new List<string>(){
+            "L02_01UU_viz.mid",
+            "L02_02UUe_viz.mid",
+            "L02_03DD_viz.mid",
+            "L02_04DDe_viz.mid",
+            "L02_05UD_viz.mid",
+            "L02_06UDe_viz.mid",
+            "L02_07DU_viz.mid",
+            "L02_08DUe_viz.mid"
+        };
+
+        lessonlist.Add(lesson2);
+
+        //3 to 8 is more straightforward so we use that
+        // Lessons 3 to 5 with 8 sublessons each
+        for (int i = 3; i <= 5; i++)
+        {
+            List<string> lesson = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                lesson.Add($"L{i:D2}_{j:D2}_viz.mid");
+            }
+            lessonlist.Add(lesson);
+        }//end for loop
+
+    }//end SetLessons
+
+    ////when updating the files, just update these lessons. 
+    public void SetSheetFilenames()
+    {
+        //=== something to take note here is that since this is a seralizable game object
+        //we remove the .txt in the extension even though the real files are using .abc.txt 
+        //lesson 01 is more specific
+        List<string> lesson1 = new List<string>(){
+            "L01_01C_viz.abc",
+            "L01_02D_viz.abc",
+            "L01_03E_viz.abc",
+            "L01_04F_viz.abc",
+            "L01_05G_viz.abc",
+            "L01_06A_viz.abc",
+            "L01_07B_viz.abc"
+        };
+
+        sheetlist.Add(lesson1);
+
+        //so is lesson 02 
+        List<string> lesson2 = new List<string>(){
+            "L02_01UU_viz.abc",
+            "L02_02UUe_viz.abc",
+            "L02_03DD_viz.abc",
+            "L02_04DDe_viz.abc",
+            "L02_05UD_viz.abc",
+            "L02_06UDe_viz.abc",
+            "L02_07DU_viz.abc",
+            "L02_08DUe_viz.abc"
+        };
+
+        sheetlist.Add(lesson2);
+
+        //3 to 8 is more straightforward so we use that
+        // Lessons 3 to 5 with 8 sublessons each
+        for (int i = 3; i <= 5; i++)
+        {
+            List<string> lesson = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                lesson.Add($"L{i:D2}_{j:D2}_viz.abc");
+            }
+            sheetlist.Add(lesson);
+        }//end for loop
+
+    }//end SetLessons
+
+    //for sanity's sake here's a print to check
+    void PrintAllLessons(List<List<string>> lessons)
+    {
+        for (int i = 0; i < lessons.Count; i++)
+        {
+            Debug.Log($"Lesson {i + 1}:");
+            foreach (var sublesson in lessons[i])
+            {
+                Debug.Log(sublesson);
+            }
+            Debug.Log("");
+        }
+    }//end printall lessons
+
 
 }//end lessonmgr
