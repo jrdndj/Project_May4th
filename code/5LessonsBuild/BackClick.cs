@@ -39,6 +39,7 @@ public class BackClick : MonoBehaviour
     //back button
     public void OnBackButtonClick()
     {
+        ImprovManager.GetComponent<ImprovMgr>().seqctr = 0;
         index = ImprovManager.GetComponent<ImprovMgr>().display_lesson_ctr-1;
 
         if (index==1)
