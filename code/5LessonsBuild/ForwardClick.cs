@@ -42,6 +42,7 @@ public class ForwardClick : MonoBehaviour
     //back button
     public void OnNextButtonClick()
     {
+        ImprovManager.GetComponent<ImprovMgr>().seqctr = 0; 
         index = ImprovManager.GetComponent<ImprovMgr>().display_lesson_ctr-1;
         max = ImprovManager.GetComponent<ImprovMgr>().display_lesson_max;
 

@@ -62,6 +62,7 @@ sealed class RollMgr : MonoBehaviour
     // [SerializeField] GameObject AudioManager;
 
     GameObject noteObject;
+    public GameObject back, pause, forward;
 
     public GameObject green_line; //formerly 0 -85 0
     public GameObject spawnpoint; //for the spawnpoint
@@ -484,15 +485,29 @@ sealed class RollMgr : MonoBehaviour
 
             float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
 
-            // Calculate the height of the object based on note.Duration 
-            float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
-                                                                                   //240000.0f the correct version
-                                                                                   //get the height of that object
+            // Calculate the height of the object based on note.Duration
+            //this was the last working - 28.03.2024
+            //    float noteHeight = (float)noteDuration.TotalMicroseconds / 240000.0f;  //test mode //change 10 to 24 if ever
+            //240000.0f the correct version
+            //get the height of that object
+
+            
+            float noteHeight = (float)noteDuration.TotalMicroseconds / 240000 ;  //test mode //change 10 to 24 if ever
+            if (isBlackPrefab) {
+                Debug.Log("sample noteheight is " + noteHeight);
+            }
+            // float objectHeight = GetComponent<Renderer>().bounds.size.y;
+            float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
   
-           // float objectHeight = GetComponent<Renderer>().bounds.size.y;
-          float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
-                                                                                           //  float objectHeight = noteObject.GetComponent<RectTransform>().rect.height*2;
+
+            //readjust the height f some notes that are too long a
+            if (noteHeight>=4)
+            {
+                noteHeight = (noteHeight/2) + 0.2f; 
+            }
+
+
             // float blacknoteHeight = objectHeight / 2; 
             //change the size (localscale) of the object based on the computed height
             noteObject.transform.localScale = new Vector3(1, noteHeight, 1);
@@ -502,13 +517,19 @@ sealed class RollMgr : MonoBehaviour
 
             //get the half of the object - some computation here
             // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + (objectHeight * 2), zPosition); // latest working
-            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2f, zPosition); // changes to test
-                                                                                                            // or NoteHeight/2
-          
+            //=== this was the last working 
+            //   noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2f, zPosition); // changes to test
+            // or NoteHeight/2
+
+            //testing this below 28.03.2024 - this is better 
+               noteObject.transform.position = new Vector3(xPosition, yPosition + objectHeight * 2f, zPosition); // changes to test
+            //noteObject.transform.position = new Vector3(xPosition, yPosition, zPosition); // changes to test
+
+
             //== if type 1, adjust it one more time
             if (spawntype == 1)
             {
-                noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + yPosition + objectHeight*2, zPosition); // changes to test
+        //        noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + yPosition + objectHeight*2, zPosition); // changes to test
             }//end adjust
 
 
@@ -536,7 +557,7 @@ sealed class RollMgr : MonoBehaviour
 
             // Start the coroutine to make the note fall at a constant speed
             //  StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight), userMode));
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight*2), userMode));
 
             //it should end on the half
 
@@ -574,9 +595,30 @@ sealed class RollMgr : MonoBehaviour
     // == some press related functions
     public void onNoteOn(int noteNumber, float velocity)
     {
+      //  Debug.Log("notenumber is!" + noteNumber);
         //    default behaviour is show white
-        pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+       
 
+        //simulate press for these three UI button controls
+        if (noteNumber == 57)
+        {
+            // Debug.Log("back!");
+           // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            //simulate back press
+            back.GetComponent<BackClick>().OnBackButtonClick();
+        }else if (noteNumber == 59)
+        {
+          //  pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            pause.GetComponent<PauseClic>().OnStopButtonClick();
+        }
+        else if (noteNumber == 60)
+        {
+         //   pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            forward.GetComponent<ForwardClick>().OnNextButtonClick();
+        }
+
+
+        pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
     }//endonNoteOn;
 
     //when user releases a pressed key as per MIDIScript 
@@ -640,7 +682,7 @@ sealed class RollMgr : MonoBehaviour
                         //  ctr++;
                         //   IsMotifPlaying = true;
                     }//end is motifyplaying
-                    else if (!IsMotifPlaying && userMode == 3)//its just test yourself mode
+                    else if (!IsMotifPlaying && (userMode == 3) || ImprovManager.GetComponent<ImprovMgr>().CanReload)//its just try yourself mode
                     {
                         StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
                         //have the coroutine here

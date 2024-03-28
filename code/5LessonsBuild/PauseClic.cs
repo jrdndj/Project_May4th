@@ -40,6 +40,7 @@ public class PauseClic : MonoBehaviour
     //stop button
     public void OnStopButtonClick()
     {
+        ImprovManager.GetComponent<ImprovMgr>().seqctr = 0;
         index = ImprovManager.GetComponent<ImprovMgr>().display_lesson_ctr-1;
         isStopped = true;
         //simply destroy all spawns

@@ -34,11 +34,14 @@ public class ImprovMgr : MonoBehaviour
                                                                   // int SelectedIndex = 0; // 0 by default
     public int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
 
-    bool loaded = false;
+    public bool loaded = false;
+    public bool CanReload = false; 
 
-    public int seqctr = 4;
+    public int seqctr = 0;
     public int display_lesson_ctr = 0; //always init to 1 and refresh to 1
     public int display_lesson_max = 8; //set 7 if lessonvalue = 1
+
+    public int vizindex; 
 
     //==== UI related variables
 
@@ -76,10 +79,30 @@ public class ImprovMgr : MonoBehaviour
     {
         if (loaded && RollManager.GetComponent<RollMgr>().numOfEvents == RollManager.GetComponent<RollMgr>().ctr)
         {
-            display_text.text = "Lesson finished. Select another lesson to continue";
+           // display_text.text = "Lesson finished. Select another lesson to continue";
             loaded = false;
             AudioManager.GetComponent<AudioManager>().StopRhythm(); //finish rhythm too
+            seqctr++; 
+            CanReload = true; //this is for the 4B 4B 4P 4P sequence
 
+            //fresh restart
+            ClearSpawns();
+            //RollManager.GetComponent<RollMgr>().ctr = 0;
+            //LoadSequence(modeValue, lessonValue, guidanceValue, 0);
+
+            //then immediately reload
+            if (seqctr < 4 && CanReload)
+            {
+                //restart some numbers here to ensure repeat 
+                RollManager.GetComponent<RollMgr>().ctr = 0;
+                CanReload = false;
+                if (seqctr >= 2)
+                {
+                    LoadSequence(3, lessonValue, guidanceValue, vizindex); //should always be zero
+                }
+                else LoadSequence(modeValue, lessonValue, guidanceValue, vizindex); //should always be zero
+
+            }
         }  //end if loaded check
 
     }//end update()
@@ -89,7 +112,7 @@ public class ImprovMgr : MonoBehaviour
     //introducing ManageSequence so I dont destroy ManageImpprov
     public void ManageSequence()
     {
-        
+       // loaded = true; 
         //metronome is always on but to be SOLID we need to determine accompaniement
         GuidanceManager.GetComponent<GuidanceMgr>().DetermineAccompaniement();
 
@@ -151,11 +174,12 @@ public class ImprovMgr : MonoBehaviour
 
     public void LoadSequence(int modeValue, int lessonValue, int guidanceValue, int count)
     {
+        loaded = true;
 
         //assign filenames that we will pass
         List<string> vizfilenames = AssignSequence(modeValue, lessonValue, guidanceValue, count);
         List<string> sheetfilenames = AssignSheetFileNames(modeValue, lessonValue, guidanceValue, count);
-        int vizindex = count;
+        vizindex = count;
         string lesson_title; 
 
         //now show the sheetfilename - by calling MusicSheetManager to update notation handler
@@ -200,7 +224,27 @@ public class ImprovMgr : MonoBehaviour
             RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
             spawntype = 2;
             RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
-            Metronome.GetComponent<Metronome>().StartMetronome(); 
+            Metronome.GetComponent<Metronome>().StartMetronome();
+
+            //if (CanReload && seqctr < 4)
+            //{
+            //    //code is the same just that in Rollmanager it stops the midi events 
+            //    RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+            //    RollManager.GetComponent<RollMgr>().InvokeSongManager();
+            //    RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
+            //    spawntype = 2;
+            //    RollManager.GetComponent<RollMgr>().GeneratePianoRoll(improvpink, spawntype, modeValue);
+            //    //if harmony is enabled then no need to play metronome
+            //    if ((guidanceValue == 4 || guidanceValue == 12))
+            //    {
+            //        AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
+            //    }//end checkharmony
+            //    else
+            //    {
+            //        Metronome.GetComponent<Metronome>().StartMetronome();
+
+            //    }//end else
+            //}
 
         }//end modeValue 1
         else if (modeValue == 3) //try yourself
