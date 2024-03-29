@@ -17,13 +17,14 @@ public class ModeMgr : MonoBehaviour
     [SerializeField] GameObject ImprovMgr;
 
     //=== declare toggle listeners here
-    public Toggle listentoggle, trytoggle, testtoggle;
+    public Toggle listentoggle, trytoggle, testtoggle, composetoggle;
 
     //declare variable to send to ImprovMgr
     //  int module = 9; //default set it to zero
     // 1 if listen
     // 2 if test yourself
     // 3 if try yourself
+    // 4 if compose (only for lessons 4 and 5) 
 
     // Start is called before the first frame update
     void Start()
@@ -49,6 +50,13 @@ public class ModeMgr : MonoBehaviour
         testtoggle.onValueChanged.AddListener(delegate
         {
             TestToggleValueChanged(testtoggle);
+        });
+
+        //compose mode
+        composetoggle.GetComponent<Toggle>();
+        composetoggle.onValueChanged.AddListener(delegate
+        {
+            TestToggleValueChanged(composetoggle);
         });
 
     }
@@ -126,6 +134,32 @@ public class ModeMgr : MonoBehaviour
             //change to default module
             //   module = 9;
             Debug.Log("Unselected Listen and Learn mode.");
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Select a mode to begin with.";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 9;
+
+        }//endelse 
+    }//end testtoggle
+
+    //compose toggle
+    public void ComposeToggleValueChanged(Toggle change)
+    {
+        if (change.isOn)
+        {
+            //   module = 4; //compose mode
+            Debug.Log("Selected Compose mode");
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Compose Mode valid only for L4 and L5";
+
+            //now send the value to ImprovMgr
+            ImprovMgr.GetComponent<ImprovMgr>().modeValue = 4;
+
+        }//endif 
+        else
+        {
+            //change to default module
+            //   module = 9;
+            Debug.Log("Unselected Compose mode.");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Select a mode to begin with.";
 
             //now send the value to ImprovMgr

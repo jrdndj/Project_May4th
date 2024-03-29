@@ -6,8 +6,8 @@ repository for Piano 2.0 MVP v1
 ### April Updates
 - [x] Implement 4B-4B-4P-4P protocol
 - [x] Test Mode for Lessons 1-3
-- [ ] Compose Mode for Lessons 4-5
-- [ ] Expand sheets add harmony Fclef
+- [x] Compose Mode for Lessons 4-5
+- [x] Expand sheets add harmony Fclef
 - [ ] update music info linked
 
 ### All lessons received from Sandi. Newer tasks as of 12.01.2024

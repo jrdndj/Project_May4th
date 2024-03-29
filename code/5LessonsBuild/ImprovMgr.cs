@@ -77,33 +77,86 @@ public class ImprovMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (loaded && RollManager.GetComponent<RollMgr>().numOfEvents == RollManager.GetComponent<RollMgr>().ctr)
+        //note this function decides the second, third and fourth in the protocol
+        //W&L 4B 4B 4P 4P
+        // Test none
+        // Compose 4B 4P 4B 4P
+
+        //== if mode 1
+        if (modeValue==1)
         {
-           // display_text.text = "Lesson finished. Select another lesson to continue";
-            loaded = false;
-            AudioManager.GetComponent<AudioManager>().StopRhythm(); //finish rhythm too
-            seqctr++; 
-            CanReload = true; //this is for the 4B 4B 4P 4P sequence
-
-            //fresh restart
-            ClearSpawns();
-            //RollManager.GetComponent<RollMgr>().ctr = 0;
-            //LoadSequence(modeValue, lessonValue, guidanceValue, 0);
-
-            //then immediately reload
-            if (seqctr < 4 && CanReload)
+            if (loaded && RollManager.GetComponent<RollMgr>().numOfEvents == RollManager.GetComponent<RollMgr>().ctr)
             {
-                //restart some numbers here to ensure repeat 
-                RollManager.GetComponent<RollMgr>().ctr = 0;
-                CanReload = false;
-                if (seqctr >= 2)
-                {
-                    LoadSequence(3, lessonValue, guidanceValue, vizindex); //should always be zero
-                }
-                else LoadSequence(modeValue, lessonValue, guidanceValue, vizindex); //should always be zero
+                // display_text.text = "Lesson finished. Select another lesson to continue";
+                loaded = false;
+                AudioManager.GetComponent<AudioManager>().StopRhythm(); //finish rhythm too
+                seqctr++;
+                CanReload = true; //this is for the 4B 4B 4P 4P sequence
 
-            }
-        }  //end if loaded check
+                //fresh restart
+                ClearSpawns();
+                //RollManager.GetComponent<RollMgr>().ctr = 0;
+                //LoadSequence(modeValue, lessonValue, guidanceValue, 0);
+
+                //then immediately reload
+                if (seqctr < 4 && CanReload)
+                {
+                    //restart some numbers here to ensure repeat 
+                    RollManager.GetComponent<RollMgr>().ctr = 0;
+                    CanReload = false;
+                    if (seqctr >= 2)
+                    {
+                        LoadSequence(3, lessonValue, guidanceValue, vizindex); //should always be zero
+                    }
+                    else LoadSequence(modeValue, lessonValue, guidanceValue, vizindex); //should always be zero
+
+                }//end can reload
+            }  //end if loaded check
+
+        }//end watch and learn mode 1
+
+        if (modeValue == 2) //test mode
+        {
+
+        }//end test mode
+
+        if (modeValue == 4) //compose mode 
+        {
+            //practically the same as modeValue 1 but instead of 4b4b4p4p its 4b4p4b4p
+            if (loaded && RollManager.GetComponent<RollMgr>().numOfEvents == RollManager.GetComponent<RollMgr>().ctr)
+            {
+                // display_text.text = "Lesson finished. Select another lesson to continue";
+                loaded = false;
+                AudioManager.GetComponent<AudioManager>().StopRhythm(); //finish rhythm too
+                seqctr++;
+                CanReload = true; //this is for the 4B 4B 4P 4P sequence
+
+                //fresh restart
+                ClearSpawns();
+                //RollManager.GetComponent<RollMgr>().ctr = 0;
+                //LoadSequence(modeValue, lessonValue, guidanceValue, 0);
+
+                //then immediately reload
+                if (seqctr%2==1 && CanReload)
+                {
+                    //restart some numbers here to ensure repeat 
+                    RollManager.GetComponent<RollMgr>().ctr = 0;
+                    CanReload = false;
+                    if (seqctr >= 2)
+                    {
+                        LoadSequence(3, lessonValue, guidanceValue, vizindex); //should always be zero
+                    }
+                    else
+                    {
+                        //loading 01 cos we wanna force the W&L mode without changing actual mode
+                        LoadSequence(1, lessonValue, guidanceValue, vizindex); //should always be zero
+                    }//endelse
+
+                }//end can reload
+            }  //end if loaded check
+
+        }
+       
 
     }//end update()
 
@@ -112,7 +165,9 @@ public class ImprovMgr : MonoBehaviour
     //introducing ManageSequence so I dont destroy ManageImpprov
     public void ManageSequence()
     {
-       // loaded = true; 
+       // loaded = true;
+       //we do some last changes here based on selection of choices 
+
         //metronome is always on but to be SOLID we need to determine accompaniement
         GuidanceManager.GetComponent<GuidanceMgr>().DetermineAccompaniement();
 
@@ -174,17 +229,34 @@ public class ImprovMgr : MonoBehaviour
 
     public void LoadSequence(int modeValue, int lessonValue, int guidanceValue, int count)
     {
-        loaded = true;
-
+        //load compose-specific lessons first before changing the operation thru the modevalue 
         //assign filenames that we will pass
         List<string> vizfilenames = AssignSequence(modeValue, lessonValue, guidanceValue, count);
         List<string> sheetfilenames = AssignSheetFileNames(modeValue, lessonValue, guidanceValue, count);
         vizindex = count;
-        string lesson_title; 
+        string lesson_title;
+
+        //=== so at this point we know now we gonna load the lesson if 6 or 7 
+
+        //have something that tells us that if its compose mode, we still load modeValue 1
+        // only in terms of behaviour
+        if (modeValue == 4)
+        {
+            modeValue = 1; 
+        }//check modeValue
+
+        //the lessons will remain assigned to compose lessons
+
+
+
+
+        loaded = true;
+
+   
 
         //now show the sheetfilename - by calling MusicSheetManager to update notation handler
         MusicSheetMgr.GetComponent<MusicSheetManager>().SetSheetFilename(sheetfilenames[vizindex]); //no minus 1 here
-        Debug.Log("sheet index loaded is " + vizindex);
+       // Debug.Log("sheet index loaded is " + vizindex);
 
         //update display lesson regardless of mode comes in two parts
         //part 1 set lesson title
