@@ -483,7 +483,7 @@ sealed class RollMgr : MonoBehaviour
 
             //this firstyposition becomes an offset for melody type spawns
 
-            float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
+            float zPosition = pianoKeys[noteNumber].transform.position.z ; //should be always 0 or 1 only and based on the piannkey
 
             // Calculate the height of the object based on note.Duration
             //this was the last working - 28.03.2024
@@ -521,8 +521,10 @@ sealed class RollMgr : MonoBehaviour
             //   noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight * 2f, zPosition); // changes to test
             // or NoteHeight/2
 
-            //testing this below 28.03.2024 - this is better 
-               noteObject.transform.position = new Vector3(xPosition, yPosition + objectHeight * 2f, zPosition); // changes to test
+            //testing this below 28.03.2024 - this is better
+       //     noteObject.transform.position = new Vector3(xPosition, yPosition + objectHeight * 2f, zPosition); // changes to test
+
+            noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition, zPosition); // changes to test
             //noteObject.transform.position = new Vector3(xPosition, yPosition, zPosition); // changes to test
 
 

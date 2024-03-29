@@ -24,6 +24,9 @@ public class LessonMgr : MonoBehaviour
     // 3 motifs
     // 4 variations
     // 5 quesans
+    //we need to accommodate for variations compose and quesans compose
+    // 6 variations_compose
+    // 7 quesans_compose
 
     // Start is called before the first frame update
     void Start()
@@ -164,6 +167,7 @@ public class LessonMgr : MonoBehaviour
     {
         if (change.isOn)
         {
+  
             lesson = 4;
             Debug.Log("Selected Lesson 04: Variations");
             ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Selected Lesson 04. Press Load to begin.";
@@ -247,13 +251,25 @@ public class LessonMgr : MonoBehaviour
         lessonlist.Add(lesson2);
 
         //3 to 8 is more straightforward so we use that
-        // Lessons 3 to 5 with 8 sublessons each
+        // Lessons 3 to 5 with 8 sublessons each 
         for (int i = 3; i <= 5; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
                 lesson.Add($"L{i:D2}_{j:D2}_viz.mid");
+            }
+            lessonlist.Add(lesson);
+        }//end for loop
+
+        //6 to 7 are compose tasks so they begin with T
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 6; i <= 7; i++)
+        {
+            List<string> lesson = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                lesson.Add($"T{i:D2}_{j:D2}_viz.mid");
             }
             lessonlist.Add(lesson);
         }//end for loop
@@ -292,14 +308,26 @@ public class LessonMgr : MonoBehaviour
 
         sheetlist.Add(lesson2);
 
-        //3 to 8 is more straightforward so we use that
-        // Lessons 3 to 5 with 8 sublessons each
-        for (int i = 3; i <= 5; i++)
+        //3 to 5 is more straightforward so we use that
+        // Lessons 3 to 5 with 8 sublessons each //added 6 and 7 
+        for (int i = 3;i <= 5; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
                 lesson.Add($"L{i:D2}_{j:D2}_viz.abc");
+            }
+            sheetlist.Add(lesson);
+        }//end for loop
+
+        //6 to 7 are compose tasks so they begin with T
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 6; i <= 7; i++)
+        {
+            List<string> lesson = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                lesson.Add($"T{i:D2}_{j:D2}_viz.abc");
             }
             sheetlist.Add(lesson);
         }//end for loop
@@ -311,12 +339,12 @@ public class LessonMgr : MonoBehaviour
     {
         for (int i = 0; i < lessons.Count; i++)
         {
-            Debug.Log($"Lesson {i + 1}:");
+          //  Debug.Log($"Lesson {i + 1}:");
             foreach (var sublesson in lessons[i])
             {
                 Debug.Log(sublesson);
             }
-            Debug.Log("");
+         //   Debug.Log("");
         }
     }//end printall lessons
 
