@@ -9,28 +9,44 @@ public class Metronome : MonoBehaviour
     private float nextBeatTime;
     public AudioSource audioSource; // Assign your AudioSource component in the Unity Editor
     public AudioClip clickSound; // Assign your .aiff click sound in the Unity Editor
+    public bool metronomestarted = false; 
 
     void Start()
     {
         nextBeatTime = Time.time;
-    }
+    }//end start 
 
     // Method to start the metronome
     public void StartMetronome()
     {
         nextBeatTime = Time.time;
-        float interval = 60f / bpm; // Calculate the time interval between each beat
+        float interval = 56f / bpm; // formerly 60
         InvokeRepeating(nameof(PlayClickSound), 0f, interval); // Start generating click sounds with the calculated interval
-    }
+    }//end startmetronome
 
     // Method to stop the metronome
     public void StopMetronome()
     {
         CancelInvoke(nameof(PlayClickSound)); // Stop generating click sounds
-    }
+    }//end stop metronome
 
     void PlayClickSound()
     {
         audioSource.PlayOneShot(clickSound); // Play the assigned click sound
+    }//end void playclicksound
+
+    public void FourBeatStart()
+    {
+         float delayBetweenTicks = 0.56f;
+        // Schedule four ticks with a delay between each one
+        //Invoke(nameof(PlayClickSound), 0f);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 2);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 3);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 4); // formerly 0 
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 5);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 6);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 7);
+        Invoke(nameof(PlayClickSound), delayBetweenTicks * 8);
     }
-}
+}//end metronome class

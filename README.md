@@ -3,6 +3,8 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
+## as of 08.04.2024 metronome is fixed :) 
+
 ### April Updates
 - [x] Implement 4B-4B-4P-4P protocol
 - [x] Test Mode for Lessons 1-3
