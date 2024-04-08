@@ -57,7 +57,7 @@ sealed class RollMgr : MonoBehaviour
     //==== environment related variables
 
     //an important element to manage all children of spawns
-    [SerializeField] GameObject rollManager;
+    [SerializeField] GameObject rollManager, metronome;
     [SerializeField] GameObject songManager, ImprovManager;
     // [SerializeField] GameObject AudioManager;
 
@@ -204,6 +204,19 @@ sealed class RollMgr : MonoBehaviour
         yield return new WaitForSeconds(Duration);
 
     }//end playNote
+
+    public void ReleaseAllPresses()
+    {
+        foreach (var port in _ports)
+        {
+            for (int noteNumber = 0; noteNumber <= 127; noteNumber++)
+            {
+                // Send "note off" message for each note number
+                port.SendNoteOff(0, noteNumber);
+            }
+        }
+
+    }
 
     //putting here a more reusable version 
     System.Collections.IEnumerator playNoteTryYourself(int index, float Duration)
@@ -559,7 +572,7 @@ sealed class RollMgr : MonoBehaviour
 
             // Start the coroutine to make the note fall at a constant speed
             //  StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight*2), userMode));
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight), userMode));
 
             //it should end on the half
 
@@ -653,7 +666,8 @@ sealed class RollMgr : MonoBehaviour
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
                                                                     //float duration = 200.00f; //testing 
                                                                     //Debug.Log("speed is now " + duration);
-       // Debug.Log("fallspeed is " + fallSpeed);
+
+        // Debug.Log("fallspeed is " + fallSpeed);
         //get the height of that object
         float objectHeight = (noteObject.GetComponent<RectTransform>().rect.height*2); //latest working *2
 
@@ -663,19 +677,38 @@ sealed class RollMgr : MonoBehaviour
             float t = elapsedTime / duration; // ? 
                                               //  float t = duration / elapsedTime;
                                               //something here that checks time when it falls
-         
+
+            float beatsBeforeEnd = 4f; // Four beats before the end
+            float thresholdT = 1f - (beatsBeforeEnd / 100f); // Threshold value for t corresponding to four beats before the end
+
+          
+
             try
             {
+
+                //// Assuming t is calculated somewhere else
+                //if (t <= thresholdT && !metronome.GetComponent<Metronome>().metronomestarted)
+                //{
+                //    metronome.GetComponent<Metronome>().FourBeatStart();
+                //}
+
                 //this is where we check if the rolls touch the greenline
                 if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
                 {                                //  
-                    isTouched = true; 
+                    isTouched = true;
+
+                    if (!metronome.GetComponent<Metronome>().metronomestarted)
+                    {
+                        metronome.GetComponent<Metronome>().metronomestarted = true; 
+                        metronome.GetComponent<Metronome>().StartMetronome();
+                    }//end check if metronome started
 
                     if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
 
                         StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
-                      
+                      //  DestroyObject(rollingObject);
+
                         //have the coroutine here
                         //  StartCoroutine(MIDIMessenger(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
@@ -687,15 +720,16 @@ sealed class RollMgr : MonoBehaviour
                     else if (!IsMotifPlaying && (userMode == 3) || ImprovManager.GetComponent<ImprovMgr>().CanReload)//its just try yourself mode
                     {
                         StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
+                       // DestroyObject(rollingObject);
                         //have the coroutine here
-                     //   StartCoroutine(MIDIMessengerTryYourself(noteInfo));
+                        //   StartCoroutine(MIDIMessengerTryYourself(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
-                    //    Debug.Log("hi tunes");
+                        //    Debug.Log("hi tunes");
                         //check to true
-                     //   IsMotifPlaying = true;
+                        //   IsMotifPlaying = true;
                     }//end else if user mode 3
 
-                    //destroy here            
+                    //destroy here === revert if fckup          
                     DestroyObject(rollingObject);
 
                 }//end check if touch
