@@ -1,6 +1,9 @@
 X:1
 T:Swing Mode G
 M:4/4
+L: 1/8
 V:1
+V:2 clef=bass
 K:C
 [V:1] GABc defg | fedc BA G2 | GABc defg | fedc BA G2 :|
+[V:2] [G,B,DF]8 | [G,B,DF]8 | [G,B,DF]8 | [G,B,DF]8 :|

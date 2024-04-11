@@ -1,0 +1,7 @@
+X:1
+T:Deck The Halls
+M:C
+L:1/4
+V:1
+K:C
+[V:1] !5!c>_BAG | FGAF | !2!G/2A/2!4!_B/2G/2 A>G| !1!F !3!E !1!F2 |!5!c>_BAG | FGAF | G/2A/2!4!_B/2G/2 A>G| !1!F !3!E !1!F2 | Z | Z | z2 !2!D/2E/2 F | !3!E D C2 | !5!c>BAG| FGAF | !2!D/2D/2D/2D/2 C>z| z !1!!3![CE] !4!F2 |

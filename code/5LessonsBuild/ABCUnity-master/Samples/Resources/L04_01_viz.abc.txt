@@ -3,5 +3,7 @@ T:Variations 1
 L:1/4
 M:4/4
 V:1
+V:2 clef=bass
 K:C
 [V:1] D F A c | B A G F | E D C B, | A, ^C/F/ F2 :|
+[V:2] [D,F,C]4 | [G,,F,B,]4 | [C,E,B,]4 | [A,,^C,G,]4 :|

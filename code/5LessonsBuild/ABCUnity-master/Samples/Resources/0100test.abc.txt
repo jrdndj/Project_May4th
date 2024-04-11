@@ -1,0 +1,18 @@
+X:1
+T:Swing
+L:1/8
+M:4/4
+I:linebreak 
+K:C
+V:1 clef=treble
+V:1
+|CDEF GABc | BAGF ED C2 | CDEF GABc | BAGF ED C2 :: z8 | 
+ z8 | z8 | z8 :: DEFG ABcd | cBAG FE D2 | DEFG ABcd | 
+ cBAG FE D2 :: z8 | z8 | z8 | z8 :: EFGA Bcde | 
+ dcBA GF E2 | EFGA Bcde | dcBA GF E2 :: z8 | z8 | z8 | z8 :: 
+ FGAB cdef | edcB AG F2 | FGAB cdef | edcB AG F2 :: 
+ z8 | z8 | z8 | z8 :: GABc defg | fedc BA G2 | 
+ GABc defg | fedc BA G2 :: z8 | z8 | z8 | z8 :: 
+ ABcd efga | gfed cB A2 | ABcd efga | gfed cB A2 :: 
+ z8 | z8 | z8 | z8 :: Bcde fgab | agfe dc B2 | 
+ Bcde fgab | agfe dc B2 :: z8 | z8 | z8 | z8 :| 

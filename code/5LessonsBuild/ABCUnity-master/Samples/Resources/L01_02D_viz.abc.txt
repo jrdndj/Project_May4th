@@ -1,6 +1,9 @@
 X:1
 T:Swing mode D
 M:4/4
-V:1 
+L: 1/8
+V:1
+V:2 clef=bass
 K:C
 [V:1] DEFG ABcd | cBAG FE D2 | DEFG ABcd | cBAG FE D2 :|
+[V:2] [D,F,A,C]8 | [D,F,A,C]8 | [D,F,A,C]8 | [D,F,A,C]8 :|

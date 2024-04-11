@@ -3,5 +3,7 @@ T: Motif 7
 L:1/8
 M:4/4
 V:1
+V:2 clef=bass
 K:C
 [V:1] f e2 g fAce | d2 cB z4 | e d2 f eGBd | ^c2 _BA z4 :|
+[V:2] [D,F,C]8 | [G,,F,B,]8 | [C,E,B,]8 | [A,,G,^C]8 :|

@@ -1,6 +1,9 @@
 X:1
 T:Swing Mode A
 M:4/4
+L: 1/8
 V:1
+V:2 clef=bass
 K:C
 [V:1] ABcd efga | gfed cB A2 | ABcd efga | gfed cB A2 :|
+[V:2] [A,CEG]8 | [A,CEG]8 | [A,CEG]8 | [A,CEG]8 :|
