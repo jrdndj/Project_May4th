@@ -1,0 +1,7 @@
+X:1
+T:QA 8
+L:1/8
+M:4/4
+V:1
+K:C
+[V:1] AecA GF z D | EFGd dc B2 | cGED CEGB | ^c B/2 G/2 E/2 A/2 A/2 F ^C2 :|

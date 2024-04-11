@@ -1,0 +1,10 @@
+X:1
+T:Lesson 1
+M:4/4
+L:1/8
+V:1 
+K:C
+[V:1] CDEF GABc | BAGF EDC2 | CDEF GABc | BAGF EDC2 :: z8 | z8 | z8 | z8 :: DEFG ABcd | cBAG FED2 | DEFG ABcd | cBAG FED2 :: z8 | z8 | z8 | z8 ::
+[V:1] EFGA Bcde | dcBA GFE2 | EFGA Bcde | dcBA GFE2 :: z8 | z8 | z8 | z8 :: FGAB cdef | edcB AGF2 | FGAB cdef | edcB AGF2 :: z8 | z8 | z8 | z8 ::
+[V:1] GABc defg | fedc BAG2 | GABc defg | fedc BAG2 :: z8 | z8 | z8 | z8 :: ABcd efga | gfed cBA2 | ABcd efga | gfed cBA2 :: z8 | z8 | z8 | z8 ::
+[V:1] Bcde fgab | agfe dcB2 | Bcde fgab | agfe dcB2 :: z8 | z8 | z8 | z8 :| 

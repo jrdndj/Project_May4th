@@ -3,5 +3,7 @@ T:Variations 4
 L:1/8
 M:4/4
 V:1
+V:2 clef=bass
 K:C
 [V:1] FGAc efdc | B/2 c/2 d/2 c/2 B/2 c/2 B/2 A/2 G F | EDCB, CEGA | c_BAG F ^C3 :|
+[V:2] [D,F,C]8 | [G,,F,B,]8 | [C,E,B,]8 | [A,,G,^C]8 :|

@@ -3,5 +3,7 @@ T: Motif 3
 L:1/4
 M:4/4
 V:1
+V:2 clef=bass
 K:C
 [V:1] e c A F | E3/2 D/ D2 | d B G E | D3/2 ^C/ C2 :|
+[V:2] [D,F,C]4 | [G,,F,B,]4 | [C,E,B,]4 | [A,,G,]4 :|

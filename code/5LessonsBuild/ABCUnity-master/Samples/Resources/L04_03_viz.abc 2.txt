@@ -1,0 +1,7 @@
+X:1
+T:Variations 3
+L:1/8
+M:4/4
+V:1
+K:C
+[V:1] DF/2 A/2 z/2 c e g/2 f | e/2 f/2 e/2 d/2 c/2 B/2 A/2 G/2 F/2 | E/2 F/2 G/2 A/2 B/2 G/2 E/2 D/2 | ^C2 _BA A2 G2 :|

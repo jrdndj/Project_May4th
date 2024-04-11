@@ -1,7 +1,9 @@
 X:1
 T:Up-Up Motif Extension
-L:1/8
 M:4/4
+L: 1/8
 V:1
+V:2 clef=bass
 K:C
 [V:1] DEFG EFGA | FGAB GABc | ABcd GABc | FGAB EFGA :|
+[V:2] [D,G,C]2 z [E,A,D]2 [E,A,D]4 | [F,B,E]2 z [G,CF]4 [G,CF]4 | [A,DG]2 z [G,CF]2 [G,CF]4 |[F,B,E]2 z [E,A,D]2 [E,A,D]4 :| 

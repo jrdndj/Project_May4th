@@ -1,6 +1,9 @@
 X:1
 T:Swing Mode B
 M:4/4
+L: 1/8
 V:1
+V:2 clef=bass
 K:C
 [V:1] Bcde fgab | agfe dc B2 | Bcde fgab | agfe dc B2 :|
+[V:2] [B,DFA]8 | [B,DFA]8 | [B,DFA]8 | [B,DFA]8 :|

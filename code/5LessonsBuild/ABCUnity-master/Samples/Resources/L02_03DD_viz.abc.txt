@@ -1,7 +1,9 @@
 X:1
 T:Lesson 2.0
-L:1/4
 M:4/4
+L: 1/8
 V:1
+V:2 clef=bass
 K:C
-[V:1] G F E D/A/ | A G F E | B A G F/A/ | A G F E :| 
+[V:1] G F E D/A/ | A G F E | B A G F/A/ | A G F E :|
+[V:2] [D,F,A,]6 [D,F,A,][E,G,B,]2 | [E,G,B,]8 | [F,A,C]6 [F,A,C][E,G,B,]2 | [E,G,B,]8 :|
