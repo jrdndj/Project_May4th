@@ -20,7 +20,7 @@ public class GuidanceMgr : MonoBehaviour
     public int guidancevalue = 9; //default is 9
                                   // lets use flags for easy tracking
 
-    public bool rhythm, harmony, metronome = true; //metronome is always true! 
+    public bool rhythm=false , harmony=false, metronome = false;
     //then have a function that if all three are on return guidance value 3
 
 

@@ -56,7 +56,7 @@ public class ModeMgr : MonoBehaviour
         composetoggle.GetComponent<Toggle>();
         composetoggle.onValueChanged.AddListener(delegate
         {
-            TestToggleValueChanged(composetoggle);
+            ComposeToggleValueChanged(composetoggle);
         });
 
     }

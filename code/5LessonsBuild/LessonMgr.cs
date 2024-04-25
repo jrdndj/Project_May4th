@@ -25,8 +25,8 @@ public class LessonMgr : MonoBehaviour
     // 4 variations
     // 5 quesans
     //we need to accommodate for variations compose and quesans compose
-    // 6 variations_compose
-    // 7 quesans_compose
+    // 7 variations_compose
+    // 8 quesans_compose
 
     // Start is called before the first frame update
     void Start()
@@ -252,7 +252,7 @@ public class LessonMgr : MonoBehaviour
 
         //3 to 8 is more straightforward so we use that
         // Lessons 3 to 5 with 8 sublessons each 
-        for (int i = 3; i <= 5; i++)
+        for (int i = 3; i <= 6; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
@@ -262,14 +262,14 @@ public class LessonMgr : MonoBehaviour
             lessonlist.Add(lesson);
         }//end for loop
 
-        //6 to 7 are compose tasks so they begin with T
+        //7 to 8 are compose tasks so they begin with L
         // Lessons 3 to 5 with 8 sublessons each 
-        for (int i = 6; i <= 7; i++)
+        for (int i = 7; i <= 8; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
-                lesson.Add($"T{i:D2}_{j:D2}_viz.mid");
+                lesson.Add($"L{i:D2}_{j:D2}_viz.mid");
             }
             lessonlist.Add(lesson);
         }//end for loop
@@ -310,7 +310,7 @@ public class LessonMgr : MonoBehaviour
 
         //3 to 5 is more straightforward so we use that
         // Lessons 3 to 5 with 8 sublessons each //added 6 and 7 
-        for (int i = 3;i <= 5; i++)
+        for (int i = 3;i <= 6; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
@@ -320,14 +320,14 @@ public class LessonMgr : MonoBehaviour
             sheetlist.Add(lesson);
         }//end for loop
 
-        //6 to 7 are compose tasks so they begin with T
+        //7 to 8 are compose tasks so they begin with L
         // Lessons 3 to 5 with 8 sublessons each 
-        for (int i = 6; i <= 7; i++)
+        for (int i = 7; i <= 8; i++)
         {
             List<string> lesson = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
-                lesson.Add($"T{i:D2}_{j:D2}_viz.abc");
+                lesson.Add($"L{i:D2}_{j:D2}_viz.abc");
             }
             sheetlist.Add(lesson);
         }//end for loop
@@ -347,6 +347,7 @@ public class LessonMgr : MonoBehaviour
          //   Debug.Log("");
         }
     }//end printall lessons
+
 
 
 }//end lessonmgr

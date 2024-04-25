@@ -58,19 +58,20 @@ sealed class RollMgr : MonoBehaviour
 
     //an important element to manage all children of spawns
     [SerializeField] GameObject rollManager, metronome;
-    [SerializeField] GameObject songManager, ImprovManager;
+    [SerializeField] GameObject songManager, ImprovManager, GuidanceManager;
     // [SerializeField] GameObject AudioManager;
 
     GameObject noteObject;
     public GameObject back, pause, forward;
 
+    public GameObject destroyPoint;
     public GameObject green_line; //formerly 0 -85 0
     public GameObject spawnpoint; //for the spawnpoint
                                   // Move the noteObject to the destroy point (final Y position) based on note.Time
     float destroyY;
 
     public static RollMgr Instance;
-    public bool reload = true; 
+    public bool reload = true;
 
     //this helps the mapping of keys similar to that midi hardware
     [SerializeField] List<GameObject> pianoKeys = new List<GameObject>();
@@ -84,7 +85,10 @@ sealed class RollMgr : MonoBehaviour
     int spawnCount = 0;
     public int numOfEvents = 0;
 
-    public float latestY = 0; 
+    public float latestY = 0;
+
+    //for the rectransform pivot
+    private RectTransform rollingBarRectTransform;
 
     //storing the first y for the spawning of harmony
     float firstYpos = 0.0f;
@@ -99,7 +103,7 @@ sealed class RollMgr : MonoBehaviour
     public string Filename; // this should be manipulated by ImprovManager
 
     public bool IsMotifPlaying = false;
-    public bool isTouched = false; 
+    public bool isTouched = false;
 
     public List<(float Time, float Duration, int NoteNumber)> noteInfo = new List<(float Time, float Duration, int NoteNumber)>();
 
@@ -107,9 +111,9 @@ sealed class RollMgr : MonoBehaviour
 
     //playback related objects and variables
     [SerializeField] GameObject AudioManager;
-    public AudioClip[] clips; 
+    public AudioClip[] clips;
     public AudioSource audioSource;
-    public bool IsRhythmPlaying = false; 
+    public bool IsRhythmPlaying = false;
 
     //=== midi out related variables 
     public int swingcount = 0;
@@ -176,7 +180,23 @@ sealed class RollMgr : MonoBehaviour
     //putting here a more reusable version 
     System.Collections.IEnumerator playNote(int index, float Duration)
     {
-        pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        //the sending of midi to different channel
+        int midiChannel = (index == (index - 36)) ? 2 : 1;
+
+
+        if ((index-36)<=23 && ImprovManager.GetComponent<ImprovMgr>().modeValue == 1)
+        {
+            pianoKeys[index-36].GetComponent<Image>().color = yellow; //show harmony as yellow
+        }
+        else if((index - 36) == 39)
+        {
+            //  pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
+            //actually just do nothing tbh so we good
+            //change velocity
+            velocity = 20; 
+        }
+        else pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+
         swingcount++;
         if (swingcount % swingfrequency == 0) //change force of press every other press to simulate swing press
         {
@@ -187,7 +207,7 @@ sealed class RollMgr : MonoBehaviour
 
         foreach (var port in _ports)
         {
-            port?.SendNoteOn(0, index, velocity);
+            port?.SendNoteOn(midiChannel, index, velocity);
         }//endforeach for ports midi out
 
         //next
@@ -199,7 +219,7 @@ sealed class RollMgr : MonoBehaviour
         pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
         foreach (var port in _ports)
         {
-            port?.SendNoteOff(0, index);
+            port?.SendNoteOff(midiChannel, index);
         }
         yield return new WaitForSeconds(Duration);
 
@@ -221,8 +241,28 @@ sealed class RollMgr : MonoBehaviour
     //putting here a more reusable version 
     System.Collections.IEnumerator playNoteTryYourself(int index, float Duration)
     {
-        pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
-      
+        //the sending of midi to different channel
+        int midiChannel = (index == (index - 36)) ? 2 : 1;
+
+        //lighting of keys here - which are based on time 
+        if ((index - 36) <= 23)
+        {
+            pianoKeys[index - 36].GetComponent<Image>().color = yellow; //show harmony as yellow
+        }
+        else pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+
+        //a sound note on but only for the metronome
+        if ((index - 36) == 39)
+        {
+            //make sure it doesnt light up
+            pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
+
+            //pressing event but only for MIDI-file based metronome
+            foreach (var port in _ports)
+            {
+                port?.SendNoteOn(midiChannel, index, 20); //velocity is set to 20 so it is not annoying
+            }//endforeach for ports midi out
+        }//end for metronome
 
         //next
         ctr++;
@@ -231,6 +271,24 @@ sealed class RollMgr : MonoBehaviour
 
         //=== then key off
         pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
+
+        //and metronome off
+
+        //a sound note on but only for the metronome
+        if ((index - 36) == 39)
+        {
+
+            //=== then key off - all keys are off anyway
+         //   pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
+
+            foreach (var port in _ports)
+            {
+                port?.SendNoteOff(midiChannel, index);
+            }
+            yield return new WaitForSeconds(Duration);
+
+
+        }//end for metronome
         yield return new WaitForSeconds(Duration);
 
     }//end playNote
@@ -294,12 +352,13 @@ sealed class RollMgr : MonoBehaviour
     void Start()
     {
 
-        //and this is the only thing we really need
-        destroyY = green_line.GetComponent<RectTransform>().position.y;
+        //and this is the only thing we really need - this makes sense since it waits for it to pass the green line
+        //destroyY = green_line.GetComponent<RectTransform>().position.y;
+        destroyY = destroyPoint.GetComponent<RectTransform>().position.y;
 
         //routine methods: scan for midi ports. never modify this code 
         _probe = new MidiProbe(MidiProbe.Mode.Out);
-      
+
     }//endstart
 
     // Update is called once per frame
@@ -349,7 +408,7 @@ sealed class RollMgr : MonoBehaviour
     public static double GetAudioSourceTime()
     {
         return (double)Instance.audioSource.timeSamples / Instance.audioSource.clip.frequency;
-    }//end get audio sourcetime
+    }//end get audio sourcetifmodeme
 
 
     //this should generate the MIDIout events
@@ -357,7 +416,7 @@ sealed class RollMgr : MonoBehaviour
     {
 
         MidiFile midi = midiFile;
-     //   Debug.Log("Successfully read for midi events" + Filename);
+        //   Debug.Log("Successfully read for midi events" + Filename);
 
         //routine getting of files
         var notes = midi.GetNotes();
@@ -372,11 +431,13 @@ sealed class RollMgr : MonoBehaviour
 
             // float noteTime = (float) note.TimeAs<MetricTimeSpan>(tempoMap);
             float noteTime = ((float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 100000000.0f);
-            // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
+            //Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
+          //  Debug.Log("noteTime in metrictime" + note.ToString() + " time : " + (float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds);
 
             //   float noteDuration = (float) note.LengthAs<MetricTimeSpan>(tempoMap);
             float noteDuration = (float)note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 2400000.0f;
-            // Debug.Log("noteDuration " + note.ToString() + "duration : " + noteDuration);
+            //  Debug.Log("noteDuration " + note.ToString() + "duration : " + noteDuration);
+         //   Debug.Log("noteDuration in metrictime" + note.ToString() + " duration : " + (float)note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds);
 
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber; //added offset
@@ -391,7 +452,7 @@ sealed class RollMgr : MonoBehaviour
         }//end for midi passing only
 
         numOfEvents = notes.Count;
-     //   Debug.Log("There are " + numOfEvents + "midi out events");
+        //   Debug.Log("There are " + numOfEvents + "midi out events");
     }// end generate MIDI Events
 
 
@@ -399,8 +460,8 @@ sealed class RollMgr : MonoBehaviour
     public void GeneratePianoRoll(Color32 spawncolor, int spawntype, int userMode) //1 for melody, 2 for licks 
     {
 
-        int sequencecount = 0; 
-        reload = false; 
+        int sequencecount = 0;
+        reload = false;
         //numOfSpawns = 0; //fresh start
         //piano related configs
         //set prefabs
@@ -410,7 +471,7 @@ sealed class RollMgr : MonoBehaviour
         // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
-     //   Debug.Log("Successfully read " + Filename);
+        //   Debug.Log("Successfully read " + Filename);
 
         //routine getting of files
 
@@ -421,16 +482,27 @@ sealed class RollMgr : MonoBehaviour
         //consolate all three then load into noteInfo
         var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
 
+        long ticks = 1000;
+        // Convert ticks to metric time
+        MetricTimeSpan metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(ticks, tempoMap);
+
         //this is for spawning and rolling so have another one for data passing
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
             //configs and declarations first
-
+            //var noteTime = note.TimeAs<MusicalTimeSpan>(tempoMap);
+            //var noteTime = TimeConverter.ConvertTo<BarBeatFractionTimeSpan>(ticks, tempoMap); //now notetime is barbeatfractiontimespan
             var noteTime = note.TimeAs<MetricTimeSpan>(tempoMap);
-            // Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
+           // Debug.Log("noteTime is  " + note.ToString() + " time : " + noteTime);
 
+            ////additional stuff
+            //MetricTimeSpan metricLength = LengthConverter.ConvertTo<MetricTimeSpan>
+            //                  (ticks, tempoMap);
+
+            //var noteDuration = note.LengthAs<MusicalTimeSpan>(tempoMap);
+            //   var noteDuration = note.LengthAs<BarBeatFractionTimeSpan>(tempoMap);
             var noteDuration = note.LengthAs<MetricTimeSpan>(tempoMap);
-            // Debug.Log("noteDuration " +note.ToString() + "duration : " + noteDuration);
+           // Debug.Log("noteDuration " + note.ToString() + " duration : " + noteDuration);
 
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
@@ -479,14 +551,17 @@ sealed class RollMgr : MonoBehaviour
             // Calculate X position in pixels based on note.Time
             float xPosition = pianoKeys[noteNumber].transform.position.x;
 
-      
 
-            //calculate their position -
-            float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
-                                                                                                //1000000.0f                              //should be somewhere between 1000000 and 2400000
-                                                                                                // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
 
-    
+            //calculate their position - 1600000.0f * pixelsPerBeat
+            //  float yPosition = (1 / 1200000.0f * pixelsPerBeat); //for testing
+
+            float yPosition = ((float)noteTime.TotalMicroseconds / 1600000 * pixelsPerBeat); //for testing
+                                                                                             // float yPosition = ((float)noteTime.TotalMicroseconds / 1600000.0f * pixelsPerBeat); //for testing
+                                                                                             //1000000.0f                              //should be somewhere between 1000000 and 2400000
+                                                                                             // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
+
+         //   Debug.Log("yposition " + yPosition);
             ////=== i still need this but only for harmony or type 1
             ////store here the first y position
             //if (spawnCount == 1)
@@ -496,7 +571,7 @@ sealed class RollMgr : MonoBehaviour
 
             //this firstyposition becomes an offset for melody type spawns
 
-            float zPosition = pianoKeys[noteNumber].transform.position.z ; //should be always 0 or 1 only and based on the piannkey
+            float zPosition = pianoKeys[noteNumber].transform.position.z; //should be always 0 or 1 only and based on the piannkey
 
             // Calculate the height of the object based on note.Duration
             //this was the last working - 28.03.2024
@@ -504,20 +579,25 @@ sealed class RollMgr : MonoBehaviour
             //240000.0f the correct version
             //get the height of that object
 
-            
-            float noteHeight = (float)noteDuration.TotalMicroseconds / 240000 ;  //test mode //change 10 to 24 if ever
-            if (isBlackPrefab) {
-                Debug.Log("sample noteheight is " + noteHeight);
+            // 240000
+            //   float noteHeight = 1 / 100000;  //test mode //change 10 to 24 if ever
+            //
+            float noteHeight = (float)noteDuration.TotalMicroseconds / 240000;  //test mode //change 10 to 24 if ever
+                                                                                //  float noteHeight = (float)noteDuration.TotalMicroseconds / 240000 ;  //test mode //change 10 to 24 if ever
+            if (isBlackPrefab)
+            {
+               // Debug.Log("sample noteheight is " + noteHeight);
             }
             // float objectHeight = GetComponent<Renderer>().bounds.size.y;
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
-  
 
-            //readjust the height f some notes that are too long a
-            if (noteHeight>=4)
+
+           // readjust the height f some notes that are too long a
+           //should be scale 
+            if (noteHeight >= 3) //formely 4
             {
-                noteHeight = (noteHeight/2) + 0.2f; 
+                noteHeight = (noteHeight / 2) + 0.1f;
             }
 
 
@@ -535,7 +615,7 @@ sealed class RollMgr : MonoBehaviour
             // or NoteHeight/2
 
             //testing this below 28.03.2024 - this is better
-       //     noteObject.transform.position = new Vector3(xPosition, yPosition + objectHeight * 2f, zPosition); // changes to test
+            //     noteObject.transform.position = new Vector3(xPosition, yPosition + objectHeight * 2f, zPosition); // changes to test
 
             noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition, zPosition); // changes to test
             //noteObject.transform.position = new Vector3(xPosition, yPosition, zPosition); // changes to test
@@ -544,7 +624,7 @@ sealed class RollMgr : MonoBehaviour
             //== if type 1, adjust it one more time
             if (spawntype == 1)
             {
-        //        noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + yPosition + objectHeight*2, zPosition); // changes to test
+                //        noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + yPosition + objectHeight*2, zPosition); // changes to test
             }//end adjust
 
 
@@ -559,14 +639,23 @@ sealed class RollMgr : MonoBehaviour
                 darkerColor = (Color)improvpink * 0.75f;
                 noteObject.GetComponent<Image>().color = darkerColor;
                 //add more height for black prefabs to offset for their height
-               // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight + blacknoteHeight, zPosition); // changes to test
+                // noteObject.transform.position = new Vector3(xPosition, spawnpoint.transform.position.y + yPosition + objectHeight + objectHeight + blacknoteHeight, zPosition); // changes to test
 
             }//endisBlackprefabcheck
+
+            //check if harmony then set spawncolor to black
+            if (noteNumber<=23 || noteNumber==39) //below c4
+            {
+                Image imageComponent = noteObject.GetComponent<Image>();
+                Color currentColor = imageComponent.color;
+                currentColor.a = 0f;
+                noteObject.GetComponent<Image>().color = currentColor;
+            }
 
             //now do some computation for the falling
 
             //remember latestY
-           // latestY = noteObject.transform.position.y;
+            // latestY = noteObject.transform.position.y;
 
             //should be something like (SpawnScale.rect.height + (SpawnScale.rect.height)))
 
@@ -581,13 +670,13 @@ sealed class RollMgr : MonoBehaviour
 
         }//end foreach
 
-       // latestY = 
+        // latestY = 
         //add sequence count
         sequencecount++;
 
         //get the latest position
         //by this point we're done
-        if (sequencecount<=4)
+        if (sequencecount <= 4)
         {
             //ImprovManager.GetComponent<ImprovMgr>().LoadSequence(ImprovManager.GetComponent<ImprovMgr>().modeValue, ImprovManager.GetComponent<ImprovMgr>().lessonValue, ImprovManager.GetComponent<ImprovMgr>().guidanceValue, sequencecount);
         }
@@ -610,25 +699,26 @@ sealed class RollMgr : MonoBehaviour
     // == some press related functions
     public void onNoteOn(int noteNumber, float velocity)
     {
-      //  Debug.Log("notenumber is!" + noteNumber);
+        //  Debug.Log("notenumber is!" + noteNumber);
         //    default behaviour is show white
-       
+
 
         //simulate press for these three UI button controls
         if (noteNumber == 57)
         {
             // Debug.Log("back!");
-           // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            // pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
             //simulate back press
             back.GetComponent<BackClick>().OnBackButtonClick();
-        }else if (noteNumber == 59)
+        }
+        else if (noteNumber == 59)
         {
-          //  pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            //  pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
             pause.GetComponent<PauseClic>().OnStopButtonClick();
         }
         else if (noteNumber == 60)
         {
-         //   pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
+            //   pianoKeys[noteNumber].GetComponent<Image>().color = Color.white;
             forward.GetComponent<ForwardClick>().OnNextButtonClick();
         }
 
@@ -662,6 +752,7 @@ sealed class RollMgr : MonoBehaviour
     //private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
     private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY, int userMode)
     {
+        float triggerline = green_line.GetComponent<RectTransform>().position.y;
         float elapsedTime = 0;
         float duration = Mathf.Abs(destroyY - initialY) / fallSpeed;// working latest if fallspeed = 100
                                                                     //float duration = 200.00f; //testing 
@@ -669,7 +760,21 @@ sealed class RollMgr : MonoBehaviour
 
         // Debug.Log("fallspeed is " + fallSpeed);
         //get the height of that object
-        float objectHeight = (noteObject.GetComponent<RectTransform>().rect.height*2); //latest working *2
+        float objectHeight = (rollingObject.GetComponent<RectTransform>().rect.height * 2); //latest working *2
+
+        //float objectHeight = (rollingObject.rect.height); //latest working *2
+
+        //assign value of rectransform to rollingBarRectTransform
+        rollingBarRectTransform = rollingObject.GetComponent<RectTransform>();
+
+
+
+        ////playrhythm
+        //if (GuidanceManager.GetComponent<GuidanceMgr>().rhythm == true)
+        //{
+
+        //    ImprovManager.GetComponent<ImprovMgr>().PlayRhythm();
+        //}
 
 
         while (elapsedTime < duration)
@@ -681,33 +786,50 @@ sealed class RollMgr : MonoBehaviour
             float beatsBeforeEnd = 4f; // Four beats before the end
             float thresholdT = 1f - (beatsBeforeEnd / 100f); // Threshold value for t corresponding to four beats before the end
 
-          
+            //values should be here cos they are updating
+            //get the position of the lowest edge of the UI object
+            //float lowestEdgePosition = rollingBarRectTransform.position.y;
+            //adjust the threshold when necessary
+
+            //  lowestEdgePosition -= 0.1f;
+
+            // Debug.Log("lowest edge position is " + rollingObject.transform.position.y);
 
             try
             {
+                //get the value real time
+                float lowestEdgePosition = (rollingObject.transform.position.y - ((rollingBarRectTransform.rect.height / 2) * rollingBarRectTransform.pivot.y));
 
-                //// Assuming t is calculated somewhere else
-                //if (t <= thresholdT && !metronome.GetComponent<Metronome>().metronomestarted)
-                //{
-                //    metronome.GetComponent<Metronome>().FourBeatStart();
-                //}
+                //then set threshold 
+                lowestEdgePosition += 0.1f;
 
+               // Debug.Log("lowest edge is " + lowestEdgePosition);
                 //this is where we check if the rolls touch the greenline
-                if ((rollingObject.transform.position.y - (objectHeight)) <= green_line.GetComponent<RectTransform>().position.y)
-                {                                //  
+                if (lowestEdgePosition <= triggerline){                                //  
+                  //  Debug.Log("touched at " + lowestEdgePosition);
+
                     isTouched = true;
 
+
+                    //if (GuidanceManager.GetComponent<GuidanceMgr>().harmony == true && !isTouched)
+                    //{
+
+                    //    //      Metronome.GetComponent<Metronome>().StartMetronome();
+                    //    ImprovManager.GetComponent<ImprovMgr>().PlayHarmony();
+                    //  //  Invoke("ImprovManager.GetComponent<ImprovMgr>().PlayHarmony", 2.0f);
+
+                    //}//end checkharmony
                     if (!metronome.GetComponent<Metronome>().metronomestarted)
                     {
-                        metronome.GetComponent<Metronome>().metronomestarted = true; 
-                        metronome.GetComponent<Metronome>().StartMetronome();
+                      //  metronome.GetComponent<Metronome>().metronomestarted = true;
+                     //   metronome.GetComponent<Metronome>().StartMetronome();
                     }//end check if metronome started
 
                     if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
 
                         StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
-                      //  DestroyObject(rollingObject);
+                        //  DestroyObject(rollingObject);
 
                         //have the coroutine here
                         //  StartCoroutine(MIDIMessenger(noteInfo));
@@ -720,7 +842,7 @@ sealed class RollMgr : MonoBehaviour
                     else if (!IsMotifPlaying && (userMode == 3) || ImprovManager.GetComponent<ImprovMgr>().CanReload)//its just try yourself mode
                     {
                         StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
-                       // DestroyObject(rollingObject);
+                        // DestroyObject(rollingObject);
                         //have the coroutine here
                         //   StartCoroutine(MIDIMessengerTryYourself(noteInfo));
                         // StartCoroutine(MIDIMessenger(noteInfo));
@@ -730,11 +852,13 @@ sealed class RollMgr : MonoBehaviour
                     }//end else if user mode 3
 
                     //destroy here === revert if fckup          
+
                     DestroyObject(rollingObject);
+
 
                 }//end check if touch
                 else //keep moving
-                {                   
+                {
                     rollingObject.transform.position = new Vector3(rollingObject.transform.position.x, Mathf.Lerp(initialY, destroyY, t), rollingObject.transform.position.z);
                     elapsedTime += Time.deltaTime;
                 }//else
@@ -745,7 +869,7 @@ sealed class RollMgr : MonoBehaviour
                 // Debug.Log("previous object destroyed so all is good" + nre.Message);
                 yield break;
             }//end catch
-            
+
             yield return null;
         }//end while duration lerp function
         reload = true;

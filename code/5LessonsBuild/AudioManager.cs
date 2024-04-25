@@ -95,6 +95,11 @@ public class AudioManager : MonoBehaviour
         RhythmToPlay.Stop();
     }//end stoprhythm
 
+    public void StopHarmony()
+    {
+        RhythmToPlay.Stop();
+    }//end stoprhythm
+
     public void StopMetronome()
     {
         RhythmToPlay.Stop();
