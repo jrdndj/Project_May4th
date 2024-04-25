@@ -26,7 +26,7 @@ public class LoadButtonScript : MonoBehaviour
         //when pressed calls all the respective methods and loads everything
         //ImprovManager.GetComponent<ImprovMgr>().ManageImprov();
         ImprovManager.GetComponent<ImprovMgr>().ManageSequence();
-        ImprovManager.GetComponent<ImprovMgr>().display_text.text = "Lesson ongoing.."; 
+       // ImprovManager.GetComponent<ImprovMgr>().display_text.text = "Lesson ongoing.."; 
         //RollManager.GetComponent<RollMgr>().GeneratePianoRoll();
     }//end loadbutton pressed
 

@@ -3,14 +3,14 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
-## as of 08.04.2024 metronome is fixed :) 
+## as of 25.04.2024 synchronization issues addressed
 
 ### April Updates
 - [x] Implement 4B-4B-4P-4P protocol
 - [x] Test Mode for Lessons 1-3
 - [x] Compose Mode for Lessons 4-5
 - [x] Expand sheets add harmony Fclef
-- [ ] update music info linked
+- [x] update music info linked
 
 ### All lessons received from Sandi. Newer tasks as of 12.01.2024
 - [x] Change guidances toggles to checkboxes

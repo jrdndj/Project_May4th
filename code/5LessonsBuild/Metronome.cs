@@ -20,7 +20,7 @@ public class Metronome : MonoBehaviour
     public void StartMetronome()
     {
         nextBeatTime = Time.time;
-        float interval = 56f / bpm; // formerly 60
+        float interval = 60f / bpm; // formerly 60, 56f was working
         InvokeRepeating(nameof(PlayClickSound), 0f, interval); // Start generating click sounds with the calculated interval
     }//end startmetronome
 
@@ -37,7 +37,7 @@ public class Metronome : MonoBehaviour
 
     public void FourBeatStart()
     {
-         float delayBetweenTicks = 0.56f;
+         float delayBetweenTicks = 0.6f; //0.56f
         // Schedule four ticks with a delay between each one
         //Invoke(nameof(PlayClickSound), 0f);
         Invoke(nameof(PlayClickSound), delayBetweenTicks);

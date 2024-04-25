@@ -57,9 +57,12 @@ public class BackClick : MonoBehaviour
         {
             //free objects
             ImprovManager.GetComponent<ImprovMgr>().ClearSpawns();
-            index--; 
+            index--;
+
             //decrease count
             ImprovManager.GetComponent<ImprovMgr>().display_lesson_ctr = index;
+            ImprovManager.GetComponent<ImprovMgr>().harmonyindex--;
+            Debug.Log("harmony to assign is " + ImprovManager.GetComponent<ImprovMgr>().harmonyindex);
 
             //reload based on this new value
             ImprovManager.GetComponent<ImprovMgr>().LoadSequence(ImprovManager.GetComponent<ImprovMgr>().modeValue, ImprovManager.GetComponent<ImprovMgr>().lessonValue, ImprovManager.GetComponent<ImprovMgr>().guidanceValue, index);
