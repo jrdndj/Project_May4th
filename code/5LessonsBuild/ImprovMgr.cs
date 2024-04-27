@@ -23,7 +23,7 @@ using UnityEngine.UI; //added for colors
 public class ImprovMgr : MonoBehaviour
 {
     //== declare Improv to be static so other classes can access it withouts
-    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager, Metronome, MusicSheetMgr;
+    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager, Metronome, MusicSheetMgr, VizMgr;
 
 
     public static ImprovMgr Instance;
@@ -33,6 +33,8 @@ public class ImprovMgr : MonoBehaviour
     public int modeValue = 9, lessonValue = 9, guidanceValue = 9; //mode, lesson and guidance mgrs need these
                                                                   // int SelectedIndex = 0; // 0 by default
     public int spawntype = 9; //9 is default, 1 is for harmony, 2 is for licks
+
+    public int noviz = 0; 
 
     public bool loaded = false;
     public bool CanReload = false;
@@ -443,13 +445,13 @@ public class ImprovMgr : MonoBehaviour
 
                 Invoke("PlayRhythm", 2.6f);
                // PlayRhythm();
-                Metronome.GetComponent<Metronome>().metronomestarted = true; 
+               // Metronome.GetComponent<Metronome>().metronomestarted = true; 
             }
 
             if (GuidanceManager.GetComponent<GuidanceMgr>().metronome == true)
             {
 
-                Metronome.GetComponent<Metronome>().FourBeatStart();
+              //  Metronome.GetComponent<Metronome>().FourBeatStart();
             }
 
             //else if (GuidanceManager.GetComponent<GuidanceMgr>().harmony == true)
@@ -505,7 +507,7 @@ public class ImprovMgr : MonoBehaviour
                 // Metronome.GetComponent<Metronome>().FourBeatStart();
                 //Invoke(nameof(AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue)), 0f);
               //  Metronome.GetComponent<Metronome>().FourBeatStart();
-                Metronome.GetComponent<Metronome>().StartMetronome();
+              //  Metronome.GetComponent<Metronome>().StartMetronome();
                 //PlayHarmony();
                 Invoke("PlayHarmony", 2.0f);
                 //AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
@@ -527,7 +529,7 @@ public class ImprovMgr : MonoBehaviour
             //}
             else
             {
-              Metronome.GetComponent<Metronome>().StartMetronome();
+             // Metronome.GetComponent<Metronome>().StartMetronome();
 
             }//end else
              // RollManager.GetComponent<RollMgr>().audioSource.Play();
@@ -1309,6 +1311,7 @@ public class ImprovMgr : MonoBehaviour
         lessonValue = 9;
         guidanceValue = 9;
         IsRhythmPlaying = false;
+        noviz = 0; 
 
         seqctr = 0;
         harmonyindex = 0; 
@@ -1330,6 +1333,10 @@ public class ImprovMgr : MonoBehaviour
         ModeManager.GetComponent<ModeMgr>().trytoggle.isOn = false;
         ModeManager.GetComponent<ModeMgr>().testtoggle.isOn = false;
         ModeManager.GetComponent<ModeMgr>().composetoggle.isOn = false;
+
+        //clear Noviz toggles
+        VizMgr.GetComponent<VizMgr>().noviztoggle.isOn = false;
+
     }//end reset all values
 
     //this is some change sequence function for the buttons

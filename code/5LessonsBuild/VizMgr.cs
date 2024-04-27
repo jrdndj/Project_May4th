@@ -1,150 +1,70 @@
-﻿using System.Collections;
+﻿//this manages the toggles for guidance such as harmony metronome and rhythm
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; //for the toggles to work
 using System.Linq; //for ToList
-
+using UnityEngine.UI; //added for colors and toggles
 public class VizMgr : MonoBehaviour
 {
 
-    //an important element to manage all children of spawns
-    [SerializeField] GameObject RollManager;
+    [SerializeField] GameObject ImprovMgr;
 
-    //putting all toggles here
-    public Toggle jazzlistener, blueslistener, HSlistener, SAlistener, Whitelistener, RedListener;
-    //public Toggle rollmodeListener, onpressmodelistener, guidedlistener, jazzlistener, blueslistener, HSlistener, SAlistener, Whitelistener, RedListener;
-    public Toggle chordnamelistener, endresolvelistener, maplinelistener, keynamelistener;
+    //toggle declarations here
+    public Toggle noviztoggle;
+    public bool noviz = false; 
+
 
     // Start is called before the first frame update
     void Start()
     {
-
-        //initialize all toggles here
-
-        //jazz improv listener
-        jazzlistener.GetComponent<Toggle>();
-        jazzlistener.onValueChanged.AddListener(delegate
+        //rhythm toggle listener
+        noviztoggle.GetComponent<Toggle>();
+        noviztoggle.onValueChanged.AddListener(delegate
         {
-            JazzValueChanged(jazzlistener);
+            NoVizToggleValueChanged(noviztoggle);
         });
 
-        //blues improv listener
-        blueslistener.GetComponent<Toggle>();
-        blueslistener.onValueChanged.AddListener(delegate
-        {
-            BluesValueChanged(blueslistener);
-        });
-
-        //bkeyname lick count listener
-        keynamelistener.GetComponent<Toggle>();
-        keynamelistener.onValueChanged.AddListener(delegate
-        {
-            KeyNameValueChanged(keynamelistener);
-        });
-
-        //halfstep listener
-        HSlistener.GetComponent<Toggle>();
-        HSlistener.onValueChanged.AddListener(delegate
-        {
-            HSValueChanged(HSlistener);
-        });
-
-        //halfstep listener
-        SAlistener.GetComponent<Toggle>();
-        SAlistener.onValueChanged.AddListener(delegate
-        {
-            SAValuechanged(SAlistener);
-        });
-
-    }//end Start
+    }
 
     // Update is called once per frame
     void Update()
     {
-
-    }//end update
-
-    //the ValueChanged functions here
+        
+    }
 
 
 
-    public void JazzValueChanged(Toggle change)
-    {
-        // ctr = 0; 
-        if (change.isOn)
-        {
-            RollManager.GetComponent<RollScript>().genre = 0;
-            //genre = 0;
-            Debug.Log("Jazz Improvs will be shown");
-
-        }
-        else
-        {
-            //change to default vizmode
-            RollManager.GetComponent<RollScript>().genre = 1;
-            Debug.Log("Blues Improvs will be shown");
-            //
-            //ChordManager.GetComponent<ChordMgr>().ChordMapper(Blues001);
-        }
-    }//end blues values toggle
-
-    public void BluesValueChanged(Toggle change)
-    {
-        //ctr = 0; 
-        if (change.isOn)
-        {
-            RollManager.GetComponent<RollScript>().genre = 1;
-            Debug.Log("Blues Improvs will be shown");
-
-
-        }
-        else
-        {
-
-            RollManager.GetComponent<RollScript>().genre = 0;
-            Debug.Log("Jazz Improvs will be shown");
-
-        }
-    }//end bluesvalues toggle
-
-    public void KeyNameValueChanged(Toggle change)
+    public void NoVizToggleValueChanged(Toggle change)
     {
         if (change.isOn)
         {
-            RollManager.GetComponent<RollScript>().showLickCount = true;
-        }//end
+            noviz = true;
+            // guidancevalue = DetermineAccompaniement();
+
+            Debug.Log("Condition 2 ON");
+            ImprovMgr.GetComponent<ImprovMgr>().noviz = 1; 
+            ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "No Viz will be generated";
+
+    
+
+        }//endif 
         else
         {
-            RollManager.GetComponent<RollScript>().showLickCount = false;
-        }
-    }//end keynamevaluechanged
+            //change to default lesson
+            // lesson = 9;
+            noviz = false;
+   
 
-    //public int getBluesSequence(int order)
-    //{
-    //    return bluessequence[order];
-    //}//end getBlues sequence number
+            Debug.Log("Condition 2 OFF");
+            ImprovMgr.GetComponent<ImprovMgr>().noviz = 0;
+            // ImprovMgr.GetComponent<ImprovMgr>().display_text.text = "Removed rhythm.";
+            // display_name.text = "select lesson";
 
-    public void HSValueChanged(Toggle change)
-    {
-        if (change.isOn)
-        {
-            RollManager.GetComponent<RollScript>().enablehalfstep = true;
-        }//end
-        else
-        {
-            RollManager.GetComponent<RollScript>().enablehalfstep = false;
-        }
-    }//end keynamevaluechanged
+            //now send the value to ImprovMgr
+            //   ImprovMgr.GetComponent<ImprovMgr>().guidanceValue = 9;
 
-    public void SAValuechanged(Toggle change)
-    {
-        if (change.isOn)
-        {
-            RollManager.GetComponent<RollScript>().enablestepabove = true;
-        }//end
-        else
-        {
-            RollManager.GetComponent<RollScript>().enablestepabove = false;
-        }
-    }//end keynamevaluechanged
+        }//endelse 
+
+    }//end rhythrmh toggle 
+
 }

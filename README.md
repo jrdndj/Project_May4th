@@ -3,7 +3,10 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
-## as of 25.04.2024 synchronization issues addressed
+## as of 27.04.2024 synchronization issues addressed
+
+- [x] condition 2 implemented
+- [x] dynamic harmony implemented
 
 ### April Updates
 - [x] Implement 4B-4B-4P-4P protocol
