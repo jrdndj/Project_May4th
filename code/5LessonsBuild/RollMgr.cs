@@ -1,5 +1,6 @@
 ﻿// this shall be the new rollscript
 // we start somethjing clean rollscript will be a legacy copy
+using System; 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -122,6 +123,9 @@ sealed class RollMgr : MonoBehaviour
     int keysCount = 61;
     public int ctr = 0;
 
+    //this one captures the highest notenumber that belongs in harmony
+    public int maxHarmonyNumber = 0; 
+
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
     public ColorBlock theColor;
@@ -184,25 +188,32 @@ sealed class RollMgr : MonoBehaviour
         int midiChannel = (index == (index - 36)) ? 2 : 1;
 
 
-        if ((index-36)<=23 && ImprovManager.GetComponent<ImprovMgr>().modeValue == 1)
+
+        if ((index - 36) < maxHarmonyNumber)
         {
-            pianoKeys[index-36].GetComponent<Image>().color = yellow; //show harmony as yellow
+           // Debug.Log("harmony is " + GuidanceManager.GetComponent<GuidanceMgr>().harmony);
+            if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1 && GuidanceManager.GetComponent<GuidanceMgr>().harmony == true)
+            {
+                pianoKeys[index - 36].GetComponent<Image>().color = yellow; //show harmony as yellow
+            }
         }
-        else if((index - 36) == 39)
+        else if ((index - 36) == 39)
         {
             //  pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
             //actually just do nothing tbh so we good
             //change velocity
-            velocity = 20; 
+            velocity = 20;
         }
-        else pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        else if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1) {
+            pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        }
 
         swingcount++;
         if (swingcount % swingfrequency == 0) //change force of press every other press to simulate swing press
         {
-            velocity = 60;
+            velocity = 40;
         }
-        else velocity = 80;
+        else velocity = 60;
         if (swingcount == 5) swingcount = 0;
 
         foreach (var port in _ports)
@@ -247,9 +258,15 @@ sealed class RollMgr : MonoBehaviour
         //lighting of keys here - which are based on time 
         if ((index - 36) <= 23)
         {
-            pianoKeys[index - 36].GetComponent<Image>().color = yellow; //show harmony as yellow
+            
+            if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1 && GuidanceManager.GetComponent<GuidanceMgr>().harmony == true)
+            {
+                pianoKeys[index - 36].GetComponent<Image>().color = yellow; //show harmony as yellow
+            }
         }
-        else pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        else if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1) {
+            pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
+        }
 
         //a sound note on but only for the metronome
         if ((index - 36) == 39)
@@ -260,7 +277,7 @@ sealed class RollMgr : MonoBehaviour
             //pressing event but only for MIDI-file based metronome
             foreach (var port in _ports)
             {
-                port?.SendNoteOn(midiChannel, index, 20); //velocity is set to 20 so it is not annoying
+                port?.SendNoteOn(1, index, 35); //velocity is set to 20 so it is not annoying
             }//endforeach for ports midi out
         }//end for metronome
 
@@ -449,8 +466,12 @@ sealed class RollMgr : MonoBehaviour
             //and add into note collection
             noteInfo.Add(noteSet);
 
+            //now also get the highest note
+           
         }//end for midi passing only
 
+        maxHarmonyNumber = FindHighestNoteNumberInHarmonyTrack(midiFile) - 24; //consider offset
+       // Debug.Log("yellow keys are until " + (maxHarmonyNumber));
         numOfEvents = notes.Count;
         //   Debug.Log("There are " + numOfEvents + "midi out events");
     }// end generate MIDI Events
@@ -630,7 +651,9 @@ sealed class RollMgr : MonoBehaviour
 
             //set color to yellow or pink based on type
             noteObject.GetComponent<Image>().color = spawncolor; //pink for now SOLID it later
-            // or if we are calling this again, ddoing two spawns then yeah this can be made simpler 
+                                                                 // or if we are calling this again, ddoing two spawns then yeah this can be made simpler
+
+          
 
             //make colors darker if dark prefab
             if (isBlackPrefab)
@@ -643,8 +666,20 @@ sealed class RollMgr : MonoBehaviour
 
             }//endisBlackprefabcheck
 
+            //if condition 2 we overrule colors
+            if (ImprovManager.GetComponent<ImprovMgr>().noviz == 1)
+            {
+                NoVizColors();
+            }
+
+            //check if lesson 1, use maxHarmony number, else use 23
+            if (ImprovManager.GetComponent<ImprovMgr>().lessonValue!=1)
+            {
+                maxHarmonyNumber = 24; // if its not lesson 1 where is it an issue
+            }
+
             //check if harmony then set spawncolor to black
-            if (noteNumber<=23 || noteNumber==39) //below c4
+            if (noteNumber<(maxHarmonyNumber) || noteNumber==39) //below c4 used to be 23
             {
                 Image imageComponent = noteObject.GetComponent<Image>();
                 Color currentColor = imageComponent.color;
@@ -913,4 +948,53 @@ sealed class RollMgr : MonoBehaviour
     //    Instance.audioSource.Play(); 
     //    //Instance.MotifToPlay.Play();
     //}
+
+    //a new method to checking the harmony track and identifying the limit
+    // Function to find the highest note number in the harmony track of a MIDI file
+    int FindHighestNoteNumberInHarmonyTrack(MidiFile midiFile)
+    {
+        // Variable to store the lowest note number found in the melody track
+        int lowestMelodyNoteNumber = int.MaxValue;
+
+        // Iterate through each track chunk in the MIDI file
+        foreach (var trackChunk in midiFile.GetTrackChunks())
+        {
+            // Check if the track corresponds to the melody track (you can adjust this condition based on your MIDI file)
+            var isMelodyTrack = false;
+            foreach (var midiEvent in trackChunk.Events)
+            {
+                if (midiEvent is NoteOnEvent)
+                {
+                    isMelodyTrack = true;
+                    break;
+                }
+            }
+
+            if (isMelodyTrack)
+            {
+                // Iterate through the MIDI events in the track
+                foreach (var midiEvent in trackChunk.Events)
+                {
+                    // Check if the MIDI event is a NoteOn event
+                    if (midiEvent is NoteOnEvent noteOnEvent)
+                    {
+                        // Update the lowest note number if necessary
+                        lowestMelodyNoteNumber = Math.Min(lowestMelodyNoteNumber, noteOnEvent.NoteNumber);
+                    }
+                }
+            }
+        }
+
+        // Return the lowest note number found in the melody track
+        return lowestMelodyNoteNumber;
+    }//end returnhighest melody number
+
+    //a method for the noviz condition
+    public void NoVizColors()
+    {
+        Image imageComponent = noteObject.GetComponent<Image>();
+        Color currentColor = imageComponent.color;
+        currentColor.a = 0f;
+        noteObject.GetComponent<Image>().color = currentColor;
+    }
 }//end RollMgr

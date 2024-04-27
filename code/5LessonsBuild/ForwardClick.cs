@@ -53,8 +53,8 @@ public class ForwardClick : MonoBehaviour
             index++;
             //increase count
             ImprovManager.GetComponent<ImprovMgr>().display_lesson_ctr = index;
-            ImprovManager.GetComponent<ImprovMgr>().harmonyindex++;
-            Debug.Log("harmony to assign is " + ImprovManager.GetComponent<ImprovMgr>().harmonyindex);
+        //    ImprovManager.GetComponent<ImprovMgr>().harmonyindex++;
+       //     Debug.Log("harmony to assign is " + ImprovManager.GetComponent<ImprovMgr>().harmonyindex);
 
             //reload based on this new value
             ImprovManager.GetComponent<ImprovMgr>().LoadSequence(ImprovManager.GetComponent<ImprovMgr>().modeValue, ImprovManager.GetComponent<ImprovMgr>().lessonValue, ImprovManager.GetComponent<ImprovMgr>().guidanceValue, index);
