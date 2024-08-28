@@ -15,6 +15,8 @@ public class LessonMgr : MonoBehaviour
 
     //we need to declare the lessons here so we just pass them around
     public List<List<string>> lessonlist = new List<List<string>>();
+    public List<List<string>> harmonylist = new List<List<string>>();
+    public List<List<string>> sheetimglist = new List<List<string>>();
     public List<List<string>> sheetlist = new List<List<string>>();
 
     //some variables for tracking
@@ -70,6 +72,8 @@ public class LessonMgr : MonoBehaviour
 
         //print it to check
         SetLessons();
+        SetHarmonyFilenames();
+        SetSheetImages();
         SetSheetFilenames();
         //it works! commenting it now
         //PrintAllLessons(lessonlist);
@@ -330,6 +334,119 @@ public class LessonMgr : MonoBehaviour
                 lesson.Add($"L{i:D2}_{j:D2}_viz.abc");
             }
             sheetlist.Add(lesson);
+        }//end for loop
+
+    }//end SetLessons
+
+    ////when updating the files, just update these lessons. 
+    public void SetHarmonyFilenames()
+    {
+        //lesson 01 is more specific
+        List<string> lesson1 = new List<string>(){
+            "L01_01C_viz_H.mid",
+            "L01_02D_viz_H.mid",
+            "L01_03E_viz_H.mid",
+            "L01_04F_viz_H.mid",
+            "L01_05G_viz_H.mid",
+            "L01_06A_viz_H.mid",
+            "L01_07B_viz_H.mid"
+        };
+
+        harmonylist.Add(lesson1);
+
+        //so is lesson 02 
+        List<string> lesson2 = new List<string>(){
+            "L02_01UU_viz_H.mid",
+            "L02_02UUe_viz_H.mid",
+            "L02_03DD_viz_H.mid",
+            "L02_04DDe_viz_H.mid",
+            "L02_05UD_viz_H.mid",
+            "L02_06UDe_viz_H.mid",
+            "L02_07DU_viz_H.mid",
+            "L02_08DUe_viz_H.mid"
+        };
+
+        harmonylist.Add(lesson2);
+
+        //3 to 8 is more straightforward so we use that
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 3; i <= 6; i++)
+        {
+            List<string> harmony = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                harmony.Add($"L{i:D2}_{j:D2}_viz_H.mid");
+            }
+            harmonylist.Add(harmony);
+        }//end for loop
+
+        //7 to 8 are compose tasks so they begin with L
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 7; i <= 8; i++)
+        {
+            List<string> harmony = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                harmony.Add($"L{i:D2}_{j:D2}_viz_H.mid");
+            }
+            harmonylist.Add(harmony);
+        }//end for loop
+
+    }//end SetLessons
+
+    //createfilesheetnames
+    ////when updating the files, just update these lessons. 
+    public void SetSheetImages()
+    {
+        //lesson 01 is more specific
+        List<string> lesson1 = new List<string>(){
+            "L01_01C.png",
+            "L01_02D.png",
+            "L01_03E.png",
+            "L01_04F.png",
+            "L01_05G.png",
+            "L01_06A.png",
+            "L01_07B.png"
+        };
+
+        sheetimglist.Add(lesson1);
+
+        //so is lesson 02 
+        List<string> lesson2 = new List<string>(){
+            "L02_01UU.png",
+            "L02_02UUe.png",
+            "L02_03DD.png",
+            "L02_04DDe.png",
+            "L02_05UD.png",
+            "L02_06UDe.png",
+            "L02_07DU.png",
+            "L02_08DUe.png"
+        };
+
+        sheetimglist.Add(lesson2);
+
+        //3 to 8 is more straightforward so we use that
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 3; i <= 6; i++)
+        {
+            List<string> harmony = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                harmony.Add($"L{i:D2}_{j:D2}.png");
+            }
+            sheetimglist.Add(harmony);
+        }//end for loop
+
+        //7 to 8 are compose tasks so they begin with L
+        // Lessons 3 to 5 with 8 sublessons each 
+        for (int i = 7; i <= 8; i++)
+        {
+            List<string> harmony = new List<string>();
+            for (int j = 1; j <= 8; j++)
+            {
+                harmony.Add($"L{i:D2}_{j:D2}.png");
+            }
+            sheetimglist.Add(harmony);
         }//end for loop
 
     }//end SetLessons

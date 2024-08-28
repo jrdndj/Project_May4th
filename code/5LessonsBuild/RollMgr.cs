@@ -3,6 +3,7 @@
 using System; 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Melanchall.DryWetMidi.Core;
@@ -99,9 +100,11 @@ sealed class RollMgr : MonoBehaviour
 
     //==== midi related variables
     public static MidiFile midiFile; // MIDI file asset
+    public static MidiFile harmonyMidi; //MIDI file for harmony reference
     public float fallSpeed = 0.0f; // Adjust this to control the speed of falling - was 100
     public float pixelsPerBeat = 0.0f; // height of one beat in pixels - shouldnt this be 1? 
     public string Filename; // this should be manipulated by ImprovManager
+    public string HarmonyFilename; //filename for harmony
 
     public bool IsMotifPlaying = false;
     public bool isTouched = false;
@@ -124,7 +127,7 @@ sealed class RollMgr : MonoBehaviour
     public int ctr = 0;
 
     //this one captures the highest notenumber that belongs in harmony
-    public int maxHarmonyNumber = 0; 
+   // public int maxHarmonyNumber = 0; 
 
     //=========== COLOR RELATED VARIABLES ==========/
     //these are the color related objects
@@ -182,27 +185,33 @@ sealed class RollMgr : MonoBehaviour
     }//end MIDIMessenger
 
     //putting here a more reusable version 
-    System.Collections.IEnumerator playNote(int index, float Duration)
+    System.Collections.IEnumerator playNote(int index, float Duration, bool isHarmony)
     {
         //the sending of midi to different channel
         int midiChannel = (index == (index - 36)) ? 2 : 1;
 
 
 
-        if ((index - 36) < maxHarmonyNumber)
+        // if ((index - 36) < maxHarmonyNumber)
+        if (isHarmony && (index - 36) != 39)
         {
            // Debug.Log("harmony is " + GuidanceManager.GetComponent<GuidanceMgr>().harmony);
             if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1 && GuidanceManager.GetComponent<GuidanceMgr>().harmony == true)
             {
                 pianoKeys[index - 36].GetComponent<Image>().color = yellow; //show harmony as yellow
             }
+            isHarmony = false; 
         }
-        else if ((index - 36) == 39)
+        else if ((index - 36) == 39) //I think this is the metronome, iirc 
         {
-            //  pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
+            pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
             //actually just do nothing tbh so we good
             //change velocity
-            velocity = 20;
+            // velocity = 20;
+            //play metronome sound and now you dont want it to play so change velocity to 0
+            velocity = 0;
+
+            metronome.GetComponent<Metronome>().PlayClickSound();
         }
         else if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1) {
             pianoKeys[index - 36].GetComponent<Image>().color = improvpink;
@@ -218,7 +227,10 @@ sealed class RollMgr : MonoBehaviour
 
         foreach (var port in _ports)
         {
-            port?.SendNoteOn(midiChannel, index, velocity);
+            if ((index - 36) == 39) {
+
+            }
+            else port?.SendNoteOn(midiChannel, index, velocity);
         }//endforeach for ports midi out
 
         //next
@@ -230,7 +242,11 @@ sealed class RollMgr : MonoBehaviour
         pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
         foreach (var port in _ports)
         {
-            port?.SendNoteOff(midiChannel, index);
+            if ((index - 36) == 39)
+            {
+
+            }
+            else port?.SendNoteOff(midiChannel, index);
         }
         yield return new WaitForSeconds(Duration);
 
@@ -250,13 +266,13 @@ sealed class RollMgr : MonoBehaviour
     }
 
     //putting here a more reusable version 
-    System.Collections.IEnumerator playNoteTryYourself(int index, float Duration)
+    System.Collections.IEnumerator playNoteTryYourself(int index, float Duration, bool isHarmony)
     {
         //the sending of midi to different channel
         int midiChannel = (index == (index - 36)) ? 2 : 1;
 
         //lighting of keys here - which are based on time 
-        if ((index - 36) <= 23)
+        if (isHarmony && (index - 36) != 39)
         {
             
             if (ImprovManager.GetComponent<ImprovMgr>().noviz != 1 && GuidanceManager.GetComponent<GuidanceMgr>().harmony == true)
@@ -274,11 +290,18 @@ sealed class RollMgr : MonoBehaviour
             //make sure it doesnt light up
             pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
 
-            //pressing event but only for MIDI-file based metronome
-            foreach (var port in _ports)
-            {
-                port?.SendNoteOn(1, index, 35); //velocity is set to 20 so it is not annoying
-            }//endforeach for ports midi out
+            ////pressing event but only for MIDI-file based metronome
+            //foreach (var port in _ports)
+            //{
+            //    port?.SendNoteOn(1, index, 35); //velocity is set to 20 so it is not annoying
+            //}//endforeach for ports midi out
+            //  pianoKeys[index - 36].GetComponent<Image>().color = Color.black; //make metronome black
+            //actually just do nothing tbh so we good
+            //change velocity
+            // velocity = 20;
+            //play metronome sound and now you dont want it to play so change velocity to 0
+            velocity = 0;
+            metronome.GetComponent<Metronome>().PlayClickSound();
         }//end for metronome
 
         //next
@@ -297,12 +320,12 @@ sealed class RollMgr : MonoBehaviour
 
             //=== then key off - all keys are off anyway
          //   pianoKeys[index - 36].GetComponent<Image>().color = Color.black;
-
-            foreach (var port in _ports)
-            {
-                port?.SendNoteOff(midiChannel, index);
-            }
-            yield return new WaitForSeconds(Duration);
+         //do nothing tbh
+            //foreach (var port in _ports)
+            //{
+            //    port?.SendNoteOff(midiChannel, index);
+            //}
+            //yield return new WaitForSeconds(Duration);
 
 
         }//end for metronome
@@ -413,6 +436,7 @@ sealed class RollMgr : MonoBehaviour
     {
         //give songmaneger the filename to get file 
         midiFile = songManager.GetComponent<SongMgr>().ReadFromFile(Filename);
+        harmonyMidi = songManager.GetComponent<SongMgr>().ReadFromFile(HarmonyFilename);
 
     }//end InvokeSongManager
 
@@ -437,15 +461,21 @@ sealed class RollMgr : MonoBehaviour
 
         //routine getting of files
         var notes = midi.GetNotes();
+      //  var chords = midi.GetChords(); 
         var tempoMap = midi.GetTempoMap();
 
         //consolate all three then load into noteInfo
         var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
 
+     
+        //test something here
+
+
         //this is the one for data passing
         foreach (Melanchall.DryWetMidi.Interaction.Note note in notes)
         {
 
+         
             // float noteTime = (float) note.TimeAs<MetricTimeSpan>(tempoMap);
             float noteTime = ((float)note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 100000000.0f);
             //Debug.Log("noteTime " + note.ToString() + "time : " + noteTime);
@@ -470,7 +500,7 @@ sealed class RollMgr : MonoBehaviour
            
         }//end for midi passing only
 
-        maxHarmonyNumber = FindHighestNoteNumberInHarmonyTrack(midiFile) - 24; //consider offset
+       // maxHarmonyNumber = FindHighestNoteNumberInHarmonyTrack(midiFile) - 24; //consider offset
        // Debug.Log("yellow keys are until " + (maxHarmonyNumber));
         numOfEvents = notes.Count;
         //   Debug.Log("There are " + numOfEvents + "midi out events");
@@ -492,13 +522,17 @@ sealed class RollMgr : MonoBehaviour
         // midi related configs
         // MidiFile midi = MidiFile.Read(Filename); // Read the MIDI file from ImprovMgr
         MidiFile midi = midiFile;
+        MidiFile harmony_source_midi = harmonyMidi;
         //   Debug.Log("Successfully read " + Filename);
 
         //routine getting of files
 
         var notes = midi.GetNotes(); // note that this info must be sent to MIDIMessageReceiver
-
+       // var chords = midi.GetChords();
         var tempoMap = midi.GetTempoMap();
+        // var notes2 = harmony_source_midi.GetNotes();
+        bool isHarmony = false;
+
 
         //consolate all three then load into noteInfo
         var noteCollection = new List<(float Time, float Duration, int NoteNumber)>();
@@ -514,8 +548,8 @@ sealed class RollMgr : MonoBehaviour
             //var noteTime = note.TimeAs<MusicalTimeSpan>(tempoMap);
             //var noteTime = TimeConverter.ConvertTo<BarBeatFractionTimeSpan>(ticks, tempoMap); //now notetime is barbeatfractiontimespan
             var noteTime = note.TimeAs<MetricTimeSpan>(tempoMap);
-           // Debug.Log("noteTime is  " + note.ToString() + " time : " + noteTime);
-
+            // Debug.Log("noteTime is  " + note.ToString() + " time : " + noteTime);
+            // Debug.Log(note.NoteName + note.GetType());
             ////additional stuff
             //MetricTimeSpan metricLength = LengthConverter.ConvertTo<MetricTimeSpan>
             //                  (ticks, tempoMap);
@@ -523,7 +557,7 @@ sealed class RollMgr : MonoBehaviour
             //var noteDuration = note.LengthAs<MusicalTimeSpan>(tempoMap);
             //   var noteDuration = note.LengthAs<BarBeatFractionTimeSpan>(tempoMap);
             var noteDuration = note.LengthAs<MetricTimeSpan>(tempoMap);
-           // Debug.Log("noteDuration " + note.ToString() + " duration : " + noteDuration);
+            // Debug.Log("noteDuration " + note.ToString() + " duration : " + noteDuration);
 
             //check the correct number in the piano key array - OK correct 
             int noteNumber = note.NoteNumber - 36; //added offset
@@ -582,7 +616,7 @@ sealed class RollMgr : MonoBehaviour
                                                                                              //1000000.0f                              //should be somewhere between 1000000 and 2400000
                                                                                              // float yPosition = ((float)noteTime.TotalMicroseconds / 2400000.0f) * pixelsPerBeat; //latest working
 
-         //   Debug.Log("yposition " + yPosition);
+            //   Debug.Log("yposition " + yPosition);
             ////=== i still need this but only for harmony or type 1
             ////store here the first y position
             //if (spawnCount == 1)
@@ -607,15 +641,15 @@ sealed class RollMgr : MonoBehaviour
                                                                                 //  float noteHeight = (float)noteDuration.TotalMicroseconds / 240000 ;  //test mode //change 10 to 24 if ever
             if (isBlackPrefab)
             {
-               // Debug.Log("sample noteheight is " + noteHeight);
+                // Debug.Log("sample noteheight is " + noteHeight);
             }
             // float objectHeight = GetComponent<Renderer>().bounds.size.y;
             float objectHeight = noteObject.GetComponent<RectTransform>().rect.height * 2; //latest working
 
 
 
-           // readjust the height f some notes that are too long a
-           //should be scale 
+            // readjust the height f some notes that are too long a
+            //should be scale 
             if (noteHeight >= 3) //formely 4
             {
                 noteHeight = (noteHeight / 2) + 0.1f;
@@ -653,8 +687,6 @@ sealed class RollMgr : MonoBehaviour
             noteObject.GetComponent<Image>().color = spawncolor; //pink for now SOLID it later
                                                                  // or if we are calling this again, ddoing two spawns then yeah this can be made simpler
 
-          
-
             //make colors darker if dark prefab
             if (isBlackPrefab)
             {
@@ -672,20 +704,74 @@ sealed class RollMgr : MonoBehaviour
                 NoVizColors();
             }
 
-            //check if lesson 1, use maxHarmony number, else use 23
-            if (ImprovManager.GetComponent<ImprovMgr>().lessonValue!=1)
-            {
-                maxHarmonyNumber = 24; // if its not lesson 1 where is it an issue
-            }
+            //we dont need this cos all harmony checks are dynamic and applies for all lessons
+            ////check if lesson 1, use maxHarmony number, else use 23
+            //if (ImprovManager.GetComponent<ImprovMgr>().lessonValue != 1)
+            //{
+            //    maxHarmonyNumber = 24; // if its not lesson 1 where is it nan issue
+            //}
 
             //check if harmony then set spawncolor to black
-            if (noteNumber<(maxHarmonyNumber) || noteNumber==39) //below c4 used to be 23
+            //==NEW
+            //if (IsNoteFromFClef(note) || noteNumber == 39) 
+            //{
+            //    Image imageComponent = noteObject.GetComponent<Image>();
+            //    Color currentColor = imageComponent.color;
+            //    currentColor.a = 0f;
+            //    noteObject.GetComponent<Image>().color = currentColor;
+            //}
+
+            if (noteNumber == 39)
             {
                 Image imageComponent = noteObject.GetComponent<Image>();
                 Color currentColor = imageComponent.color;
                 currentColor.a = 0f;
                 noteObject.GetComponent<Image>().color = currentColor;
             }
+
+
+            //===temp
+            //check with file 2
+            //foreach (Melanchall.DryWetMidi.Interaction.Note harmonynote in notes2)
+            //{
+            //    // Check if the chord contains the note
+            //    // if (chord.Notes.Count() >= 2 && chord.Notes.Any(chordNote => chordNote.NoteName == note.NoteName))
+            //    //if (chord.Notes.Count >= 3 && chord.Notes.Any(chordNote => chordNote.NoteName == note.NoteName))
+            //    if (notes2.Any(chordNote => harmonynote.NoteNumber == note.NoteNumber))
+            //    {
+            //        //then change color to black
+            //        Image imageComponent = noteObject.GetComponent<Image>();
+            //        Color currentColor = imageComponent.color;
+            //        currentColor.a = 0f;
+            //        noteObject.GetComponent<Image>().color = currentColor;
+            //    }
+
+            //}
+
+            if (CheckIfHarmony(note, harmony_source_midi) || noteNumber == 39) //if harmony and metronome
+            {
+                isHarmony = true;
+                //then change color to black
+                Image imageComponent = noteObject.GetComponent<Image>();
+                Color currentColor = imageComponent.color;
+                currentColor.a = 0f;
+                noteObject.GetComponent<Image>().color = currentColor;
+            }
+            else
+            {
+                isHarmony = false;
+            }
+
+            //=== test
+
+            //== OLD
+            //if (noteNumber<(maxHarmonyNumber) || noteNumber==39) //below c4 used to be 23
+            //{
+            //    Image imageComponent = noteObject.GetComponent<Image>();
+            //    Color currentColor = imageComponent.color;
+            //    currentColor.a = 0f;
+            //    noteObject.GetComponent<Image>().color = currentColor;
+            //}
 
             //now do some computation for the falling
 
@@ -696,7 +782,7 @@ sealed class RollMgr : MonoBehaviour
 
             // Start the coroutine to make the note fall at a constant speed
             //  StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject.transform, noteObject.transform.position.y, destroyY - (objectHeight)));
-            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight), userMode));
+            StartCoroutine(FallAtEndOfDuration(noteNumber, noteObject, noteObject.transform.position.y, destroyY - (objectHeight), userMode, isHarmony));
 
             //it should end on the half
 
@@ -785,7 +871,7 @@ sealed class RollMgr : MonoBehaviour
 
     //lerp related falling
     //private IEnumerator FallAtEndOfDuration(int noteNumber, Transform noteTransform, float initialY, float destroyY)
-    private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY, int userMode)
+    private IEnumerator FallAtEndOfDuration(int noteNumber, GameObject rollingObject, float initialY, float destroyY, int userMode, bool isHarmony)
     {
         float triggerline = green_line.GetComponent<RectTransform>().position.y;
         float elapsedTime = 0;
@@ -863,7 +949,8 @@ sealed class RollMgr : MonoBehaviour
                     if (!IsMotifPlaying && userMode == 1 && ctr <= noteInfo.Count) //if waL play tunes 
                     {
 
-                        StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
+                        StartCoroutine(playNote(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration, isHarmony));
+                        isHarmony = false; 
                         //  DestroyObject(rollingObject);
 
                         //have the coroutine here
@@ -876,7 +963,8 @@ sealed class RollMgr : MonoBehaviour
                     }//end is motifyplaying
                     else if (!IsMotifPlaying && (userMode == 3) || ImprovManager.GetComponent<ImprovMgr>().CanReload)//its just try yourself mode
                     {
-                        StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration));
+                        StartCoroutine(playNoteTryYourself(noteInfo[ctr].NoteNumber, noteInfo[ctr].Duration, isHarmony));
+                        isHarmony = false;
                         // DestroyObject(rollingObject);
                         //have the coroutine here
                         //   StartCoroutine(MIDIMessengerTryYourself(noteInfo));
@@ -997,4 +1085,88 @@ sealed class RollMgr : MonoBehaviour
         currentColor.a = 0f;
         noteObject.GetComponent<Image>().color = currentColor;
     }
+
+    //a method to loosely check if trebleclef or not
+    static bool IsTrebleClefNote(Melanchall.DryWetMidi.Interaction.Note note)
+    {
+        // Middle C (MIDI note number 60) and above are typically considered Treble Clef
+        int middleC = 60;
+
+        // If the note number is 60 or higher, consider it as Treble Clef
+        return note.NoteNumber >= middleC;
+    }//end istrebleclef
+    //note: consider adding offset
+
+    ///method to check whether a note is in chord
+    static bool IsNoteInChord(Melanchall.DryWetMidi.Interaction.Note note)
+    {
+        var chords = midiFile.GetChords();
+        foreach (Melanchall.DryWetMidi.Interaction.Chord chord in chords)
+        {
+            // Check if the chord contains the note
+            // if (chord.Notes.Count() >= 2 && chord.Notes.Any(chordNote => chordNote.NoteName == note.NoteName))
+            //if (chord.Notes.Count >= 3 && chord.Notes.Any(chordNote => chordNote.NoteName == note.NoteName))
+           if(chord.Notes.Count >= 2 && chord.Notes.Any(chordNote => chordNote.NoteNumber == note.NoteNumber))
+            {
+                Debug.Log("note " + note + " belongs to Chord " + chord.GetMusicTheoryChord());
+                return true;
+            }
+           // else Debug.Log("note " + note.NoteName + " does not belong to Chord " + chord.Notes);
+        }
+        
+        return false;
+    }//end
+
+    //some fclef checker
+    static bool IsNoteFromFClef(Melanchall.DryWetMidi.Interaction.Note note)
+    {
+        // Define the pitch ranges for the clefs
+        const int trebleClefMaxNote = 103-36; // G6
+        const int trebleClefMinNote = 40-36;  // E2
+
+        const int bassClefMaxNote = 67; // G4
+        const int bassClefMinNote = 28; // E1
+
+        int noteNumber = note.NoteNumber;
+
+        // Determine if the note is within the range typically associated with the F-clef
+        if (noteNumber >= bassClefMinNote && noteNumber <= bassClefMaxNote)
+        {
+            return true; // Note is likely from the F-clef (Bass Clef)
+        }
+        else if (noteNumber >= trebleClefMinNote && noteNumber <= trebleClefMaxNote)
+        {
+            return false; // Note is likely from the G-clef (Treble Clef)
+        }
+        else
+        {
+            // Notes outside both ranges are ambiguous
+            // You may choose to return false or add further logic as needed
+            return false;
+        }
+    }//end method
+
+    //we have here a method that compares the current note information against
+    //the harmonic information in another midi file
+    static bool CheckIfHarmony(Melanchall.DryWetMidi.Interaction.Note notes_to_check, MidiFile harmony_source)
+    {
+        Debug.Log("Harmony source to use is " + harmony_source.ToString());
+        // Get notes from the second MIDI file
+        var harmony_notes = harmony_source.GetNotes();
+
+        // Check if the note exists in midiFile2 with the same start time
+        foreach (var note in harmony_notes)
+        {
+            if (note.NoteNumber == notes_to_check.NoteNumber &&
+                note.Time == notes_to_check.Time) // Compare note numbers and start times
+            {
+                return true; // Found a match
+            }
+        }
+
+        // No matching note found
+        return false;
+    }//endcheck ifHarmony
+
+
 }//end RollMgr

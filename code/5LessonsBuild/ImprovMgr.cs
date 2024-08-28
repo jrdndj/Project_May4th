@@ -276,7 +276,7 @@ public class ImprovMgr : MonoBehaviour
         RollManager.GetComponent<RollMgr>().pixelsPerBeat = 24; //formerly 24
 
         //initialize harmony index here and then play around 
-        harmonyindex = (lessonValue - 1) * 8;
+       // harmonyindex = (lessonValue - 1) * 8;
         LoadSequence(modeValue, lessonValue, guidanceValue, 0); //should always be zero
 
     }//end ManageSequence
@@ -303,14 +303,34 @@ public class ImprovMgr : MonoBehaviour
 
     }//end AssignSequence
 
+    //assign sequence for viz filenames on load
+    public List<string> AssignHarmonies(int modeValue, int lessonValue, int guidanceValue, int count)
+    {
+        //some local variables to streamline data transfer
+        List<string> harmonyfiles = new List<string>(8);
+        int vizindex = count;
+
+        //the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
+        //dynamically assign the lessons from LessonMgr - this is the viz and the set of 
+        if (LessonManager.GetComponent<LessonMgr>().harmonylist.Count > 0)
+        {
+            List<string> lessonSublessons = LessonManager.GetComponent<LessonMgr>().harmonylist[lessonValue - 1]; // -1 index 
+            for (int i = 0; i < 8 && i < lessonSublessons.Count; i++)
+            {
+                harmonyfiles.Add(lessonSublessons[i]); // Add first 8 sublessons to eightElementList
+            }
+        }//end transfer
+
+        return harmonyfiles;
+
+    }//end AssignSequence
+
     //assign filenames for music sheets on load
     public List<string> AssignSheetFileNames(int modeValue, int lessonValue, int guidanceValue, int count)
     {
         //some local variables to streamline data transfer
         List<string> sheetfilenames = new List<string>(8);
         // int sheetindex = count;
-
-     
 
         //the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
         //dynamically assign the lessons from LessonMgr - this is the viz and the set of 
@@ -338,7 +358,7 @@ public class ImprovMgr : MonoBehaviour
         if (modeValue == 4)
         {
             //increment all harmonuy indeces by 8
-            harmonyindex += 8; 
+           // harmonyindex += 8; 
             //still load it as if it is 1 and just manage the repetitions 
             modeValue = 1;
             display_text.text = "Improvise during the gaps!";
@@ -356,6 +376,7 @@ public class ImprovMgr : MonoBehaviour
         //load compose-specific lessons first before changing the operation thru the modevalue 
         //assign filenames that we will pass
         List<string> vizfilenames = AssignSequence(modeValue, lessonValue, guidanceValue, count);
+        List<string> harmonyfilenames = AssignHarmonies(modeValue, lessonValue, guidanceValue, count);
         List<string> sheetfilenames = AssignSheetFileNames(modeValue, lessonValue, guidanceValue, count);
         vizindex = count;
         string lesson_title;
@@ -435,6 +456,7 @@ public class ImprovMgr : MonoBehaviour
         {
 
             RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+            RollManager.GetComponent<RollMgr>().HarmonyFilename = harmonyfilenames[vizindex];
             RollManager.GetComponent<RollMgr>().InvokeSongManager();
             RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
             spawntype = 2;
@@ -472,6 +494,7 @@ public class ImprovMgr : MonoBehaviour
         {
             //code is the same just that in Rollmanager it stops the midi events 
             RollManager.GetComponent<RollMgr>().Filename = vizfilenames[vizindex];
+            RollManager.GetComponent<RollMgr>().HarmonyFilename = harmonyfilenames[vizindex];
             RollManager.GetComponent<RollMgr>().InvokeSongManager();
             RollManager.GetComponent<RollMgr>().GenerateMIDIEvents(vizfilenames[vizindex]);
             spawntype = 2;
@@ -480,7 +503,7 @@ public class ImprovMgr : MonoBehaviour
             //if harmony is enabled then no need to play metronome
             if ((guidanceValue == 4 || guidanceValue == 12))
             {
-                AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
+               // AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
             }//end checkharmony
             else
             {
@@ -509,7 +532,7 @@ public class ImprovMgr : MonoBehaviour
               //  Metronome.GetComponent<Metronome>().FourBeatStart();
               //  Metronome.GetComponent<Metronome>().StartMetronome();
                 //PlayHarmony();
-                Invoke("PlayHarmony", 2.0f);
+             //   Invoke("PlayHarmony", 2.0f);
                 //AudioManager.GetComponent<AudioManager>().HarmonySelection(lessonValue);
             }//end checkharmony
 

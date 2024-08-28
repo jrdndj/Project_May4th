@@ -30,9 +30,9 @@ public class Metronome : MonoBehaviour
         CancelInvoke(nameof(PlayClickSound)); // Stop generating click sounds
     }//end stop metronome
 
-    void PlayClickSound()
+    public void PlayClickSound()
     {
-        audioSource.PlayOneShot(clickSound); // Play the assigned click sound
+        audioSource.PlayOneShot(clickSound, 0.05f); // Play the assigned click sound
     }//end void playclicksound
 
     public void FourBeatStart()
