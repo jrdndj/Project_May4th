@@ -1150,7 +1150,7 @@ sealed class RollMgr : MonoBehaviour
     //the harmonic information in another midi file
     static bool CheckIfHarmony(Melanchall.DryWetMidi.Interaction.Note notes_to_check, MidiFile harmony_source)
     {
-        Debug.Log("Harmony source to use is " + harmony_source.ToString());
+       // Debug.Log("Harmony source to use is " + harmony_source.ToString());
         // Get notes from the second MIDI file
         var harmony_notes = harmony_source.GetNotes();
 

@@ -3,14 +3,18 @@ repository for Piano 2.0 MVP v1
 
 <img src="eva-title.png">
 
+## wishlist features as of 29.04.2024
+- [ ] dynamic volume
+- [ ] looping of compose mode
+- [ ] bar cursor
+- [ ] metronome before any play
+
 ## latest features as of 28.04.2024
 
 - [x] harmony colorization
 - [x] improved harmony checking
 - [x] improved metronome
-- [ ] updated music sheets
-
-
+- [x] updated music sheets
 
 ## as of 27.04.2024 synchronization issues addressed
 

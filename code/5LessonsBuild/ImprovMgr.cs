@@ -23,7 +23,7 @@ using UnityEngine.UI; //added for colors
 public class ImprovMgr : MonoBehaviour
 {
     //== declare Improv to be static so other classes can access it withouts
-    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager, Metronome, MusicSheetMgr, VizMgr;
+    [SerializeField] GameObject RollManager, GuidanceManager, LessonManager, ModeManager, Metronome, MusicSheetMgr, VizMgr, ImageMgr;
 
 
     public static ImprovMgr Instance;
@@ -346,6 +346,27 @@ public class ImprovMgr : MonoBehaviour
         return sheetfilenames;
     }//end AssignSequence
 
+    //assign filenames for music sheets images on load
+    public List<string> AssignSheetImageFileNames(int modeValue, int lessonValue, int guidanceValue, int count)
+    {
+        //some local variables to streamline data transfer
+        List<string> sheetimgfilenames = new List<string>(8);
+        // int sheetindex = count;
+
+        //the filename is in LessonManager.GetComponent<LessonMgr>().lessonlist[lessonValue][lessonValue];
+        //dynamically assign the lessons from LessonMgr - this is the viz and the set of 
+        if (LessonManager.GetComponent<LessonMgr>().sheetimglist.Count > 0)
+        {
+            List<string> sheetSublessons = LessonManager.GetComponent<LessonMgr>().sheetimglist[lessonValue - 1]; // -1 index 
+            for (int i = 0; i < 8 && i < sheetSublessons.Count; i++)
+            {
+                sheetimgfilenames.Add(sheetSublessons[i]); // Add first 8 sublessons to eightElementList
+            }
+        }//end transfer
+
+        return sheetimgfilenames;
+    }//end AssignSequence
+
     public void LoadSequence(int modeValue, int lessonValue, int guidanceValue, int count)
     {
         //Debug.Log("lesson Value here is " + lessonValue );
@@ -378,6 +399,7 @@ public class ImprovMgr : MonoBehaviour
         List<string> vizfilenames = AssignSequence(modeValue, lessonValue, guidanceValue, count);
         List<string> harmonyfilenames = AssignHarmonies(modeValue, lessonValue, guidanceValue, count);
         List<string> sheetfilenames = AssignSheetFileNames(modeValue, lessonValue, guidanceValue, count);
+        List<string> sheetimagenames = AssignSheetImageFileNames(modeValue, lessonValue, guidanceValue, count);
         vizindex = count;
         string lesson_title;
 
@@ -416,6 +438,10 @@ public class ImprovMgr : MonoBehaviour
         //now show the sheetfilename - by calling MusicSheetManager to update notation handler
         MusicSheetMgr.GetComponent<MusicSheetManager>().SetSheetFilename(sheetfilenames[vizindex]); //no minus 1 here
                                                                                                     // Debug.Log("sheet index loaded is " + vizindex);
+
+        //this is where we update the image
+        ImageMgr.GetComponent<SheetImageLoader>().LoadSheetImage(sheetimagenames[vizindex]);
+        //Debug.Log("The following image should be loaded " + sheetimagenames[vizindex]);
 
         //update display lesson regardless of mode comes in two parts
         //part 1 set lesson title
@@ -524,7 +550,7 @@ public class ImprovMgr : MonoBehaviour
             if (GuidanceManager.GetComponent<GuidanceMgr>().rhythm == true )
             {
                 //Metronome.GetComponent<Metronome>().FourBeatStart();
-                PlayRhythm();
+              //  PlayRhythm();
             }
             else if (GuidanceManager.GetComponent<GuidanceMgr>().harmony == true ) {
                 // Metronome.GetComponent<Metronome>().FourBeatStart();
@@ -552,7 +578,7 @@ public class ImprovMgr : MonoBehaviour
             //}
             else
             {
-             // Metronome.GetComponent<Metronome>().StartMetronome();
+             Metronome.GetComponent<Metronome>().StartMetronome();
 
             }//end else
              // RollManager.GetComponent<RollMgr>().audioSource.Play();
@@ -1310,6 +1336,9 @@ public class ImprovMgr : MonoBehaviour
         //remove sheets
         MusicSheetMgr.GetComponent<MusicSheetManager>().ClearSheets();
 
+        //clear images too
+        ImageMgr.GetComponent<SheetImageLoader>().ClearImage();
+
         //stop metronome
         Metronome.GetComponent<Metronome>().StopMetronome();
 
@@ -1385,6 +1414,9 @@ public class ImprovMgr : MonoBehaviour
         //remove sheets
         MusicSheetMgr.GetComponent<MusicSheetManager>().ClearSheets();
 
+        //clear images too
+        ImageMgr.GetComponent<SheetImageLoader>().ClearImage();
+
         //stop metronome
         Metronome.GetComponent<Metronome>().StopMetronome();
 
@@ -1429,8 +1461,11 @@ public class ImprovMgr : MonoBehaviour
         //remove sheets
         MusicSheetMgr.GetComponent<MusicSheetManager>().ClearSheets();
 
+        //clear images too
+        ImageMgr.GetComponent<SheetImageLoader>().ClearImage();
+
         //stop metronome
-       // Metronome.GetComponent<Metronome>().StopMetronome();
+        // Metronome.GetComponent<Metronome>().StopMetronome();
 
         //refresh metronome variables
         Metronome.GetComponent<Metronome>().metronomestarted = false;
@@ -1453,7 +1488,7 @@ public class ImprovMgr : MonoBehaviour
     //some method to delay calling of harmony
     public void PlayHarmony()
     {
-        Debug.Log("Harmony index to be played is " + harmonyindex);
+        //Debug.Log("Harmony index to be played is " + harmonyindex);
         AudioManager.GetComponent<AudioManager>().HarmonySelection(harmonyindex);
     }
 

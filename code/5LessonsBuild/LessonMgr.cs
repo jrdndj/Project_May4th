@@ -400,27 +400,27 @@ public class LessonMgr : MonoBehaviour
     {
         //lesson 01 is more specific
         List<string> lesson1 = new List<string>(){
-            "L01_01C.png",
-            "L01_02D.png",
-            "L01_03E.png",
-            "L01_04F.png",
-            "L01_05G.png",
-            "L01_06A.png",
-            "L01_07B.png"
+            "L01_01C",
+            "L01_02D",
+            "L01_03E",
+            "L01_04F",
+            "L01_05G",
+            "L01_06A",
+            "L01_07B"
         };
 
         sheetimglist.Add(lesson1);
 
         //so is lesson 02 
         List<string> lesson2 = new List<string>(){
-            "L02_01UU.png",
-            "L02_02UUe.png",
-            "L02_03DD.png",
-            "L02_04DDe.png",
-            "L02_05UD.png",
-            "L02_06UDe.png",
-            "L02_07DU.png",
-            "L02_08DUe.png"
+            "L02_01UU",
+            "L02_02UUe",
+            "L02_03DD",
+            "L02_04DDe",
+            "L02_05UD",
+            "L02_06UDe",
+            "L02_07DU",
+            "L02_08DUe"
         };
 
         sheetimglist.Add(lesson2);
@@ -432,7 +432,7 @@ public class LessonMgr : MonoBehaviour
             List<string> harmony = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
-                harmony.Add($"L{i:D2}_{j:D2}.png");
+                harmony.Add($"L{i:D2}_{j:D2}");
             }
             sheetimglist.Add(harmony);
         }//end for loop
@@ -444,7 +444,7 @@ public class LessonMgr : MonoBehaviour
             List<string> harmony = new List<string>();
             for (int j = 1; j <= 8; j++)
             {
-                harmony.Add($"L{i:D2}_{j:D2}.png");
+                harmony.Add($"L{i:D2}_{j:D2}");
             }
             sheetimglist.Add(harmony);
         }//end for loop
