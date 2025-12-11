@@ -4,10 +4,12 @@ repository for Piano 2.0 MVP v1
 <img src="eva-title.png">
 
 ## wishlist features as of 29.04.2024
-- [ ] dynamic volume
-- [ ] looping of compose mode
-- [ ] bar cursor
-- [ ] metronome before any play
+
+These wishlist features have been applied in the spinoff version of ImproVisAR, SoulAR. Refer to this [repo](https://github.com/jrdndj/SoulAR). 
+- [x] dynamic volume
+- [x] looping of compose mode
+- [x] bar cursor
+- [x] metronome before any play
 
 ## latest features as of 28.04.2024
 
@@ -117,10 +119,10 @@ More information about dependencies and relationships will be revealed soon as w
 - [x] implement VizMgr and toggle 
 - [x] demo to bosses
 - [x] Study 1 with Improv Teachers
-- [ ] Develop Post-Study Version - ONGOING 
-- [ ] Study 2 with Improv Students - per lesson
-- [ ] Study 3 on Spatiotemporal Data collection
-- [ ] Graduate
+- [x] Develop Post-Study Version
+- [x] Study 2 with Improv Students - per lesson
+~- [ ] Study 3 on Spatiotemporal Data collection~
+- [ NEXT ] Graduate
  
 ### MVP version ready by ~22 Aug~ ~I DONT EVEN KNOW ANYMORE~ AY WE HERE BRUH 
 
@@ -216,7 +218,7 @@ target completion of MVP 12/08/2022  ~~13/11/2021~~
 
 ##### integration targets
 - [x] setup external speakers to play synthesized sound
-- [ ] run pilot user study 
+- [x] run pilot user study 
 - [x] measure projection board hind legs
 - [z] acquire materials for projection board hind legs 
 
